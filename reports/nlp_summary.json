@@ -1,0 +1,141 @@
+{
+  "sentiment": {
+    "best_C": 2.0,
+    "metrics": [
+      {
+        "model": "VADER (lexicon baseline)",
+        "macro_recall": 0.5696140027344412,
+        "macro_f1": 0.5280862909879547,
+        "accuracy": 0.5292250081406707,
+        "f1_negative": 0.5815231614760534,
+        "f1_positive": 0.47369155617585484
+      },
+      {
+        "model": "TF-IDF + LogReg (ours)",
+        "macro_recall": 0.6284391460416529,
+        "macro_f1": 0.6169428532869717,
+        "accuracy": 0.6195050472158906,
+        "f1_negative": 0.6267889908256881,
+        "f1_positive": 0.6017147310989868
+      }
+    ]
+  },
+  "topics": [
+    {
+      "topic_id": 0,
+      "label": "good / love / happy",
+      "n_posts": 19434,
+      "share_negative_pred": 0.19990737882062365
+    },
+    {
+      "topic_id": 1,
+      "label": "friday / black / kendrick",
+      "n_posts": 3282,
+      "share_negative_pred": 0.15173674588665448
+    },
+    {
+      "topic_id": 2,
+      "label": "time / watching / watch",
+      "n_posts": 2680,
+      "share_negative_pred": 0.17686567164179104
+    },
+    {
+      "topic_id": 3,
+      "label": "game / sox / vs",
+      "n_posts": 3477,
+      "share_negative_pred": 0.1253954558527466
+    },
+    {
+      "topic_id": 4,
+      "label": "sunday / ice / national",
+      "n_posts": 3386,
+      "share_negative_pred": 0.15239220318960425
+    },
+    {
+      "topic_id": 5,
+      "label": "saturday / live / come",
+      "n_posts": 3265,
+      "share_negative_pred": 0.11607963246554365
+    },
+    {
+      "topic_id": 6,
+      "label": "trump / donald / melania",
+      "n_posts": 8880,
+      "share_negative_pred": 0.4331081081081081
+    },
+    {
+      "topic_id": 7,
+      "label": "new / album / york",
+      "n_posts": 6659,
+      "share_negative_pred": 0.12163988586874906
+    },
+    {
+      "topic_id": 8,
+      "label": "monday / raw / frank",
+      "n_posts": 3657,
+      "share_negative_pred": 0.15258408531583265
+    },
+    {
+      "topic_id": 9,
+      "label": "want / know / really",
+      "n_posts": 5179,
+      "share_negative_pred": 0.25854412048658043
+    }
+  ],
+  "exposure": [
+    {
+      "arm": "control",
+      "topic_entropy": 0.8800514697213407,
+      "top_topic_share": 0.2459888888888889,
+      "distinct_topics": 9.708333333333334,
+      "negative_share": 0.18941777777777777,
+      "expected_engagements": 17.747422758834382,
+      "topic_entropy_rel_change": NaN,
+      "topic_entropy_p": NaN,
+      "top_topic_share_rel_change": NaN,
+      "top_topic_share_p": NaN,
+      "distinct_topics_rel_change": NaN,
+      "distinct_topics_p": NaN,
+      "negative_share_rel_change": NaN,
+      "negative_share_p": NaN,
+      "expected_engagements_rel_change": NaN,
+      "expected_engagements_p": NaN
+    },
+    {
+      "arm": "ai_feed",
+      "topic_entropy": 0.5011513343801859,
+      "top_topic_share": 0.5666711111111111,
+      "distinct_topics": 6.392,
+      "negative_share": 0.36705111111111105,
+      "expected_engagements": 27.789050552089513,
+      "topic_entropy_rel_change": -0.4305431538693182,
+      "topic_entropy_p": 0.0,
+      "top_topic_share_rel_change": 1.3036451510908353,
+      "top_topic_share_p": 0.0,
+      "distinct_topics_rel_change": -0.34159656652360515,
+      "distinct_topics_p": 0.0,
+      "negative_share_rel_change": 0.9377859640066635,
+      "negative_share_p": 0.0,
+      "expected_engagements_rel_change": 0.5658076628763784,
+      "expected_engagements_p": 0.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "topic_entropy": 0.6668996031791031,
+      "top_topic_share": 0.42841333333333326,
+      "distinct_topics": 8.052333333333333,
+      "negative_share": 0.24630444444444446,
+      "expected_engagements": 23.280278938650007,
+      "topic_entropy_rel_change": -0.24220386406459837,
+      "topic_entropy_p": 0.0,
+      "top_topic_share_rel_change": 0.7415962780613394,
+      "top_topic_share_p": 0.0,
+      "distinct_topics_rel_change": -0.17057510729613734,
+      "distinct_topics_p": 0.0,
+      "negative_share_rel_change": 0.3003237992444685,
+      "negative_share_p": 0.0,
+      "expected_engagements_rel_change": 0.3117554731749126,
+      "expected_engagements_p": 1.0953305574254719e-221
+    }
+  ]
+}

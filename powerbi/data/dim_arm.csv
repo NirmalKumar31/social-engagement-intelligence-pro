@@ -1,0 +1,4 @@
+arm,arm_label,is_treatment,sort_order,color_hex
+control,Control (ranked-chronological),0,1,#2a78d6
+ai_feed,AI 'For You' feed,1,2,#eb6834
+ai_feed_social,AI feed + friend boost,1,3,#1baf7a

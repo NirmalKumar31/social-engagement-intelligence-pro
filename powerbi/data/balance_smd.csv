@@ -1,0 +1,31 @@
+arm,covariate,smd,balanced
+ai_feed,pre_minutes_per_day,-0.0038612529877183,True
+ai_feed,pre_active_days_per_day,-0.0007026525419999,True
+ai_feed,pre_sessions_per_day,-0.0030796716427301,True
+ai_feed,pre_friend_interactions_per_day,-0.0112925337952021,True
+ai_feed,pre_ad_revenue_per_day,-0.0031199145912325,True
+ai_feed,tenure_days,-0.0003107102050513,True
+ai_feed,friend_count,0.0046200589158583,True
+ai_feed,is_new_user,-0.0006704399022727,True
+ai_feed,age_group=18-24,-0.000606907762859,True
+ai_feed,age_group=55+,-0.0054433804431809,True
+ai_feed,device=iOS,0.0038138084149433,True
+ai_feed,device=Android,0.0048457768901636,True
+ai_feed,account_type=creator,0.0062312603631257,True
+ai_feed,region=India,-0.0063871560002419,True
+ai_feed,region=North America,-0.00337882559483,True
+ai_feed_social,pre_minutes_per_day,-0.0020610926414041,True
+ai_feed_social,pre_active_days_per_day,-0.0020186670246685,True
+ai_feed_social,pre_sessions_per_day,-0.0030488930173224,True
+ai_feed_social,pre_friend_interactions_per_day,-0.0190418796496058,True
+ai_feed_social,pre_ad_revenue_per_day,-0.0008150537616497,True
+ai_feed_social,tenure_days,0.0026558325790364,True
+ai_feed_social,friend_count,0.0020613593845109,True
+ai_feed_social,is_new_user,-0.0120001423539623,True
+ai_feed_social,age_group=18-24,-0.0100253309830106,True
+ai_feed_social,age_group=55+,0.0003286335339777,True
+ai_feed_social,device=iOS,0.0039073482344128,True
+ai_feed_social,device=Android,0.0060178583375743,True
+ai_feed_social,account_type=creator,-0.0110341860886255,True
+ai_feed_social,region=India,-0.0102537052744155,True
+ai_feed_social,region=North America,-0.0075704172751588,True

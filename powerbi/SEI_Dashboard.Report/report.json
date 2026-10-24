@@ -1,0 +1,681 @@
+{
+  "config": "{\"version\": \"5.59\", \"activeSectionIndex\": 0, \"defaultDrillFilterOtherVisuals\": true, \"settings\": {\"useNewFilterPaneExperience\": true, \"allowChangeFilterTypes\": true, \"useStylableVisualContainerHeader\": true, \"exportDataMode\": 1}}",
+  "layoutOptimization": 0,
+  "sections": [
+    {
+      "name": "ReportSectionc82b5350adf9525d95",
+      "displayName": "Executive Summary",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 0,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"f3c3bcb141ed57928ca4\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Feed Ranking Experiment \\u00b7 Launch Decision\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"3-arm randomised test \\u00b7 60,000 users \\u00b7 14-day pre-period + 28-day experiment \\u00b7 Recommendation: ship AI feed + friend boost\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"d88dd14c84755f9691ed\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 196, \"height\": 110, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Users\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Users\"}, \"Name\": \"_Measures.Users\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Users in experiment'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 228,
+          "y": 84,
+          "z": 2000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"60065d81b52d56e0b596\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 228, \"y\": 84, \"z\": 2000, \"width\": 196, \"height\": 110, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.AI Feed Minutes Lift\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"AI Feed Minutes Lift\"}, \"Name\": \"_Measures.AI Feed Minutes Lift\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'AI feed: minutes lift'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 436,
+          "y": 84,
+          "z": 3000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"2c480b0077bd5a20a202\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 436, \"y\": 84, \"z\": 3000, \"width\": 196, \"height\": 110, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Friend Boost Minutes Lift\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Friend Boost Minutes Lift\"}, \"Name\": \"_Measures.Friend Boost Minutes Lift\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Friend boost: minutes lift'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 644,
+          "y": 84,
+          "z": 4000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"c8d3557a090f5a648729\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 644, \"y\": 84, \"z\": 4000, \"width\": 196, \"height\": 110, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.AI Feed Churn Change\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"AI Feed Churn Change\"}, \"Name\": \"_Measures.AI Feed Churn Change\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'AI feed: churn change'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 852,
+          "y": 84,
+          "z": 5000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"8b9881fdae7758ee97dd\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 852, \"y\": 84, \"z\": 5000, \"width\": 196, \"height\": 110, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Friend Boost Churn Change\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Friend Boost Churn Change\"}, \"Name\": \"_Measures.Friend Boost Churn Change\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Friend boost: churn change'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 1060,
+          "y": 84,
+          "z": 6000,
+          "width": 196,
+          "height": 110,
+          "config": "{\"name\": \"e69044a992ea54028145\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 1060, \"y\": 84, \"z\": 6000, \"width\": 196, \"height\": 110, \"tabOrder\": 6000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Friend Boost 12M Value ($M)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Friend Boost 12M Value ($M)\"}, \"Name\": \"_Measures.Friend Boost 12M Value ($M)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Friend boost: 12-mo value'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 206,
+          "z": 7000,
+          "width": 760,
+          "height": 250,
+          "config": "{\"name\": \"f6ac7dd8572d5782a6f9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 206, \"z\": 7000, \"width\": 760, \"height\": 250, \"tabOrder\": 7000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.date\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.Minutes per User-Day\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"date\"}, \"Name\": \"dim_date.date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Minutes per User-Day\"}, \"Name\": \"_Measures.Minutes per User-Day\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Daily minutes per assigned user (pre-period \\u2192 experiment)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 466,
+          "z": 8000,
+          "width": 760,
+          "height": 240,
+          "config": "{\"name\": \"1477a133ad835220a153\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 466, \"z\": 8000, \"width\": 760, \"height\": 240, \"tabOrder\": 8000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"daily_lift.day\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(daily_lift.rel_lift)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"daily_lift\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"day\"}, \"Name\": \"daily_lift.day\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rel_lift\"}}, \"Function\": 0}, \"Name\": \"Sum(daily_lift.rel_lift)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Daily lift vs control: novelty decays'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 792,
+          "y": 206,
+          "z": 9000,
+          "width": 468,
+          "height": 500,
+          "config": "{\"name\": \"65a00adad11a54b980f9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 792, \"y\": 206, \"z\": 9000, \"width\": 468, \"height\": 500, \"tabOrder\": 9000}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"metric_results.arm\"}, {\"queryRef\": \"metric_results.metric_label\"}, {\"queryRef\": \"Sum(metric_results.rel_lift)\"}, {\"queryRef\": \"Sum(metric_results.p_adj_bh)\"}, {\"queryRef\": \"metric_results.verdict\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"metric_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm\"}, \"Name\": \"metric_results.arm\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"metric_label\"}, \"Name\": \"metric_results.metric_label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rel_lift\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.rel_lift)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p_adj_bh\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.p_adj_bh)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"verdict\"}, \"Name\": \"metric_results.verdict\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Metric scorecard (CUPED, BH-adjusted)'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSectionaba7265e949c59d28f",
+      "displayName": "Experiment Scorecard",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 1,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"4c2eddeeba185c189f04\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Experiment Scorecard & Validity\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"SRM, balance, A/A calibration, CUPED power gains, and every metric with 95% CIs\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 300,
+          "height": 120,
+          "config": "{\"name\": \"efd63312be1855708a42\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 300, \"height\": 120, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Arm'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 340,
+          "y": 84,
+          "z": 2000,
+          "width": 220,
+          "height": 120,
+          "config": "{\"name\": \"d26f485ab20a5f61ac4e\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 340, \"y\": 84, \"z\": 2000, \"width\": 220, \"height\": 120, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Significant Wins\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Significant Wins\"}, \"Name\": \"_Measures.Significant Wins\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Significant wins'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 580,
+          "y": 84,
+          "z": 3000,
+          "width": 220,
+          "height": 120,
+          "config": "{\"name\": \"123c775c63c95ee0b083\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 580, \"y\": 84, \"z\": 3000, \"width\": 220, \"height\": 120, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Significant Harms\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Significant Harms\"}, \"Name\": \"_Measures.Significant Harms\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Significant harms (guardrails)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 216,
+          "z": 4000,
+          "width": 620,
+          "height": 490,
+          "config": "{\"name\": \"4022650926ce52bc853b\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 216, \"z\": 4000, \"width\": 620, \"height\": 490, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"metric_results.metric_label\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(metric_results.rel_lift)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"metric_results\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"metric_label\"}, \"Name\": \"metric_results.metric_label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rel_lift\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.rel_lift)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Relative lift vs control by metric'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 84,
+          "z": 5000,
+          "width": 608,
+          "height": 300,
+          "config": "{\"name\": \"4d08411f2e6d53159656\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 84, \"z\": 5000, \"width\": 608, \"height\": 300, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"power_mde.n_per_arm\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(power_mde.mde_rel)\"}], \"Series\": [{\"queryRef\": \"power_mde.method\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"power_mde\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"n_per_arm\"}, \"Name\": \"power_mde.n_per_arm\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"mde_rel\"}}, \"Function\": 0}, \"Name\": \"Sum(power_mde.mde_rel)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"method\"}, \"Name\": \"power_mde.method\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Minimum detectable effect: raw vs CUPED'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 396,
+          "z": 6000,
+          "width": 608,
+          "height": 310,
+          "config": "{\"name\": \"af12f3b5dd1f5d3286e4\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 396, \"z\": 6000, \"width\": 608, \"height\": 310, \"tabOrder\": 6000}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"metric_results.arm\"}, {\"queryRef\": \"metric_results.metric_label\"}, {\"queryRef\": \"Sum(metric_results.rel_ci_low)\"}, {\"queryRef\": \"Sum(metric_results.rel_ci_high)\"}, {\"queryRef\": \"Sum(metric_results.variance_reduction)\"}, {\"queryRef\": \"Sum(metric_results.p_value)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"metric_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm\"}, \"Name\": \"metric_results.arm\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"metric_label\"}, \"Name\": \"metric_results.metric_label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rel_ci_low\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.rel_ci_low)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"rel_ci_high\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.rel_ci_high)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"variance_reduction\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.variance_reduction)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p_value\"}}, \"Function\": 0}, \"Name\": \"Sum(metric_results.p_value)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Confidence intervals & CUPED variance reduction'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSectiond845dd0ef3ac58449f",
+      "displayName": "Engagement Trends",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 2,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"40c810a83e3d55c4b110\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Engagement Trends Explorer\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"Slice the daily fact by segment. Every measure is per assigned user (intent-to-treat)\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 300,
+          "height": 90,
+          "config": "{\"name\": \"c90f696cd8b65a95969e\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 300, \"height\": 90, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_daily.age_group\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_daily\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"age_group\"}, \"Name\": \"fact_daily.age_group\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Age Group'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 332,
+          "y": 84,
+          "z": 2000,
+          "width": 300,
+          "height": 90,
+          "config": "{\"name\": \"487b85b28044554cb6bc\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 332, \"y\": 84, \"z\": 2000, \"width\": 300, \"height\": 90, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_daily.region\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_daily\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"region\"}, \"Name\": \"fact_daily.region\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Region'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 644,
+          "y": 84,
+          "z": 3000,
+          "width": 300,
+          "height": 90,
+          "config": "{\"name\": \"303430408f6756b3b0ab\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 644, \"y\": 84, \"z\": 3000, \"width\": 300, \"height\": 90, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_daily.device\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_daily\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"device\"}, \"Name\": \"fact_daily.device\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Device'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 956,
+          "y": 84,
+          "z": 4000,
+          "width": 300,
+          "height": 90,
+          "config": "{\"name\": \"b567f4562f695eb98beb\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 956, \"y\": 84, \"z\": 4000, \"width\": 300, \"height\": 90, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"fact_daily.account_type\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_daily\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"account_type\"}, \"Name\": \"fact_daily.account_type\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Account Type'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 186,
+          "z": 5000,
+          "width": 615,
+          "height": 255,
+          "config": "{\"name\": \"6e97ee5931695176b872\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 186, \"z\": 5000, \"width\": 615, \"height\": 255, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.date\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.Minutes Lift vs Control\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"date\"}, \"Name\": \"dim_date.date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Minutes Lift vs Control\"}, \"Name\": \"_Measures.Minutes Lift vs Control\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Minutes lift vs control'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 645,
+          "y": 186,
+          "z": 6000,
+          "width": 615,
+          "height": 255,
+          "config": "{\"name\": \"ca1b59f6f55a572b8c16\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 645, \"y\": 186, \"z\": 6000, \"width\": 615, \"height\": 255, \"tabOrder\": 6000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.date\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.DAU Rate\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"date\"}, \"Name\": \"dim_date.date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"DAU Rate\"}, \"Name\": \"_Measures.DAU Rate\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'DAU rate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 451,
+          "z": 7000,
+          "width": 615,
+          "height": 255,
+          "config": "{\"name\": \"998e98bdd26d5ce69a83\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 451, \"z\": 7000, \"width\": 615, \"height\": 255, \"tabOrder\": 7000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.date\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.Friend Interactions per User-Day\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"date\"}, \"Name\": \"dim_date.date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Friend Interactions per User-Day\"}, \"Name\": \"_Measures.Friend Interactions per User-Day\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Friend interactions per user-day (guardrail)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 645,
+          "y": 451,
+          "z": 8000,
+          "width": 615,
+          "height": 255,
+          "config": "{\"name\": \"08693be8cad359558f74\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 645, \"y\": 451, \"z\": 8000, \"width\": 615, \"height\": 255, \"tabOrder\": 8000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_date.date\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.Revenue per User-Day\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_date\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"date\"}, \"Name\": \"dim_date.date\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Revenue per User-Day\"}, \"Name\": \"_Measures.Revenue per User-Day\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Ad revenue per user-day'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection585701d69b095c5880",
+      "displayName": "Segment Deep-Dive",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 3,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"968ec98b884c53e6b29f\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Who Wins, Who Churns\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"CUPED minutes lift and churn change by segment \\u00b7 BH-adjusted across all segment tests\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 260,
+          "height": 200,
+          "config": "{\"name\": \"bb89a85783535d4d968b\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 260, \"height\": 200, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"segment_results.dimension\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"segment_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"dimension\"}, \"Name\": \"segment_results.dimension\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Segment dimension'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 292,
+          "y": 84,
+          "z": 2000,
+          "width": 968,
+          "height": 300,
+          "config": "{\"name\": \"27a372502a185cf28b74\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 292, \"y\": 84, \"z\": 2000, \"width\": 968, \"height\": 300, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"segment_results.segment\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(segment_results.churn_diff_pp)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"segment_results\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"segment\"}, \"Name\": \"segment_results.segment\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"churn_diff_pp\"}}, \"Function\": 0}, \"Name\": \"Sum(segment_results.churn_diff_pp)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Churn change vs control (percentage points)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 396,
+          "z": 3000,
+          "width": 620,
+          "height": 310,
+          "config": "{\"name\": \"452943b0e764503fbf69\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 396, \"z\": 3000, \"width\": 620, \"height\": 310, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"segment_results.segment\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(segment_results.minutes_lift)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"segment_results\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"segment\"}, \"Name\": \"segment_results.segment\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"minutes_lift\"}}, \"Function\": 0}, \"Name\": \"Sum(segment_results.minutes_lift)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Minutes lift vs control'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 396,
+          "z": 4000,
+          "width": 608,
+          "height": 310,
+          "config": "{\"name\": \"61ed7e22ad4951fe98f0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 396, \"z\": 4000, \"width\": 608, \"height\": 310, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"segment_results.dimension\"}, {\"queryRef\": \"segment_results.segment\"}, {\"queryRef\": \"segment_results.arm\"}, {\"queryRef\": \"Sum(segment_results.minutes_lift)\"}, {\"queryRef\": \"Sum(segment_results.churn_diff_pp)\"}, {\"queryRef\": \"segment_results.status\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"segment_results\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"dimension\"}, \"Name\": \"segment_results.dimension\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"segment\"}, \"Name\": \"segment_results.segment\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm\"}, \"Name\": \"segment_results.arm\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"minutes_lift\"}}, \"Function\": 0}, \"Name\": \"Sum(segment_results.minutes_lift)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"churn_diff_pp\"}}, \"Function\": 0}, \"Name\": \"Sum(segment_results.churn_diff_pp)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"status\"}, \"Name\": \"segment_results.status\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Segment verdicts'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection59dee140a88f5fdab5",
+      "displayName": "Retention & Churn Risk",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 4,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"c344306500655bb8843b\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Retention & Churn Early Warning\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"Kaplan-Meier by arm \\u00b7 leakage-free LightGBM risk model (scored day 13) \\u00b7 campaign economics\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 200,
+          "height": 100,
+          "config": "{\"name\": \"7791c9c35ab95fbb8c94\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 200, \"height\": 100, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Churn Model AUC\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Churn Model AUC\"}, \"Name\": \"_Measures.Churn Model AUC\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Churn model ROC-AUC'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 230,
+          "y": 84,
+          "z": 2000,
+          "width": 200,
+          "height": 100,
+          "config": "{\"name\": \"d032b7ea473c5f31b668\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 230, \"y\": 84, \"z\": 2000, \"width\": 200, \"height\": 100, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.High-Risk Users\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"High-Risk Users\"}, \"Name\": \"_Measures.High-Risk Users\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'High/critical-risk users'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 440,
+          "y": 84,
+          "z": 3000,
+          "width": 200,
+          "height": 100,
+          "config": "{\"name\": \"7a410573263e580a8130\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 440, \"y\": 84, \"z\": 3000, \"width\": 200, \"height\": 100, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Churn Rate\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Churn Rate\"}, \"Name\": \"_Measures.Churn Rate\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'28-day churn rate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 196,
+          "z": 4000,
+          "width": 620,
+          "height": 250,
+          "config": "{\"name\": \"45897b137bf25f85be64\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 196, \"z\": 4000, \"width\": 620, \"height\": 250, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"km_survival.day\", \"active\": true}], \"Y\": [{\"queryRef\": \"Avg(km_survival.survival)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"km_survival\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"day\"}, \"Name\": \"km_survival.day\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"survival\"}}, \"Function\": 1}, \"Name\": \"Avg(km_survival.survival)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Kaplan-Meier: share of users not yet churned'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 84,
+          "z": 5000,
+          "width": 608,
+          "height": 362,
+          "config": "{\"name\": \"c4a2658c1d9252cb8dae\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 84, \"z\": 5000, \"width\": 608, \"height\": 362, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"churn_shap_importance.feature\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(churn_shap_importance.mean_abs_shap)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"churn_shap_importance\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"feature\"}, \"Name\": \"churn_shap_importance.feature\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"mean_abs_shap\"}}, \"Function\": 0}, \"Name\": \"Sum(churn_shap_importance.mean_abs_shap)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Churn drivers (mean |SHAP|)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 456,
+          "z": 6000,
+          "width": 620,
+          "height": 250,
+          "config": "{\"name\": \"2e9b393bc2625b59aabf\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 456, \"z\": 6000, \"width\": 620, \"height\": 250, \"tabOrder\": 6000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"retention_profit_curve.fraction_targeted\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(retention_profit_curve.profit_at_scale_musd)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"retention_profit_curve\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"fraction_targeted\"}, \"Name\": \"retention_profit_curve.fraction_targeted\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"profit_at_scale_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(retention_profit_curve.profit_at_scale_musd)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Retention campaign profit curve ($M at scale)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 456,
+          "z": 7000,
+          "width": 608,
+          "height": 250,
+          "config": "{\"name\": \"4999cbc6e8ff5fbc8d1c\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 456, \"z\": 7000, \"width\": 608, \"height\": 250, \"tabOrder\": 7000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"fact_user.risk_tier\", \"active\": true}], \"Y\": [{\"queryRef\": \"_Measures.Users\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"fact_user\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"_Measures\", \"Type\": 0}, {\"Name\": \"t2\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"risk_tier\"}, \"Name\": \"fact_user.risk_tier\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"Users\"}, \"Name\": \"_Measures.Users\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t2\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Users by churn-risk tier'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSection1bc4aea6c77a5d7e8d",
+      "displayName": "Personalisation (HTE)",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 5,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"bd4df0cae04c51e0a44f\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Heterogeneous Effects & Rollout Policy\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"DR-learner CATE on net annual user value \\u00b7 IPW policy evaluation on held-out users\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 240,
+          "height": 100,
+          "config": "{\"name\": \"cb69623c67ce59a1b3b0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 240, \"height\": 100, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Best Policy Uplift ($/user/yr)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Best Policy Uplift ($/user/yr)\"}, \"Name\": \"_Measures.Best Policy Uplift ($/user/yr)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Best policy uplift ($/user/yr)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 196,
+          "z": 2000,
+          "width": 620,
+          "height": 250,
+          "config": "{\"name\": \"17ccb877f4f45976a1f1\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 196, \"z\": 2000, \"width\": 620, \"height\": 250, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"policy_values.policy\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(policy_values.uplift_vs_control_usd)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"policy_values\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"policy\"}, \"Name\": \"policy_values.policy\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"uplift_vs_control_usd\"}}, \"Function\": 0}, \"Name\": \"Sum(policy_values.uplift_vs_control_usd)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Net annual value per user vs control, by rollout policy'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 272,
+          "y": 84,
+          "z": 3000,
+          "width": 368,
+          "height": 100,
+          "config": "{\"name\": \"432777f58d6a5c9abbb7\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 272, \"y\": 84, \"z\": 3000, \"width\": 368, \"height\": 100, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"qini_curves.arm\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"qini_curves\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm\"}, \"Name\": \"qini_curves.arm\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Qini: treatment arm'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 84,
+          "z": 4000,
+          "width": 608,
+          "height": 362,
+          "config": "{\"name\": \"6f0105a244a351ba8027\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 84, \"z\": 4000, \"width\": 608, \"height\": 362, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"qini_curves.fraction_targeted\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(qini_curves.cumulative_gain)\"}], \"Series\": [{\"queryRef\": \"qini_curves.model\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"qini_curves\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"fraction_targeted\"}, \"Name\": \"qini_curves.fraction_targeted\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"cumulative_gain\"}}, \"Function\": 0}, \"Name\": \"Sum(qini_curves.cumulative_gain)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"model\"}, \"Name\": \"qini_curves.model\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Qini curve: model vs random targeting'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 456,
+          "z": 5000,
+          "width": 1240,
+          "height": 250,
+          "config": "{\"name\": \"470abe7b329b59ec8d03\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 456, \"z\": 5000, \"width\": 1240, \"height\": 250, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"cate_deciles.decile\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(cate_deciles.predicted_cate)\"}, {\"queryRef\": \"Sum(cate_deciles.observed_uplift)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"cate_deciles\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"decile\"}, \"Name\": \"cate_deciles.decile\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"predicted_cate\"}}, \"Function\": 0}, \"Name\": \"Sum(cate_deciles.predicted_cate)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"observed_uplift\"}}, \"Function\": 0}, \"Name\": \"Sum(cate_deciles.observed_uplift)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'CATE calibration by decile: predicted vs observed uplift (USD/user/yr)'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSectioncf101778a48058eba5",
+      "displayName": "Content & Responsible AI",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 6,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"6d1288f708cc5d508229\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"Content Health & Responsible-AI Guardrails\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"Real TweetEval posts \\u00b7 NMF topics \\u00b7 sentiment model \\u00b7 simulated ranker exposure\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 1240,
+          "height": 300,
+          "config": "{\"name\": \"dd6a88f411a955be992c\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 1240, \"height\": 300, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"topic_exposure_by_arm.label\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(topic_exposure_by_arm.share)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"topic_exposure_by_arm\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"label\"}, \"Name\": \"topic_exposure_by_arm.label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"share\"}}, \"Function\": 0}, \"Name\": \"Sum(topic_exposure_by_arm.share)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Share of impressions by topic'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 396,
+          "z": 2000,
+          "width": 400,
+          "height": 310,
+          "config": "{\"name\": \"74a7714d8e885c278f07\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 396, \"z\": 2000, \"width\": 400, \"height\": 310, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_arm.arm_label\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(content_exposure_summary.negative_share)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_arm\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"content_exposure_summary\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"negative_share\"}}, \"Function\": 0}, \"Name\": \"Sum(content_exposure_summary.negative_share)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Share of negative posts served'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 432,
+          "y": 396,
+          "z": 3000,
+          "width": 400,
+          "height": 310,
+          "config": "{\"name\": \"41aacbb73a915739afe0\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 432, \"y\": 396, \"z\": 3000, \"width\": 400, \"height\": 310, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"dim_arm.arm_label\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(content_exposure_summary.topic_entropy)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"dim_arm\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"content_exposure_summary\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"topic_entropy\"}}, \"Function\": 0}, \"Name\": \"Sum(content_exposure_summary.topic_entropy)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Feed diversity (normalised topic entropy)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 844,
+          "y": 396,
+          "z": 4000,
+          "width": 416,
+          "height": 310,
+          "config": "{\"name\": \"c376a34047285a958ea2\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 844, \"y\": 396, \"z\": 4000, \"width\": 416, \"height\": 310, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"sentiment_model_metrics.model\"}, {\"queryRef\": \"Sum(sentiment_model_metrics.macro_recall)\"}, {\"queryRef\": \"Sum(sentiment_model_metrics.macro_f1)\"}, {\"queryRef\": \"Sum(sentiment_model_metrics.accuracy)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"sentiment_model_metrics\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"model\"}, \"Name\": \"sentiment_model_metrics.model\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"macro_recall\"}}, \"Function\": 0}, \"Name\": \"Sum(sentiment_model_metrics.macro_recall)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"macro_f1\"}}, \"Function\": 0}, \"Name\": \"Sum(sentiment_model_metrics.macro_f1)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"accuracy\"}}, \"Function\": 0}, \"Name\": \"Sum(sentiment_model_metrics.accuracy)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Sentiment model benchmark (TweetEval test)'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSectionc9bba782f30957beaa",
+      "displayName": "Business Impact",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 7,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"eb69ff937e6455b59d65\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"12-Month Business Impact\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"Monte Carlo over steady-state revenue lift and churn hazard ratio \\u00b7 40M eligible MAU\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 300,
+          "height": 100,
+          "config": "{\"name\": \"5f42c96d52bd5dc2909f\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 300, \"height\": 100, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.Friend Boost 12M Value ($M)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"Friend Boost 12M Value ($M)\"}, \"Name\": \"_Measures.Friend Boost 12M Value ($M)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Friend boost: median 12-mo value'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 330,
+          "y": 84,
+          "z": 2000,
+          "width": 300,
+          "height": 100,
+          "config": "{\"name\": \"15cc5e05baec5ff6b0bd\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 330, \"y\": 84, \"z\": 2000, \"width\": 300, \"height\": 100, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.AI Feed 12M Value ($M)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"AI Feed 12M Value ($M)\"}, \"Name\": \"_Measures.AI Feed 12M Value ($M)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'AI feed: median 12-mo value'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 640,
+          "y": 84,
+          "z": 3000,
+          "width": 300,
+          "height": 100,
+          "config": "{\"name\": \"4daf5488efe25565b8f1\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 640, \"y\": 84, \"z\": 3000, \"width\": 300, \"height\": 100, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"_Measures.P(Friend Boost Beats AI Feed)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"_Measures\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"P(Friend Boost Beats AI Feed)\"}, \"Name\": \"_Measures.P(Friend Boost Beats AI Feed)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'P(friend boost > AI feed)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 196,
+          "z": 4000,
+          "width": 620,
+          "height": 260,
+          "config": "{\"name\": \"eeeee8735d625d74bce9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 196, \"z\": 4000, \"width\": 620, \"height\": 260, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"impact_fan.month\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(impact_fan.p50)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"impact_fan\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"month\"}, \"Name\": \"impact_fan.month\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p50\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_fan.p50)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Cumulative incremental revenue, median ($M)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 196,
+          "z": 5000,
+          "width": 608,
+          "height": 260,
+          "config": "{\"name\": \"f136a12f03fe5d199caa\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 196, \"z\": 5000, \"width\": 608, \"height\": 260, \"tabOrder\": 5000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"impact_distribution.bin_mid_musd\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(impact_distribution.share_of_draws)\"}], \"Series\": [{\"queryRef\": \"dim_arm.arm_label\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"impact_distribution\", \"Type\": 0}, {\"Name\": \"t1\", \"Entity\": \"dim_arm\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"bin_mid_musd\"}, \"Name\": \"impact_distribution.bin_mid_musd\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"share_of_draws\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_distribution.share_of_draws)\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t1\"}}, \"Property\": \"arm_label\"}, \"Name\": \"dim_arm.arm_label\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Distribution of 12-month value across simulations ($M)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 468,
+          "z": 6000,
+          "width": 620,
+          "height": 238,
+          "config": "{\"name\": \"653f1785771759e3afe9\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 468, \"z\": 6000, \"width\": 620, \"height\": 238, \"tabOrder\": 6000}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"impact_monte_carlo.comparison\"}, {\"queryRef\": \"Sum(impact_monte_carlo.p05_musd)\"}, {\"queryRef\": \"Sum(impact_monte_carlo.p50_musd)\"}, {\"queryRef\": \"Sum(impact_monte_carlo.p95_musd)\"}, {\"queryRef\": \"Sum(impact_monte_carlo.prob_positive)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"impact_monte_carlo\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"comparison\"}, \"Name\": \"impact_monte_carlo.comparison\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p05_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_monte_carlo.p05_musd)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p50_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_monte_carlo.p50_musd)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"p95_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_monte_carlo.p95_musd)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"prob_positive\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_monte_carlo.prob_positive)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Monte Carlo summary ($M)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 652,
+          "y": 468,
+          "z": 7000,
+          "width": 608,
+          "height": 238,
+          "config": "{\"name\": \"81a832a5bb02566dabcf\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 652, \"y\": 468, \"z\": 7000, \"width\": 608, \"height\": 238, \"tabOrder\": 7000}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"impact_sensitivity.assumption\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(impact_sensitivity.low_musd)\"}, {\"queryRef\": \"Sum(impact_sensitivity.high_musd)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"impact_sensitivity\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"assumption\"}, \"Name\": \"impact_sensitivity.assumption\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"low_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_sensitivity.low_musd)\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"high_musd\"}}, \"Function\": 0}, \"Name\": \"Sum(impact_sensitivity.high_musd)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Sensitivity: friend boost minus AI feed ($M)'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    },
+    {
+      "name": "ReportSectione77da8ec63915640a9",
+      "displayName": "Creator Virality (Real Data)",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720,
+      "ordinal": 8,
+      "config": "{}",
+      "filters": "[]",
+      "visualContainers": [
+        {
+          "x": 20,
+          "y": 8,
+          "z": 0,
+          "width": 1240,
+          "height": 64,
+          "config": "{\"name\": \"78b21b321b125804b335\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 8, \"z\": 0, \"width\": 1240, \"height\": 64, \"tabOrder\": 0}}], \"singleVisual\": {\"visualType\": \"textbox\", \"drillFilterOtherVisuals\": true, \"objects\": {\"general\": [{\"properties\": {\"paragraphs\": [{\"textRuns\": [{\"value\": \"What Makes Content Spread\", \"textStyle\": {\"fontSize\": \"20pt\", \"fontWeight\": \"bold\"}}]}, {\"textRuns\": [{\"value\": \"UCI Online News Popularity \\u00b7 39,644 real articles \\u00b7 time-split LightGBM \\u00b7 SHAP drivers\", \"textStyle\": {\"fontSize\": \"10pt\"}}]}]}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 20,
+          "y": 84,
+          "z": 1000,
+          "width": 500,
+          "height": 622,
+          "config": "{\"name\": \"93a449764e1054f4a357\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20, \"y\": 84, \"z\": 1000, \"width\": 500, \"height\": 622, \"tabOrder\": 1000}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Category\": [{\"queryRef\": \"virality_shap_importance.feature\", \"active\": true}], \"Y\": [{\"queryRef\": \"Sum(virality_shap_importance.mean_abs_shap)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"virality_shap_importance\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"feature\"}, \"Name\": \"virality_shap_importance.feature\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"mean_abs_shap\"}}, \"Function\": 0}, \"Name\": \"Sum(virality_shap_importance.mean_abs_shap)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Virality drivers (mean |SHAP|)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 532,
+          "y": 84,
+          "z": 2000,
+          "width": 728,
+          "height": 70,
+          "config": "{\"name\": \"2da7f364ffd156cd8e63\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 532, \"y\": 84, \"z\": 2000, \"width\": 728, \"height\": 70, \"tabOrder\": 2000}}], \"singleVisual\": {\"visualType\": \"slicer\", \"projections\": {\"Values\": [{\"queryRef\": \"virality_playbook.dimension\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"virality_playbook\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"dimension\"}, \"Name\": \"virality_playbook.dimension\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Playbook dimension'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 532,
+          "y": 166,
+          "z": 3000,
+          "width": 728,
+          "height": 270,
+          "config": "{\"name\": \"5aea076f16a65097a041\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 532, \"y\": 166, \"z\": 3000, \"width\": 728, \"height\": 270, \"tabOrder\": 3000}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"virality_playbook.level\", \"active\": true}], \"Y\": [{\"queryRef\": \"Avg(virality_playbook.viral_rate)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"virality_playbook\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"level\"}, \"Name\": \"virality_playbook.level\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"viral_rate\"}}, \"Function\": 1}, \"Name\": \"Avg(virality_playbook.viral_rate)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Viral rate (top-quartile shares) by level'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 532,
+          "y": 448,
+          "z": 4000,
+          "width": 728,
+          "height": 258,
+          "config": "{\"name\": \"c6ea9b7cc8a15474bb62\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 532, \"y\": 448, \"z\": 4000, \"width\": 728, \"height\": 258, \"tabOrder\": 4000}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"virality_weekly.week\", \"active\": true}], \"Y\": [{\"queryRef\": \"Avg(virality_weekly.viral_rate)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"t0\", \"Entity\": \"virality_weekly\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"week\"}, \"Name\": \"virality_weekly.week\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"t0\"}}, \"Property\": \"viral_rate\"}}, \"Function\": 1}, \"Name\": \"Avg(virality_weekly.viral_rate)\"}]}, \"drillFilterOtherVisuals\": true, \"vcObjects\": {\"title\": [{\"properties\": {\"show\": {\"expr\": {\"Literal\": {\"Value\": \"true\"}}}, \"text\": {\"expr\": {\"Literal\": {\"Value\": \"'Weekly viral rate'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ]
+    }
+  ]
+}

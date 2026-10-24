@@ -1,0 +1,11 @@
+topic_id,label,top_words,n_posts,share_negative_pred,share_positive_pred,mean_p_negative
+0,good / love / happy,"good, love, happy, think, tonight, birthday, watch, make, thursday, best",19434,0.19990737882062365,0.43825254708243283,0.22724794101083803
+1,friday / black / kendrick,"friday, black, kendrick, ice, cube, lamar, cole, amazon, prime, chris",3282,0.15173674588665448,0.43662400975015236,0.17939663901167568
+2,time / watching / watch,"time, watching, watch, world, jurassic, watched, man, saw, long, seeing",2680,0.17686567164179104,0.42649253731343284,0.20765854751417792
+3,game / sox / vs,"game, sox, vs, red, thrones, season, white, tonight, play, win",3477,0.1253954558527466,0.3206787460454415,0.16626325488723706
+4,sunday / ice / national,"sunday, ice, national, cream, super, eagles, oliseh, johnson, dustin, coach",3386,0.15239220318960425,0.4176018901358535,0.17849642052079961
+5,saturday / live / come,"saturday, live, come, tickets, foo, fighters, concert, jason, aldean, brown",3265,0.11607963246554365,0.4336906584992343,0.14667001057769757
+6,trump / donald / melania,"trump, donald, melania, obama, white, president, cabinet, anti, protest, transition",8880,0.4331081081081081,0.11497747747747748,0.4268579105828858
+7,new / album / york,"new, album, york, maiden, ocean, frank, iron, apple, video, september",6659,0.12163988586874906,0.36296741252440307,0.1563556382925838
+8,monday / raw / frank,"monday, raw, frank, john, cena, football, gifford, rollins, seth, lesnar",3657,0.15258408531583265,0.3475526387749521,0.1839675559012655
+9,want / know / really,"want, know, really, tickets, let, did, jason, aldean, people, concert",5179,0.25854412048658043,0.3044989380189226,0.27748185227027344

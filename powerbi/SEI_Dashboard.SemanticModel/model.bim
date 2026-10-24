@@ -1,0 +1,2905 @@
+{
+  "name": "SEI_Dashboard",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "tables": [
+      {
+        "name": "dim_date",
+        "lineageTag": "e6e0a93c-9650-5ee3-b43d-9692362c56a3",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "lineageTag": "2870fb2f-b84e-5223-b987-41e5d6f40ae6",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "experiment_day",
+            "dataType": "int64",
+            "sourceColumn": "experiment_day",
+            "summarizeBy": "sum",
+            "lineageTag": "164ff34f-8e0c-5815-908f-4b4a5eabe808"
+          },
+          {
+            "name": "period",
+            "dataType": "string",
+            "sourceColumn": "period",
+            "summarizeBy": "none",
+            "lineageTag": "6050e714-5517-59fd-8c8f-c8ffade24bdf"
+          },
+          {
+            "name": "experiment_week",
+            "dataType": "int64",
+            "sourceColumn": "experiment_week",
+            "summarizeBy": "sum",
+            "lineageTag": "ac306f79-339b-501c-b01b-8b495c113252"
+          },
+          {
+            "name": "weekday",
+            "dataType": "string",
+            "sourceColumn": "weekday",
+            "summarizeBy": "none",
+            "lineageTag": "7fef71fd-bf44-536a-8421-60ef8548d880"
+          },
+          {
+            "name": "is_weekend",
+            "dataType": "int64",
+            "sourceColumn": "is_weekend",
+            "summarizeBy": "sum",
+            "lineageTag": "9e83230c-1e7b-53a3-8643-00cd2ac90b84"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_date.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"date\", type date}, {\"experiment_day\", Int64.Type}, {\"period\", type text}, {\"experiment_week\", Int64.Type}, {\"weekday\", type text}, {\"is_weekend\", Int64.Type}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_arm",
+        "lineageTag": "41ae8cb3-3f49-5ce6-aaba-c5b60c5fd500",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "6c82e9fd-a710-5808-a776-ba27ca353149"
+          },
+          {
+            "name": "arm_label",
+            "dataType": "string",
+            "sourceColumn": "arm_label",
+            "summarizeBy": "none",
+            "lineageTag": "4d6c42a2-4cd4-5119-a369-122c50c823b8",
+            "sortByColumn": "sort_order"
+          },
+          {
+            "name": "is_treatment",
+            "dataType": "int64",
+            "sourceColumn": "is_treatment",
+            "summarizeBy": "sum",
+            "lineageTag": "6f842041-f81a-59a2-838e-accceb888c24"
+          },
+          {
+            "name": "sort_order",
+            "dataType": "int64",
+            "sourceColumn": "sort_order",
+            "summarizeBy": "sum",
+            "lineageTag": "859c8101-91b4-5965-ae1b-43d84b485d22"
+          },
+          {
+            "name": "color_hex",
+            "dataType": "string",
+            "sourceColumn": "color_hex",
+            "summarizeBy": "none",
+            "lineageTag": "4581aaf1-c345-58d2-a7f5-8efac19d67f7"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_arm",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_arm.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"arm_label\", type text}, {\"is_treatment\", Int64.Type}, {\"sort_order\", Int64.Type}, {\"color_hex\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "fact_daily",
+        "lineageTag": "db0a4f38-679b-5b10-967a-ad65d6b60c52",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "8f2e49aa-24d3-5334-b98c-51b995593c48"
+          },
+          {
+            "name": "age_group",
+            "dataType": "string",
+            "sourceColumn": "age_group",
+            "summarizeBy": "none",
+            "lineageTag": "9fdf60d8-26e6-5f33-a7f7-70bfe3c9be0d"
+          },
+          {
+            "name": "region",
+            "dataType": "string",
+            "sourceColumn": "region",
+            "summarizeBy": "none",
+            "lineageTag": "38794be2-de03-5260-aa23-3109106f9ec6"
+          },
+          {
+            "name": "device",
+            "dataType": "string",
+            "sourceColumn": "device",
+            "summarizeBy": "none",
+            "lineageTag": "9d27ed90-d58c-5ad1-92b3-32ac24880842"
+          },
+          {
+            "name": "account_type",
+            "dataType": "string",
+            "sourceColumn": "account_type",
+            "summarizeBy": "none",
+            "lineageTag": "9c3ea224-c386-5119-a3b7-0d1d7bc5410e"
+          },
+          {
+            "name": "users_assigned",
+            "dataType": "int64",
+            "sourceColumn": "users_assigned",
+            "summarizeBy": "sum",
+            "lineageTag": "958c1f46-5b69-5630-89b2-c581fbfe3bea"
+          },
+          {
+            "name": "sessions",
+            "dataType": "int64",
+            "sourceColumn": "sessions",
+            "summarizeBy": "sum",
+            "lineageTag": "c4f487d2-1fdd-51c0-bb4c-e88f6fceb1ba"
+          },
+          {
+            "name": "minutes",
+            "dataType": "double",
+            "sourceColumn": "minutes",
+            "summarizeBy": "sum",
+            "lineageTag": "c30c40c5-f6c0-5073-acdf-35db3f9e6695",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "likes",
+            "dataType": "int64",
+            "sourceColumn": "likes",
+            "summarizeBy": "sum",
+            "lineageTag": "b30bbe49-5adf-5a61-b1ee-7276e3c62622"
+          },
+          {
+            "name": "comments",
+            "dataType": "int64",
+            "sourceColumn": "comments",
+            "summarizeBy": "sum",
+            "lineageTag": "b8f2e7c4-eecd-50d6-b731-37aa557fe5fa"
+          },
+          {
+            "name": "dms_sent",
+            "dataType": "int64",
+            "sourceColumn": "dms_sent",
+            "summarizeBy": "sum",
+            "lineageTag": "3ee4a008-c410-53a3-a701-8295becc6fc5"
+          },
+          {
+            "name": "shares",
+            "dataType": "int64",
+            "sourceColumn": "shares",
+            "summarizeBy": "sum",
+            "lineageTag": "f33a4ea7-4825-5fc5-96bf-33a5d199067a"
+          },
+          {
+            "name": "posts_created",
+            "dataType": "int64",
+            "sourceColumn": "posts_created",
+            "summarizeBy": "sum",
+            "lineageTag": "edf44d16-ccc4-54dc-a9cf-d17b04254137"
+          },
+          {
+            "name": "negative_feedback",
+            "dataType": "int64",
+            "sourceColumn": "negative_feedback",
+            "summarizeBy": "sum",
+            "lineageTag": "ac8aa34f-2721-5d69-a892-0eb639037e3c"
+          },
+          {
+            "name": "ad_impressions",
+            "dataType": "int64",
+            "sourceColumn": "ad_impressions",
+            "summarizeBy": "sum",
+            "lineageTag": "62c9918b-0de6-53a6-a888-3998ab57ce5b"
+          },
+          {
+            "name": "ad_clicks",
+            "dataType": "int64",
+            "sourceColumn": "ad_clicks",
+            "summarizeBy": "sum",
+            "lineageTag": "09afef02-ed84-5ffe-891f-69613e5c793f"
+          },
+          {
+            "name": "ad_revenue",
+            "dataType": "double",
+            "sourceColumn": "ad_revenue",
+            "summarizeBy": "sum",
+            "lineageTag": "40229249-1641-5726-8b6d-fe10a5baf978",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "active_users",
+            "dataType": "int64",
+            "sourceColumn": "active_users",
+            "summarizeBy": "sum",
+            "lineageTag": "b3a16198-8cfc-5193-a2dc-fd4c8abf98ea"
+          },
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "lineageTag": "b79c87c5-66fb-513a-817b-02d87e10f4bd",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "friend_interactions",
+            "dataType": "int64",
+            "sourceColumn": "friend_interactions",
+            "summarizeBy": "sum",
+            "lineageTag": "95cc1875-36a9-55e4-ab98-0b4eda5eae2d"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_daily",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_daily.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"age_group\", type text}, {\"region\", type text}, {\"device\", type text}, {\"account_type\", type text}, {\"users_assigned\", Int64.Type}, {\"sessions\", Int64.Type}, {\"minutes\", type number}, {\"likes\", Int64.Type}, {\"comments\", Int64.Type}, {\"dms_sent\", Int64.Type}, {\"shares\", Int64.Type}, {\"posts_created\", Int64.Type}, {\"negative_feedback\", Int64.Type}, {\"ad_impressions\", Int64.Type}, {\"ad_clicks\", Int64.Type}, {\"ad_revenue\", type number}, {\"active_users\", Int64.Type}, {\"date\", type date}, {\"friend_interactions\", Int64.Type}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "fact_user",
+        "lineageTag": "64e87c10-cf71-5e03-ae1e-bcfb9973bb42",
+        "columns": [
+          {
+            "name": "user_id",
+            "dataType": "int64",
+            "sourceColumn": "user_id",
+            "summarizeBy": "none",
+            "lineageTag": "463ba1f8-74f3-5e53-ab62-6f58407d62db"
+          },
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "5f77c64f-e3a8-5eea-873e-8e1a35c61603"
+          },
+          {
+            "name": "age_group",
+            "dataType": "string",
+            "sourceColumn": "age_group",
+            "summarizeBy": "none",
+            "lineageTag": "cda0c33e-cf40-5343-9265-ce0c475e2f26"
+          },
+          {
+            "name": "region",
+            "dataType": "string",
+            "sourceColumn": "region",
+            "summarizeBy": "none",
+            "lineageTag": "befb29f1-f806-58b8-b654-296582d77f90"
+          },
+          {
+            "name": "device",
+            "dataType": "string",
+            "sourceColumn": "device",
+            "summarizeBy": "none",
+            "lineageTag": "984fd80b-6ce0-569a-8fd3-2a4403b9bb2c"
+          },
+          {
+            "name": "account_type",
+            "dataType": "string",
+            "sourceColumn": "account_type",
+            "summarizeBy": "none",
+            "lineageTag": "6763be47-f4cc-50a5-8088-60e25c2aa334"
+          },
+          {
+            "name": "acquisition_channel",
+            "dataType": "string",
+            "sourceColumn": "acquisition_channel",
+            "summarizeBy": "none",
+            "lineageTag": "587443f0-fbff-5ebc-aa76-35c96d793cdb"
+          },
+          {
+            "name": "tenure_days",
+            "dataType": "int64",
+            "sourceColumn": "tenure_days",
+            "summarizeBy": "sum",
+            "lineageTag": "d1ff7d3a-b437-5372-af32-b0863b939b6a"
+          },
+          {
+            "name": "friend_count",
+            "dataType": "int64",
+            "sourceColumn": "friend_count",
+            "summarizeBy": "sum",
+            "lineageTag": "3f997e19-2270-5903-b66f-03ab9aadb2e9"
+          },
+          {
+            "name": "is_new_user",
+            "dataType": "int64",
+            "sourceColumn": "is_new_user",
+            "summarizeBy": "sum",
+            "lineageTag": "64c9d5ae-f254-5170-b010-cbb03357a59e"
+          },
+          {
+            "name": "churned",
+            "dataType": "int64",
+            "sourceColumn": "churned",
+            "summarizeBy": "sum",
+            "lineageTag": "280124ba-1cf4-59e9-8775-9a08de4f81ff"
+          },
+          {
+            "name": "pre_minutes_per_day",
+            "dataType": "double",
+            "sourceColumn": "pre_minutes_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "ddb9031a-d5cc-528f-878a-59881cd022e9",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "exp_minutes_per_day",
+            "dataType": "double",
+            "sourceColumn": "exp_minutes_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "a0f59332-5020-5212-be91-5b097d9a343f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "pre_active_days_per_day",
+            "dataType": "double",
+            "sourceColumn": "pre_active_days_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "b604c0f8-51d8-5aa1-90d9-26612615122d",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "exp_active_days_per_day",
+            "dataType": "double",
+            "sourceColumn": "exp_active_days_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "1a06c869-5ac4-557c-9e44-5c347933476b",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "exp_friend_interactions_per_day",
+            "dataType": "double",
+            "sourceColumn": "exp_friend_interactions_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "f5d2ad93-686e-5ce8-83c2-1e6e1b8db60a",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "pre_ad_revenue_per_day",
+            "dataType": "double",
+            "sourceColumn": "pre_ad_revenue_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "8f424e29-e382-5eef-a210-c75c4c4f373b",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "exp_ad_revenue_per_day",
+            "dataType": "double",
+            "sourceColumn": "exp_ad_revenue_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "72962ed3-c58a-5eb2-94d2-61b641d65075",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "late_ad_revenue_per_day",
+            "dataType": "double",
+            "sourceColumn": "late_ad_revenue_per_day",
+            "summarizeBy": "sum",
+            "lineageTag": "0ef2c05b-204c-56e0-98d1-7c67e37e223e",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_probability",
+            "dataType": "double",
+            "sourceColumn": "churn_probability",
+            "summarizeBy": "sum",
+            "lineageTag": "12557ddb-1bc2-5498-a948-8e9a09135d49",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "risk_tier",
+            "dataType": "string",
+            "sourceColumn": "risk_tier",
+            "summarizeBy": "none",
+            "lineageTag": "774b3784-fad1-5f4a-97ed-b109eb79e457"
+          },
+          {
+            "name": "risk_decile",
+            "dataType": "double",
+            "sourceColumn": "risk_decile",
+            "summarizeBy": "sum",
+            "lineageTag": "f613e9f9-dbcf-5eb3-b634-41c846f785f1",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "actual_churn_next_14d",
+            "dataType": "double",
+            "sourceColumn": "actual_churn_next_14d",
+            "summarizeBy": "sum",
+            "lineageTag": "b59ccdce-4f6c-5c5b-a0ab-54e504bb6e5f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "cate_ai_feed",
+            "dataType": "double",
+            "sourceColumn": "cate_ai_feed",
+            "summarizeBy": "sum",
+            "lineageTag": "08cb6f04-221c-5579-9ecb-058a69c2c110",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "cate_ai_feed_social",
+            "dataType": "double",
+            "sourceColumn": "cate_ai_feed_social",
+            "summarizeBy": "sum",
+            "lineageTag": "ac9f837d-8eda-5967-89ea-af76a776ee37",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "policy_arm",
+            "dataType": "string",
+            "sourceColumn": "policy_arm",
+            "summarizeBy": "none",
+            "lineageTag": "223922b1-80e8-5d26-99e7-0e06543bfc05"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_user",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_user.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"user_id\", Int64.Type}, {\"arm\", type text}, {\"age_group\", type text}, {\"region\", type text}, {\"device\", type text}, {\"account_type\", type text}, {\"acquisition_channel\", type text}, {\"tenure_days\", Int64.Type}, {\"friend_count\", Int64.Type}, {\"is_new_user\", Int64.Type}, {\"churned\", Int64.Type}, {\"pre_minutes_per_day\", type number}, {\"exp_minutes_per_day\", type number}, {\"pre_active_days_per_day\", type number}, {\"exp_active_days_per_day\", type number}, {\"exp_friend_interactions_per_day\", type number}, {\"pre_ad_revenue_per_day\", type number}, {\"exp_ad_revenue_per_day\", type number}, {\"late_ad_revenue_per_day\", type number}, {\"churn_probability\", type number}, {\"risk_tier\", type text}, {\"risk_decile\", type number}, {\"actual_churn_next_14d\", type number}, {\"cate_ai_feed\", type number}, {\"cate_ai_feed_social\", type number}, {\"policy_arm\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "metric_results",
+        "lineageTag": "2e31d46d-20bd-5b27-8ab5-be5a302ec2d5",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "12576bf5-8492-5fa2-8c86-183af9c1f3f2"
+          },
+          {
+            "name": "metric",
+            "dataType": "string",
+            "sourceColumn": "metric",
+            "summarizeBy": "none",
+            "lineageTag": "e7d956f3-25fa-5923-898d-320a09efd144"
+          },
+          {
+            "name": "label",
+            "dataType": "string",
+            "sourceColumn": "label",
+            "summarizeBy": "none",
+            "lineageTag": "4d560360-7b1c-5294-ac8a-fe440d306f86"
+          },
+          {
+            "name": "tier",
+            "dataType": "string",
+            "sourceColumn": "tier",
+            "summarizeBy": "none",
+            "lineageTag": "2ba68063-00c9-5397-8262-3c897559cf02"
+          },
+          {
+            "name": "higher_is_better",
+            "dataType": "int64",
+            "sourceColumn": "higher_is_better",
+            "summarizeBy": "sum",
+            "lineageTag": "1a5b78d7-ad83-542f-a319-b9c6f426b7ae"
+          },
+          {
+            "name": "mean_control",
+            "dataType": "double",
+            "sourceColumn": "mean_control",
+            "summarizeBy": "sum",
+            "lineageTag": "e8439525-5b38-5ce3-acff-38d5afff6ff6",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "mean_treatment",
+            "dataType": "double",
+            "sourceColumn": "mean_treatment",
+            "summarizeBy": "sum",
+            "lineageTag": "2995ec0a-12b4-558a-9d91-3569c3575d76",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "diff",
+            "dataType": "double",
+            "sourceColumn": "diff",
+            "summarizeBy": "sum",
+            "lineageTag": "54b291da-903a-567a-9613-bed7eee48c24",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "ci_low",
+            "dataType": "double",
+            "sourceColumn": "ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "d3026472-dc97-59ac-b99a-3e4a3364c676",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "ci_high",
+            "dataType": "double",
+            "sourceColumn": "ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "b659d17d-259f-5bf1-b1e8-b10662049333",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "rel_lift",
+            "dataType": "double",
+            "sourceColumn": "rel_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "3593401e-e6e7-5da5-af6a-76688c53daa1",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "rel_ci_low",
+            "dataType": "double",
+            "sourceColumn": "rel_ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "b1cb3e2b-687c-5976-9381-f5a86ccebda0",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "rel_ci_high",
+            "dataType": "double",
+            "sourceColumn": "rel_ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "e22e2309-9675-56a0-bc96-a1e4ccaa56ca",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "p_value",
+            "dataType": "double",
+            "sourceColumn": "p_value",
+            "summarizeBy": "sum",
+            "lineageTag": "95014912-6076-54ee-a60b-32df3449da89",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_value_raw_ttest",
+            "dataType": "double",
+            "sourceColumn": "p_value_raw_ttest",
+            "summarizeBy": "sum",
+            "lineageTag": "b19e88da-1473-5a37-bcf9-ee2410e9e632",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "se_raw",
+            "dataType": "double",
+            "sourceColumn": "se_raw",
+            "summarizeBy": "sum",
+            "lineageTag": "574557ad-2f10-59b8-bd0d-e9a0550870f4",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "se_cuped",
+            "dataType": "double",
+            "sourceColumn": "se_cuped",
+            "summarizeBy": "sum",
+            "lineageTag": "6abfae33-e64e-5052-9624-b1bed8a01a4f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "variance_reduction",
+            "dataType": "double",
+            "sourceColumn": "variance_reduction",
+            "summarizeBy": "sum",
+            "lineageTag": "eab321b4-051f-55c1-be42-c31510280097",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "p_adj_bh",
+            "dataType": "double",
+            "sourceColumn": "p_adj_bh",
+            "summarizeBy": "sum",
+            "lineageTag": "b065a0fa-2658-5d81-b85e-3eb0df45dcef",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_adj_holm",
+            "dataType": "double",
+            "sourceColumn": "p_adj_holm",
+            "summarizeBy": "sum",
+            "lineageTag": "de562778-7b7d-52a8-ba8d-44275570d602",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "significant",
+            "dataType": "int64",
+            "sourceColumn": "significant",
+            "summarizeBy": "sum",
+            "lineageTag": "d5218dab-f685-5d93-a48b-7dd738c22e7c"
+          },
+          {
+            "name": "verdict",
+            "dataType": "string",
+            "sourceColumn": "verdict",
+            "summarizeBy": "none",
+            "lineageTag": "a338d8a7-25cb-54c6-ae8e-d95fd94f4daf"
+          },
+          {
+            "name": "metric_label",
+            "dataType": "string",
+            "sourceColumn": "metric_label",
+            "summarizeBy": "none",
+            "lineageTag": "ac940a1c-1a34-57d8-984c-b23254eedb43"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "metric_results",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"metric_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"tier\", type text}, {\"higher_is_better\", Int64.Type}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"diff\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"rel_lift\", type number}, {\"rel_ci_low\", type number}, {\"rel_ci_high\", type number}, {\"p_value\", type number}, {\"p_value_raw_ttest\", type number}, {\"se_raw\", type number}, {\"se_cuped\", type number}, {\"variance_reduction\", type number}, {\"p_adj_bh\", type number}, {\"p_adj_holm\", type number}, {\"significant\", Int64.Type}, {\"verdict\", type text}, {\"metric_label\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "segment_results",
+        "lineageTag": "92fe76cc-6bef-59cf-9b90-04144ba93b39",
+        "columns": [
+          {
+            "name": "dimension",
+            "dataType": "string",
+            "sourceColumn": "dimension",
+            "summarizeBy": "none",
+            "lineageTag": "fadeee80-101f-5d2d-8cd7-1ff7655723d8"
+          },
+          {
+            "name": "segment",
+            "dataType": "string",
+            "sourceColumn": "segment",
+            "summarizeBy": "none",
+            "lineageTag": "988caf19-0a94-5d69-ad93-18a464c9d669"
+          },
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "816e2a61-384c-57ed-9159-c2d26a1ca823"
+          },
+          {
+            "name": "n_treatment",
+            "dataType": "int64",
+            "sourceColumn": "n_treatment",
+            "summarizeBy": "sum",
+            "lineageTag": "bf7a43e5-35a7-5533-9b74-cff0d73a0d82"
+          },
+          {
+            "name": "n_control",
+            "dataType": "int64",
+            "sourceColumn": "n_control",
+            "summarizeBy": "sum",
+            "lineageTag": "b112e9e2-175b-5958-8677-05501a5af0f4"
+          },
+          {
+            "name": "minutes_lift",
+            "dataType": "double",
+            "sourceColumn": "minutes_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "c12e0b5d-d40a-59f5-bb24-ad573808f606",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "minutes_ci_low",
+            "dataType": "double",
+            "sourceColumn": "minutes_ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "5fe86374-4050-51a4-9f9c-5765802a611c",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "minutes_ci_high",
+            "dataType": "double",
+            "sourceColumn": "minutes_ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "edc92c6b-1cae-5866-b613-5fa159df4a24",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "minutes_p",
+            "dataType": "double",
+            "sourceColumn": "minutes_p",
+            "summarizeBy": "sum",
+            "lineageTag": "fe5c643e-ae87-5160-adfc-8b7ff6b427d6",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_control",
+            "dataType": "double",
+            "sourceColumn": "churn_control",
+            "summarizeBy": "sum",
+            "lineageTag": "1f6704ff-c567-5403-a4d5-45441389251c",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "churn_treatment",
+            "dataType": "double",
+            "sourceColumn": "churn_treatment",
+            "summarizeBy": "sum",
+            "lineageTag": "75f78bd3-71e9-5769-9e10-3a6b06422304",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "churn_diff_pp",
+            "dataType": "double",
+            "sourceColumn": "churn_diff_pp",
+            "summarizeBy": "sum",
+            "lineageTag": "be736ea6-b9f1-51e3-a688-afd28ff87345",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_ci_low_pp",
+            "dataType": "double",
+            "sourceColumn": "churn_ci_low_pp",
+            "summarizeBy": "sum",
+            "lineageTag": "248f30e9-6088-5264-a696-cd00955dfa6a",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_ci_high_pp",
+            "dataType": "double",
+            "sourceColumn": "churn_ci_high_pp",
+            "summarizeBy": "sum",
+            "lineageTag": "a95e23e5-85ef-5d15-b2a2-d96aba5c3830",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_p",
+            "dataType": "double",
+            "sourceColumn": "churn_p",
+            "summarizeBy": "sum",
+            "lineageTag": "4da650df-094c-5433-8d65-7eb5bf7cc64f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "friend_int_lift",
+            "dataType": "double",
+            "sourceColumn": "friend_int_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "625db0ae-2c2f-5c51-adb3-53ccb1968e3a",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "revenue_lift",
+            "dataType": "double",
+            "sourceColumn": "revenue_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "810abc28-bbe6-5726-8081-03565f3920df",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "minutes_p_adj",
+            "dataType": "double",
+            "sourceColumn": "minutes_p_adj",
+            "summarizeBy": "sum",
+            "lineageTag": "009705b5-4aea-5300-950c-ab9154c9a761",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "churn_p_adj",
+            "dataType": "double",
+            "sourceColumn": "churn_p_adj",
+            "summarizeBy": "sum",
+            "lineageTag": "9f27f267-4cfd-524b-919f-5abc41392adc",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "status",
+            "dataType": "string",
+            "sourceColumn": "status",
+            "summarizeBy": "none",
+            "lineageTag": "798fdce8-fb48-543f-9f1b-a32af941c0d5"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "segment_results",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"segment_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"segment\", type text}, {\"arm\", type text}, {\"n_treatment\", Int64.Type}, {\"n_control\", Int64.Type}, {\"minutes_lift\", type number}, {\"minutes_ci_low\", type number}, {\"minutes_ci_high\", type number}, {\"minutes_p\", type number}, {\"churn_control\", type number}, {\"churn_treatment\", type number}, {\"churn_diff_pp\", type number}, {\"churn_ci_low_pp\", type number}, {\"churn_ci_high_pp\", type number}, {\"churn_p\", type number}, {\"friend_int_lift\", type number}, {\"revenue_lift\", type number}, {\"minutes_p_adj\", type number}, {\"churn_p_adj\", type number}, {\"status\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "daily_lift",
+        "lineageTag": "1cee1ca7-6898-54ac-95fc-63e21951fba9",
+        "columns": [
+          {
+            "name": "day",
+            "dataType": "int64",
+            "sourceColumn": "day",
+            "summarizeBy": "sum",
+            "lineageTag": "0e22dd4a-7570-51b1-9f69-5230894d405b"
+          },
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "lineageTag": "5b17a6c0-61b2-53ad-a123-413712be6cea",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "eac17ddc-a5c5-545e-8f18-9ea355ffa940"
+          },
+          {
+            "name": "mean_control",
+            "dataType": "double",
+            "sourceColumn": "mean_control",
+            "summarizeBy": "sum",
+            "lineageTag": "fa872ddf-d2c4-5ffc-86a1-1b3d31b699c9",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "mean_treatment",
+            "dataType": "double",
+            "sourceColumn": "mean_treatment",
+            "summarizeBy": "sum",
+            "lineageTag": "055b71e7-3052-56dc-bee4-ef6cd30fec17",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "rel_lift",
+            "dataType": "double",
+            "sourceColumn": "rel_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "ba0f35c0-b09f-578a-9f42-1567e61da10e",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "ci_low",
+            "dataType": "double",
+            "sourceColumn": "ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "14303bb5-9a25-5be2-bec7-026b19003553",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "ci_high",
+            "dataType": "double",
+            "sourceColumn": "ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "f0274472-5634-5c23-8729-566d704f551a",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "fitted",
+            "dataType": "double",
+            "sourceColumn": "fitted",
+            "summarizeBy": "sum",
+            "lineageTag": "54e52063-12e7-573c-b024-6fd394c165fa",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "daily_lift",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"daily_lift.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"day\", Int64.Type}, {\"date\", type date}, {\"arm\", type text}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"rel_lift\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"fitted\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "sequential_monitoring",
+        "lineageTag": "05804948-95b6-5f18-b214-0f7af155b7a9",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "aebc8706-f7f2-51d8-b2bc-0890c2a5b87a"
+          },
+          {
+            "name": "day",
+            "dataType": "int64",
+            "sourceColumn": "day",
+            "summarizeBy": "sum",
+            "lineageTag": "6b37c180-a77d-53fa-9ebf-462a36f21880"
+          },
+          {
+            "name": "diff",
+            "dataType": "double",
+            "sourceColumn": "diff",
+            "summarizeBy": "sum",
+            "lineageTag": "7d209c0f-b4d1-5343-b62a-be41e80c2f91",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "se",
+            "dataType": "double",
+            "sourceColumn": "se",
+            "summarizeBy": "sum",
+            "lineageTag": "e9654cbc-25b8-53a1-bcc9-76be9b298bdf",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_naive",
+            "dataType": "double",
+            "sourceColumn": "p_naive",
+            "summarizeBy": "sum",
+            "lineageTag": "a0a6d54b-bc98-576d-a05e-eff8646a3f0b",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_always_valid",
+            "dataType": "double",
+            "sourceColumn": "p_always_valid",
+            "summarizeBy": "sum",
+            "lineageTag": "18a7bbe1-298f-5327-9757-769b4758279b",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "sequential_monitoring",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"sequential_monitoring.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"day\", Int64.Type}, {\"diff\", type number}, {\"se\", type number}, {\"p_naive\", type number}, {\"p_always_valid\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "power_mde",
+        "lineageTag": "84deb03b-0b8e-5326-ab78-6423ebb28278",
+        "columns": [
+          {
+            "name": "method",
+            "dataType": "string",
+            "sourceColumn": "method",
+            "summarizeBy": "none",
+            "lineageTag": "2883a79a-5a53-5e04-bad5-8c141efe89b3"
+          },
+          {
+            "name": "n_per_arm",
+            "dataType": "int64",
+            "sourceColumn": "n_per_arm",
+            "summarizeBy": "sum",
+            "lineageTag": "73566fc6-25d1-5471-aa86-4a33c513b134"
+          },
+          {
+            "name": "mde_abs",
+            "dataType": "double",
+            "sourceColumn": "mde_abs",
+            "summarizeBy": "sum",
+            "lineageTag": "1c6ec77c-159f-5b3d-a1a5-0ffba9372ff0",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "mde_rel",
+            "dataType": "double",
+            "sourceColumn": "mde_rel",
+            "summarizeBy": "sum",
+            "lineageTag": "18bc1237-9bb1-5d59-8452-b7d2ac4b39ea",
+            "formatString": "0.0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "power_mde",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"power_mde.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"method\", type text}, {\"n_per_arm\", Int64.Type}, {\"mde_abs\", type number}, {\"mde_rel\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "balance_smd",
+        "lineageTag": "325cdb2f-7b56-5e62-815e-e82e605b3f62",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "3cacb6cc-2f6c-5402-b82a-c5abf6d0b887"
+          },
+          {
+            "name": "covariate",
+            "dataType": "string",
+            "sourceColumn": "covariate",
+            "summarizeBy": "none",
+            "lineageTag": "f2ced7bc-19d7-5887-a03d-048036bf22e9"
+          },
+          {
+            "name": "smd",
+            "dataType": "double",
+            "sourceColumn": "smd",
+            "summarizeBy": "sum",
+            "lineageTag": "4d326a81-6876-5f7f-a23c-0cb4162f8323",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "balanced",
+            "dataType": "string",
+            "sourceColumn": "balanced",
+            "summarizeBy": "none",
+            "lineageTag": "eb22891b-a000-5722-8273-0d332f4d2e28"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "balance_smd",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"balance_smd.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"covariate\", type text}, {\"smd\", type number}, {\"balanced\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "bayesian_results",
+        "lineageTag": "d210481d-5663-589b-a8f0-8982422527b3",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "29972233-4ea7-549a-b570-1c02b514f406"
+          },
+          {
+            "name": "metric",
+            "dataType": "string",
+            "sourceColumn": "metric",
+            "summarizeBy": "none",
+            "lineageTag": "f55f1f16-7d85-5bb3-ba32-ec3573f7a188"
+          },
+          {
+            "name": "label",
+            "dataType": "string",
+            "sourceColumn": "label",
+            "summarizeBy": "none",
+            "lineageTag": "364a2c1f-6252-555b-a43c-c9a76da80151"
+          },
+          {
+            "name": "post_mean",
+            "dataType": "double",
+            "sourceColumn": "post_mean",
+            "summarizeBy": "sum",
+            "lineageTag": "05738925-4395-5e89-bb8f-3d4b1ceedeef",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "post_sd",
+            "dataType": "double",
+            "sourceColumn": "post_sd",
+            "summarizeBy": "sum",
+            "lineageTag": "5988112c-428e-5a6a-90de-4a81a229ac34",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_improves",
+            "dataType": "double",
+            "sourceColumn": "p_improves",
+            "summarizeBy": "sum",
+            "lineageTag": "2a74d58e-4130-55ae-9045-5285c36a515b",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "cred_low",
+            "dataType": "double",
+            "sourceColumn": "cred_low",
+            "summarizeBy": "sum",
+            "lineageTag": "9e9ac803-7618-5316-a04d-ffde2f0cec40",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "cred_high",
+            "dataType": "double",
+            "sourceColumn": "cred_high",
+            "summarizeBy": "sum",
+            "lineageTag": "f65c7e92-c909-5a13-9927-cf2d7c8ec1ce",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "bayesian_results",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"bayesian_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"post_mean\", type number}, {\"post_sd\", type number}, {\"p_improves\", type number}, {\"cred_low\", type number}, {\"cred_high\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "km_survival",
+        "lineageTag": "97a61007-145c-5ef9-bb10-14cfa21dc8da",
+        "columns": [
+          {
+            "name": "day",
+            "dataType": "double",
+            "sourceColumn": "day",
+            "summarizeBy": "sum",
+            "lineageTag": "dc8f8184-77dd-5108-979b-371f383b58c9",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "survival",
+            "dataType": "double",
+            "sourceColumn": "survival",
+            "summarizeBy": "sum",
+            "lineageTag": "d1a6d09b-8072-57bd-9d8e-be243de55b2a",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "ci_low",
+            "dataType": "double",
+            "sourceColumn": "ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "a514950d-b8ec-58b7-af6b-50b6fb180559",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "ci_high",
+            "dataType": "double",
+            "sourceColumn": "ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "9dc30199-5146-564c-8f0d-f207fd0e4df5",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "2702e3cc-50ab-5534-acbc-0ac5cf7fb18d"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "km_survival",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"km_survival.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"day\", type number}, {\"survival\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"arm\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cox_hazard_ratios",
+        "lineageTag": "b3ff498b-bfc8-536e-af51-d9205e742544",
+        "columns": [
+          {
+            "name": "covariate",
+            "dataType": "string",
+            "sourceColumn": "covariate",
+            "summarizeBy": "none",
+            "lineageTag": "94cc2f3f-9859-5f2f-bc85-51efa1fd0370"
+          },
+          {
+            "name": "hazard_ratio",
+            "dataType": "double",
+            "sourceColumn": "hazard_ratio",
+            "summarizeBy": "sum",
+            "lineageTag": "3a74440d-7ad6-5395-9b6c-a76f8f3e8d22",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "hr_ci_low",
+            "dataType": "double",
+            "sourceColumn": "hr_ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "e5712a4b-c0cb-5152-ace0-644ac35a436f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "hr_ci_high",
+            "dataType": "double",
+            "sourceColumn": "hr_ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "7e5a82f9-ebfd-56e9-86ac-71607a480602",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p_value",
+            "dataType": "double",
+            "sourceColumn": "p_value",
+            "summarizeBy": "sum",
+            "lineageTag": "b1661a07-c240-54c4-85f8-bd99cd577d18",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "cox_hazard_ratios",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"cox_hazard_ratios.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"covariate\", type text}, {\"hazard_ratio\", type number}, {\"hr_ci_low\", type number}, {\"hr_ci_high\", type number}, {\"p_value\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "churn_model_metrics",
+        "lineageTag": "2ac9d1b5-9870-5680-929c-d5f7765fcf20",
+        "columns": [
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none",
+            "lineageTag": "f0300313-a1aa-5971-803d-391fa60ca150"
+          },
+          {
+            "name": "roc_auc",
+            "dataType": "double",
+            "sourceColumn": "roc_auc",
+            "summarizeBy": "sum",
+            "lineageTag": "7e54dfee-5433-5105-b662-2b092de52bd3",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "pr_auc",
+            "dataType": "double",
+            "sourceColumn": "pr_auc",
+            "summarizeBy": "sum",
+            "lineageTag": "93a12b33-ce98-5ee3-8e77-71f6e3b2b820",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "brier",
+            "dataType": "double",
+            "sourceColumn": "brier",
+            "summarizeBy": "sum",
+            "lineageTag": "1c1351d7-7ce7-5766-8dc3-439010d8705d",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "log_loss",
+            "dataType": "double",
+            "sourceColumn": "log_loss",
+            "summarizeBy": "sum",
+            "lineageTag": "a09d766f-8e83-5f89-b125-3576538cb67f",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "top_decile_lift",
+            "dataType": "double",
+            "sourceColumn": "top_decile_lift",
+            "summarizeBy": "sum",
+            "lineageTag": "d438e945-ebf8-5c2d-be63-9ff950a9f21c",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "top_decile_precision",
+            "dataType": "double",
+            "sourceColumn": "top_decile_precision",
+            "summarizeBy": "sum",
+            "lineageTag": "ef5ca5f1-f478-56a8-ac65-0c86b18d6f70",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "cv_auc",
+            "dataType": "double",
+            "sourceColumn": "cv_auc",
+            "summarizeBy": "sum",
+            "lineageTag": "8302ede4-abdb-55cd-a1b4-fcd8ac29012e",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "churn_model_metrics",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"churn_model_metrics.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"roc_auc\", type number}, {\"pr_auc\", type number}, {\"brier\", type number}, {\"log_loss\", type number}, {\"top_decile_lift\", type number}, {\"top_decile_precision\", type number}, {\"cv_auc\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "churn_shap_importance",
+        "lineageTag": "bc4a670a-8ed1-58e8-bcf4-1a6ee55b8b91",
+        "columns": [
+          {
+            "name": "feature",
+            "dataType": "string",
+            "sourceColumn": "feature",
+            "summarizeBy": "none",
+            "lineageTag": "fcbe066e-a8e0-5adb-80c1-16b983fb0ec0"
+          },
+          {
+            "name": "mean_abs_shap",
+            "dataType": "double",
+            "sourceColumn": "mean_abs_shap",
+            "summarizeBy": "sum",
+            "lineageTag": "9c128fa2-6faa-52f9-bf93-e08a67029af2",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "churn_shap_importance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"churn_shap_importance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "retention_profit_curve",
+        "lineageTag": "853183c2-fbe9-5650-9c65-f9abbcaac322",
+        "columns": [
+          {
+            "name": "fraction_targeted",
+            "dataType": "double",
+            "sourceColumn": "fraction_targeted",
+            "summarizeBy": "sum",
+            "lineageTag": "85a6e827-5206-5e2c-b200-1f0976b08ee0",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "users_targeted",
+            "dataType": "int64",
+            "sourceColumn": "users_targeted",
+            "summarizeBy": "sum",
+            "lineageTag": "6479ec7f-f920-52e7-b319-a0e801f1a56c"
+          },
+          {
+            "name": "churners_caught",
+            "dataType": "int64",
+            "sourceColumn": "churners_caught",
+            "summarizeBy": "sum",
+            "lineageTag": "879595a7-b75f-54e4-a750-cf2808377d72"
+          },
+          {
+            "name": "recall",
+            "dataType": "double",
+            "sourceColumn": "recall",
+            "summarizeBy": "sum",
+            "lineageTag": "5ef42a06-b5df-5e41-bd93-91cf63b03fcf",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "precision",
+            "dataType": "double",
+            "sourceColumn": "precision",
+            "summarizeBy": "sum",
+            "lineageTag": "1d591e7c-bff8-50f7-aee2-7de61e720ccf",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "profit_test_usd",
+            "dataType": "double",
+            "sourceColumn": "profit_test_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "7980f0ce-2cf7-5585-a190-09ec1bcdbcaa",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "profit_at_scale_musd",
+            "dataType": "double",
+            "sourceColumn": "profit_at_scale_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "e1046a34-887e-5241-8436-fcc0febffcca",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "retention_profit_curve",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"retention_profit_curve.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"users_targeted\", Int64.Type}, {\"churners_caught\", Int64.Type}, {\"recall\", type number}, {\"precision\", type number}, {\"profit_test_usd\", type number}, {\"profit_at_scale_musd\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "policy_values",
+        "lineageTag": "67369e77-8e4a-5c80-8640-646ede5fd17f",
+        "columns": [
+          {
+            "name": "policy",
+            "dataType": "string",
+            "sourceColumn": "policy",
+            "summarizeBy": "none",
+            "lineageTag": "672aab36-da65-5577-aef0-0e5fcb5a7d73"
+          },
+          {
+            "name": "value_per_user_usd",
+            "dataType": "double",
+            "sourceColumn": "value_per_user_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "c8a23705-6d84-5a9e-bdf4-7eb58cd74919",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "uplift_ci_low",
+            "dataType": "double",
+            "sourceColumn": "uplift_ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "8ce843de-ab07-5d2a-9bd3-26c6720f80f4",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "uplift_ci_high",
+            "dataType": "double",
+            "sourceColumn": "uplift_ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "9ff0ed59-7176-5c20-b3e4-98357d93cd80",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "share_ai_feed",
+            "dataType": "double",
+            "sourceColumn": "share_ai_feed",
+            "summarizeBy": "sum",
+            "lineageTag": "91f55d8a-bdba-5d0c-94e0-a38cb636583e",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "share_ai_feed_social",
+            "dataType": "double",
+            "sourceColumn": "share_ai_feed_social",
+            "summarizeBy": "sum",
+            "lineageTag": "9167b5ec-13aa-57d9-9a99-3d767936188b",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "share_control",
+            "dataType": "double",
+            "sourceColumn": "share_control",
+            "summarizeBy": "sum",
+            "lineageTag": "0bcdabef-f76b-5447-9904-6c205c1dafde",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "uplift_vs_control_usd",
+            "dataType": "double",
+            "sourceColumn": "uplift_vs_control_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "247898ca-3387-5230-abbb-35548982b219",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "annual_value_at_scale_musd",
+            "dataType": "double",
+            "sourceColumn": "annual_value_at_scale_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "dc0d8f38-9cef-5815-b18a-82f50285e5b1",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "policy_values",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"policy_values.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"uplift_vs_control_usd\", type number}, {\"annual_value_at_scale_musd\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "qini_curves",
+        "lineageTag": "c692a82e-c8ef-52fe-b2d0-7d4f56d275b5",
+        "columns": [
+          {
+            "name": "fraction_targeted",
+            "dataType": "double",
+            "sourceColumn": "fraction_targeted",
+            "summarizeBy": "sum",
+            "lineageTag": "bd0e870a-50e1-5f91-924a-754938535b24",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "cumulative_gain",
+            "dataType": "double",
+            "sourceColumn": "cumulative_gain",
+            "summarizeBy": "sum",
+            "lineageTag": "96cdc033-36aa-51bd-b621-d9e204f0fcd4",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "random",
+            "dataType": "double",
+            "sourceColumn": "random",
+            "summarizeBy": "sum",
+            "lineageTag": "bb21fcd0-815f-5354-b500-dcb98ec50f7c",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none",
+            "lineageTag": "274861df-e361-5d8b-9e8b-7e12615d49dc"
+          },
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "b39dd38b-5c84-5509-b2b7-5127f2091c90"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "qini_curves",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"qini_curves.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"cumulative_gain\", type number}, {\"random\", type number}, {\"model\", type text}, {\"arm\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cate_deciles",
+        "lineageTag": "e55a92c7-3da5-5ae0-ab09-9d4a03ea437c",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "6d1a5687-1025-5d32-ab4d-bf61ef6f43dc"
+          },
+          {
+            "name": "decile",
+            "dataType": "int64",
+            "sourceColumn": "decile",
+            "summarizeBy": "sum",
+            "lineageTag": "24cdcb30-f9e3-51d0-a88c-e09566fd4f06"
+          },
+          {
+            "name": "predicted_cate",
+            "dataType": "double",
+            "sourceColumn": "predicted_cate",
+            "summarizeBy": "sum",
+            "lineageTag": "19e21e11-3b12-5136-9266-1c1b10fc32ee",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "observed_uplift",
+            "dataType": "double",
+            "sourceColumn": "observed_uplift",
+            "summarizeBy": "sum",
+            "lineageTag": "5fdeebb7-67ee-5cc7-be16-e2e883dbd24a",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "share_35_plus",
+            "dataType": "double",
+            "sourceColumn": "share_35_plus",
+            "summarizeBy": "sum",
+            "lineageTag": "63de6298-724c-59c0-bdb9-6cad34c22266",
+            "formatString": "0.0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "cate_deciles",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"cate_deciles.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"decile\", Int64.Type}, {\"predicted_cate\", type number}, {\"observed_uplift\", type number}, {\"share_35_plus\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "topic_info",
+        "lineageTag": "d502996b-3054-5f49-9deb-9cdb811d5512",
+        "columns": [
+          {
+            "name": "topic_id",
+            "dataType": "int64",
+            "sourceColumn": "topic_id",
+            "summarizeBy": "none",
+            "lineageTag": "644fdbf1-c291-599f-92c8-ae78f0608eaa"
+          },
+          {
+            "name": "label",
+            "dataType": "string",
+            "sourceColumn": "label",
+            "summarizeBy": "none",
+            "lineageTag": "37acc916-08d7-57a1-b211-990b17939c5a"
+          },
+          {
+            "name": "top_words",
+            "dataType": "string",
+            "sourceColumn": "top_words",
+            "summarizeBy": "none",
+            "lineageTag": "51ac9eb5-049f-52f9-a859-bace75299bf6"
+          },
+          {
+            "name": "n_posts",
+            "dataType": "int64",
+            "sourceColumn": "n_posts",
+            "summarizeBy": "sum",
+            "lineageTag": "e017c08b-b97b-5055-8de0-392e28d531ef"
+          },
+          {
+            "name": "share_negative_pred",
+            "dataType": "double",
+            "sourceColumn": "share_negative_pred",
+            "summarizeBy": "sum",
+            "lineageTag": "79384d51-972a-5a8c-9ad3-22bdab631a54",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "share_positive_pred",
+            "dataType": "double",
+            "sourceColumn": "share_positive_pred",
+            "summarizeBy": "sum",
+            "lineageTag": "a0a45ef7-7430-5864-97cc-2d5b4d611c01",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "mean_p_negative",
+            "dataType": "double",
+            "sourceColumn": "mean_p_negative",
+            "summarizeBy": "sum",
+            "lineageTag": "0320db53-96a6-5349-8c5d-ec56e05af7f3",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "topic_info",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"topic_info.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"topic_id\", Int64.Type}, {\"label\", type text}, {\"top_words\", type text}, {\"n_posts\", Int64.Type}, {\"share_negative_pred\", type number}, {\"share_positive_pred\", type number}, {\"mean_p_negative\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "content_exposure_summary",
+        "lineageTag": "dbf57d77-9fe8-5d30-80ee-5f9b2ef5cb4d",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "b33566eb-3b16-5541-bebf-d7e56a88a1da"
+          },
+          {
+            "name": "topic_entropy",
+            "dataType": "double",
+            "sourceColumn": "topic_entropy",
+            "summarizeBy": "sum",
+            "lineageTag": "26b13d3f-b6ee-5035-81d7-a1b3dc4acad7",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "top_topic_share",
+            "dataType": "double",
+            "sourceColumn": "top_topic_share",
+            "summarizeBy": "sum",
+            "lineageTag": "cb22b2f6-46f4-5224-a8b3-6e9b1cb7d611",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "distinct_topics",
+            "dataType": "double",
+            "sourceColumn": "distinct_topics",
+            "summarizeBy": "sum",
+            "lineageTag": "1b5cccf1-4740-5b1a-8da0-4064cbd46ef3",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "negative_share",
+            "dataType": "double",
+            "sourceColumn": "negative_share",
+            "summarizeBy": "sum",
+            "lineageTag": "0e4eb72e-6238-5734-8d51-655660d14209",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "expected_engagements",
+            "dataType": "double",
+            "sourceColumn": "expected_engagements",
+            "summarizeBy": "sum",
+            "lineageTag": "8d151cf8-c9ec-5982-906a-bcd72e7263b5",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "topic_entropy_rel_change",
+            "dataType": "double",
+            "sourceColumn": "topic_entropy_rel_change",
+            "summarizeBy": "sum",
+            "lineageTag": "2a427512-0e8d-5d83-b356-64d12676a3e0",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "topic_entropy_p",
+            "dataType": "double",
+            "sourceColumn": "topic_entropy_p",
+            "summarizeBy": "sum",
+            "lineageTag": "b33ea429-cf28-5d04-b952-29009e8fa2a9",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "top_topic_share_rel_change",
+            "dataType": "double",
+            "sourceColumn": "top_topic_share_rel_change",
+            "summarizeBy": "sum",
+            "lineageTag": "277bab95-7f0a-564e-a059-e3dcacf831d7",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "top_topic_share_p",
+            "dataType": "double",
+            "sourceColumn": "top_topic_share_p",
+            "summarizeBy": "sum",
+            "lineageTag": "c15f7910-67bd-52a1-bca1-62e4e9704928",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "distinct_topics_rel_change",
+            "dataType": "double",
+            "sourceColumn": "distinct_topics_rel_change",
+            "summarizeBy": "sum",
+            "lineageTag": "02cb1b6f-a46a-5e0b-bd7a-96a5c4b04bc9",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "distinct_topics_p",
+            "dataType": "double",
+            "sourceColumn": "distinct_topics_p",
+            "summarizeBy": "sum",
+            "lineageTag": "6941dd7e-5d15-5b6f-87aa-e4a998ea6725",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "negative_share_rel_change",
+            "dataType": "double",
+            "sourceColumn": "negative_share_rel_change",
+            "summarizeBy": "sum",
+            "lineageTag": "a88b9959-335b-5a43-9f13-c9d5d76cfb92",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "negative_share_p",
+            "dataType": "double",
+            "sourceColumn": "negative_share_p",
+            "summarizeBy": "sum",
+            "lineageTag": "761eac88-cf7a-543d-b150-1210f0f4aa3b",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "expected_engagements_rel_change",
+            "dataType": "double",
+            "sourceColumn": "expected_engagements_rel_change",
+            "summarizeBy": "sum",
+            "lineageTag": "c9a1b9f5-715b-5a53-929e-64baa48b7d75",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "expected_engagements_p",
+            "dataType": "double",
+            "sourceColumn": "expected_engagements_p",
+            "summarizeBy": "sum",
+            "lineageTag": "5e18424b-c313-54a2-b58e-d56ed1365ee6",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "content_exposure_summary",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"content_exposure_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_entropy\", type number}, {\"top_topic_share\", type number}, {\"distinct_topics\", type number}, {\"negative_share\", type number}, {\"expected_engagements\", type number}, {\"topic_entropy_rel_change\", type number}, {\"topic_entropy_p\", type number}, {\"top_topic_share_rel_change\", type number}, {\"top_topic_share_p\", type number}, {\"distinct_topics_rel_change\", type number}, {\"distinct_topics_p\", type number}, {\"negative_share_rel_change\", type number}, {\"negative_share_p\", type number}, {\"expected_engagements_rel_change\", type number}, {\"expected_engagements_p\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "sentiment_model_metrics",
+        "lineageTag": "926d3bc6-bb7e-578b-87f6-866c9880df85",
+        "columns": [
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none",
+            "lineageTag": "48a86171-6da1-5f99-830c-f54b9bd5835c"
+          },
+          {
+            "name": "macro_recall",
+            "dataType": "double",
+            "sourceColumn": "macro_recall",
+            "summarizeBy": "sum",
+            "lineageTag": "84aeb445-df8f-5a40-b443-0cffff2a611d",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "macro_f1",
+            "dataType": "double",
+            "sourceColumn": "macro_f1",
+            "summarizeBy": "sum",
+            "lineageTag": "bed430ef-f2d3-5a60-8023-4111f4ca80fc",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "accuracy",
+            "dataType": "double",
+            "sourceColumn": "accuracy",
+            "summarizeBy": "sum",
+            "lineageTag": "4fb92294-1e86-5857-b5b4-f97cc0dbef52",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "f1_negative",
+            "dataType": "double",
+            "sourceColumn": "f1_negative",
+            "summarizeBy": "sum",
+            "lineageTag": "96578eb2-d7d4-506b-aa9d-3b6b21678c84",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "f1_positive",
+            "dataType": "double",
+            "sourceColumn": "f1_positive",
+            "summarizeBy": "sum",
+            "lineageTag": "92cf7228-9908-5c81-b347-e2252aa83163",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "sentiment_model_metrics",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"sentiment_model_metrics.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"macro_recall\", type number}, {\"macro_f1\", type number}, {\"accuracy\", type number}, {\"f1_negative\", type number}, {\"f1_positive\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "virality_playbook",
+        "lineageTag": "eee1f104-e78c-57e9-894e-4de4d5ab3ef5",
+        "columns": [
+          {
+            "name": "dimension",
+            "dataType": "string",
+            "sourceColumn": "dimension",
+            "summarizeBy": "none",
+            "lineageTag": "a6e581ba-0b20-50da-81c4-0116ffd234e6"
+          },
+          {
+            "name": "level",
+            "dataType": "string",
+            "sourceColumn": "level",
+            "summarizeBy": "none",
+            "lineageTag": "04c9a7e4-7e86-582e-b497-9259bfe4915c"
+          },
+          {
+            "name": "articles",
+            "dataType": "int64",
+            "sourceColumn": "articles",
+            "summarizeBy": "sum",
+            "lineageTag": "a5c38e34-9b00-5354-977b-f52d552be247"
+          },
+          {
+            "name": "median_shares",
+            "dataType": "double",
+            "sourceColumn": "median_shares",
+            "summarizeBy": "sum",
+            "lineageTag": "83fdb08f-70f4-5b66-a509-b8cc6447a53d",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "viral_rate",
+            "dataType": "double",
+            "sourceColumn": "viral_rate",
+            "summarizeBy": "sum",
+            "lineageTag": "83e342b7-e074-5765-b7b4-9fda718a7493",
+            "formatString": "0.0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "virality_playbook",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_playbook.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"level\", type text}, {\"articles\", Int64.Type}, {\"median_shares\", type number}, {\"viral_rate\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "virality_shap_importance",
+        "lineageTag": "a003cddd-fe34-5274-b6f1-8356fdfe7147",
+        "columns": [
+          {
+            "name": "feature",
+            "dataType": "string",
+            "sourceColumn": "feature",
+            "summarizeBy": "none",
+            "lineageTag": "e4993cd9-3c1b-56c1-881c-ac833a7eec75"
+          },
+          {
+            "name": "mean_abs_shap",
+            "dataType": "double",
+            "sourceColumn": "mean_abs_shap",
+            "summarizeBy": "sum",
+            "lineageTag": "53c4a3f0-60f3-544c-a2cc-fe2eab009d79",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "virality_shap_importance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_shap_importance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "virality_weekly",
+        "lineageTag": "def4c4ff-b1c8-5912-b64a-91be438c20f9",
+        "columns": [
+          {
+            "name": "week",
+            "dataType": "dateTime",
+            "sourceColumn": "week",
+            "summarizeBy": "none",
+            "lineageTag": "1695cb8c-e9bb-5e47-877b-c4934d09039f",
+            "formatString": "yyyy-mm-dd"
+          },
+          {
+            "name": "median_shares",
+            "dataType": "double",
+            "sourceColumn": "median_shares",
+            "summarizeBy": "sum",
+            "lineageTag": "3c987f21-a11d-5faf-918d-c3871587abbc",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "viral_rate",
+            "dataType": "double",
+            "sourceColumn": "viral_rate",
+            "summarizeBy": "sum",
+            "lineageTag": "14d0cebf-c34d-5702-b527-3ff1fc71d081",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "articles",
+            "dataType": "int64",
+            "sourceColumn": "articles",
+            "summarizeBy": "sum",
+            "lineageTag": "59237022-1078-551e-8821-a587fd9fb0b9"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "virality_weekly",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_weekly.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"week\", type date}, {\"median_shares\", type number}, {\"viral_rate\", type number}, {\"articles\", Int64.Type}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "impact_fan",
+        "lineageTag": "d501b4dd-788d-5f1c-b426-8fe642804960",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "a7501524-daaa-59ef-b572-45a4611cdde3"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "sum",
+            "lineageTag": "bc0bde0a-76fc-577c-8158-47ca934d0a2b"
+          },
+          {
+            "name": "p05",
+            "dataType": "double",
+            "sourceColumn": "p05",
+            "summarizeBy": "sum",
+            "lineageTag": "0b6d62ae-99d0-5e78-92d7-95b330f8337a",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p50",
+            "dataType": "double",
+            "sourceColumn": "p50",
+            "summarizeBy": "sum",
+            "lineageTag": "94f795f9-112d-511c-a317-92dbf526c0c7",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p95",
+            "dataType": "double",
+            "sourceColumn": "p95",
+            "summarizeBy": "sum",
+            "lineageTag": "ebce6542-a2d3-5638-b5a0-673ec8eef092",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "impact_fan",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_fan.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"month\", Int64.Type}, {\"p05\", type number}, {\"p50\", type number}, {\"p95\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "impact_distribution",
+        "lineageTag": "f7e39c79-9617-52c9-92fd-b1725bf8d73e",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "4ac1b5a8-5d9a-5c76-b854-db43d8751edc"
+          },
+          {
+            "name": "bin_mid_musd",
+            "dataType": "double",
+            "sourceColumn": "bin_mid_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "d73eb466-b107-5b93-904e-2edd4e6cb1df",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "share_of_draws",
+            "dataType": "double",
+            "sourceColumn": "share_of_draws",
+            "summarizeBy": "sum",
+            "lineageTag": "f54a9b98-c1b8-5c57-babe-a7e1057b067a",
+            "formatString": "0.0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "impact_distribution",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_distribution.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"bin_mid_musd\", type number}, {\"share_of_draws\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "impact_monte_carlo",
+        "lineageTag": "084f28dc-abc3-56bc-aa32-25aeef80447e",
+        "columns": [
+          {
+            "name": "comparison",
+            "dataType": "string",
+            "sourceColumn": "comparison",
+            "summarizeBy": "none",
+            "lineageTag": "c1da4771-d314-50c2-ab77-23edefc0a9e0"
+          },
+          {
+            "name": "p05_musd",
+            "dataType": "double",
+            "sourceColumn": "p05_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "4f14cc6d-9afd-53f3-b2ef-422bb41c9483",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p50_musd",
+            "dataType": "double",
+            "sourceColumn": "p50_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "b3793505-3371-5251-8ae3-625351b9a432",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p95_musd",
+            "dataType": "double",
+            "sourceColumn": "p95_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "74637d40-3668-5a64-8fd1-5d1422b4cb75",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "mean_musd",
+            "dataType": "double",
+            "sourceColumn": "mean_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "c5fe0526-867a-5d09-9076-2d7680d3c2f0",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "prob_positive",
+            "dataType": "double",
+            "sourceColumn": "prob_positive",
+            "summarizeBy": "sum",
+            "lineageTag": "afcca657-9748-52ae-b97b-6314d7073b4e",
+            "formatString": "0.0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "impact_monte_carlo",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_monte_carlo.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"comparison\", type text}, {\"p05_musd\", type number}, {\"p50_musd\", type number}, {\"p95_musd\", type number}, {\"mean_musd\", type number}, {\"prob_positive\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "impact_sensitivity",
+        "lineageTag": "de2f7495-1dc4-5425-9ac3-c04945141771",
+        "columns": [
+          {
+            "name": "assumption",
+            "dataType": "string",
+            "sourceColumn": "assumption",
+            "summarizeBy": "none",
+            "lineageTag": "60412609-255a-584e-adf1-b40db09b3c3d"
+          },
+          {
+            "name": "low_musd",
+            "dataType": "double",
+            "sourceColumn": "low_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "4f43b478-5ae0-5c87-864c-3ab066e973f4",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "high_musd",
+            "dataType": "double",
+            "sourceColumn": "high_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "aee6d0ff-518a-514f-9e04-560bd008cccd",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "central_musd",
+            "dataType": "double",
+            "sourceColumn": "central_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "04fbeb06-97e7-5ed7-bfbb-b53dd4903605",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "swing",
+            "dataType": "double",
+            "sourceColumn": "swing",
+            "summarizeBy": "sum",
+            "lineageTag": "72a30cb0-4511-5813-808e-712c78eb9db4",
+            "formatString": "#,0.0000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "impact_sensitivity",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_sensitivity.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"assumption\", type text}, {\"low_musd\", type number}, {\"high_musd\", type number}, {\"central_musd\", type number}, {\"swing\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "topic_exposure_by_arm",
+        "lineageTag": "a3e843ca-d6eb-5a5f-bb51-1e5ec5327b4f",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "ef973240-36c2-59c5-8b79-416d377b3668"
+          },
+          {
+            "name": "topic_id",
+            "dataType": "int64",
+            "sourceColumn": "topic_id",
+            "summarizeBy": "none",
+            "lineageTag": "aa38ad7e-9ea3-5993-baa4-98d406438159"
+          },
+          {
+            "name": "share",
+            "dataType": "double",
+            "sourceColumn": "share",
+            "summarizeBy": "sum",
+            "lineageTag": "4ca16835-3325-5e5b-a886-078f4502ef3b",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "label",
+            "dataType": "string",
+            "sourceColumn": "label",
+            "summarizeBy": "none",
+            "lineageTag": "1075c40e-f516-5eb3-8b76-5937a95d3361"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "topic_exposure_by_arm",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(DataFolder & \"topic_exposure_by_arm.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_id\", Int64.Type}, {\"share\", type number}, {\"label\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "_Measures",
+        "lineageTag": "b582f3ce-9fd6-5634-b599-dc61df992f28",
+        "columns": [
+          {
+            "name": "Measure Holder",
+            "dataType": "string",
+            "sourceColumn": "Measure Holder",
+            "isHidden": true,
+            "summarizeBy": "none",
+            "lineageTag": "3b533ced-757b-5c75-b275-57ad35f779ea"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Users",
+            "expression": "COUNTROWS(fact_user)",
+            "formatString": "#,0",
+            "displayFolder": "Experiment",
+            "lineageTag": "e2160cdd-3181-5dee-979e-6ae51acd62ea"
+          },
+          {
+            "name": "User-Days",
+            "expression": "SUM(fact_daily[users_assigned])",
+            "formatString": "#,0",
+            "displayFolder": "Engagement",
+            "lineageTag": "2b26a598-8ee7-5303-891f-2cd581a46d3d"
+          },
+          {
+            "name": "Minutes per User-Day",
+            "expression": "DIVIDE(SUM(fact_daily[minutes]), [User-Days])",
+            "formatString": "0.00",
+            "displayFolder": "Engagement",
+            "lineageTag": "522966d3-58ed-5cb1-94d2-9efd2d23125f"
+          },
+          {
+            "name": "DAU Rate",
+            "expression": "DIVIDE(SUM(fact_daily[active_users]), [User-Days])",
+            "formatString": "0.0%",
+            "displayFolder": "Engagement",
+            "lineageTag": "ffd7beb7-1f33-5a7a-84a8-79c53fe21b4c"
+          },
+          {
+            "name": "Sessions per User-Day",
+            "expression": "DIVIDE(SUM(fact_daily[sessions]), [User-Days])",
+            "formatString": "0.00",
+            "displayFolder": "Engagement",
+            "lineageTag": "d7da2597-f5f4-5644-820a-5f0f0072e9fa"
+          },
+          {
+            "name": "Friend Interactions per User-Day",
+            "expression": "DIVIDE(SUM(fact_daily[friend_interactions]), [User-Days])",
+            "formatString": "0.000",
+            "displayFolder": "Engagement",
+            "lineageTag": "ca9dcd0f-23a1-553b-992b-9444ea63a129"
+          },
+          {
+            "name": "Posts per User-Day",
+            "expression": "DIVIDE(SUM(fact_daily[posts_created]), [User-Days])",
+            "formatString": "0.000",
+            "displayFolder": "Engagement",
+            "lineageTag": "f8e1f324-2d46-5c55-b54a-63d1592726d9"
+          },
+          {
+            "name": "Revenue per User-Day",
+            "expression": "DIVIDE(SUM(fact_daily[ad_revenue]), [User-Days])",
+            "formatString": "$0.0000",
+            "displayFolder": "Monetisation",
+            "lineageTag": "d870c7fb-07b3-5afb-bb15-ccc6798538c6"
+          },
+          {
+            "name": "Ad CTR",
+            "expression": "DIVIDE(SUM(fact_daily[ad_clicks]), SUM(fact_daily[ad_impressions]))",
+            "formatString": "0.00%",
+            "displayFolder": "Monetisation",
+            "lineageTag": "abe24fa6-3f51-590e-b7e3-9a33783e71db"
+          },
+          {
+            "name": "Negative Feedback per 100 Min",
+            "expression": "DIVIDE(SUM(fact_daily[negative_feedback]), SUM(fact_daily[minutes])) * 100",
+            "formatString": "0.000",
+            "displayFolder": "Guardrails",
+            "lineageTag": "69339511-db15-57a6-9d05-0897b3023361"
+          },
+          {
+            "name": "Minutes per User-Day (Control)",
+            "expression": "CALCULATE([Minutes per User-Day], dim_arm[arm] = \"control\")",
+            "formatString": "0.00",
+            "displayFolder": "Lift vs Control",
+            "lineageTag": "6dc35e46-6b28-532c-afa5-51173dedb466"
+          },
+          {
+            "name": "Minutes Lift vs Control",
+            "expression": "DIVIDE([Minutes per User-Day], [Minutes per User-Day (Control)]) - 1",
+            "formatString": "+0.0%;-0.0%;0.0%",
+            "displayFolder": "Lift vs Control",
+            "lineageTag": "9eb843a4-bd0b-57b0-b8cc-5c35e5678fd0"
+          },
+          {
+            "name": "Revenue Lift vs Control",
+            "expression": "DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], dim_arm[arm] = \"control\")) - 1",
+            "formatString": "+0.0%;-0.0%;0.0%",
+            "displayFolder": "Lift vs Control",
+            "lineageTag": "b36cbe80-a7ef-5bd3-94ca-1fbe6f4a1e71"
+          },
+          {
+            "name": "Friend Interactions Lift vs Control",
+            "expression": "DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], dim_arm[arm] = \"control\")) - 1",
+            "formatString": "+0.0%;-0.0%;0.0%",
+            "displayFolder": "Lift vs Control",
+            "lineageTag": "2380d73f-7ce2-5d27-a5ee-198f5c797298"
+          },
+          {
+            "name": "Churn Rate",
+            "expression": "AVERAGE(fact_user[churned])",
+            "formatString": "0.00%",
+            "displayFolder": "Retention",
+            "lineageTag": "9c04b676-d5b6-57a7-8997-a8347307550b"
+          },
+          {
+            "name": "Churn Rate (Control)",
+            "expression": "CALCULATE([Churn Rate], dim_arm[arm] = \"control\")",
+            "formatString": "0.00%",
+            "displayFolder": "Retention",
+            "lineageTag": "0ee2404e-ce1b-57fb-b43a-97433a16a1c3"
+          },
+          {
+            "name": "Churn Change vs Control (pp)",
+            "expression": "([Churn Rate] - [Churn Rate (Control)]) * 100",
+            "formatString": "+0.00;-0.00;0.00",
+            "displayFolder": "Retention",
+            "lineageTag": "f5d704e9-88b9-51b8-b043-d3d954d93a40"
+          },
+          {
+            "name": "Avg Churn Risk",
+            "expression": "AVERAGE(fact_user[churn_probability])",
+            "formatString": "0.0%",
+            "displayFolder": "Retention",
+            "lineageTag": "40a96258-4a28-5c72-a40c-caf1081a9c79"
+          },
+          {
+            "name": "High-Risk Users",
+            "expression": "CALCULATE(COUNTROWS(fact_user), fact_user[risk_tier] IN {\"High\", \"Critical\"})",
+            "formatString": "#,0",
+            "displayFolder": "Retention",
+            "lineageTag": "01b8de3a-60eb-580b-a778-7abb0f56b637"
+          },
+          {
+            "name": "AI Feed Minutes Lift",
+            "expression": "CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = \"ai_feed\", metric_results[metric] = \"minutes\")",
+            "formatString": "+0.0%;-0.0%",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "0406ea0e-8c4c-5e80-b369-51ed45c9fd88"
+          },
+          {
+            "name": "Friend Boost Minutes Lift",
+            "expression": "CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = \"ai_feed_social\", metric_results[metric] = \"minutes\")",
+            "formatString": "+0.0%;-0.0%",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "0aca7a3f-a052-55e8-94a2-539aa7fd0a0d"
+          },
+          {
+            "name": "AI Feed Churn Change",
+            "expression": "CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = \"ai_feed\", metric_results[metric] = \"churned\")",
+            "formatString": "+0.0%;-0.0%",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "39ea74dc-98ad-580a-aa4f-db249143e73a"
+          },
+          {
+            "name": "Friend Boost Churn Change",
+            "expression": "CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = \"ai_feed_social\", metric_results[metric] = \"churned\")",
+            "formatString": "+0.0%;-0.0%",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "fdee091c-bbb7-5f79-9942-cecf43740244"
+          },
+          {
+            "name": "Friend Boost 12M Value ($M)",
+            "expression": "CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = \"AI + friend boost vs control\")",
+            "formatString": "$#,0\"M\"",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "2a1d0203-3405-5595-a506-e8633ae0aa95"
+          },
+          {
+            "name": "AI Feed 12M Value ($M)",
+            "expression": "CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = \"AI feed vs control\")",
+            "formatString": "$#,0\"M\"",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "34d3b3fd-4e73-58c1-bd86-aa2e3aeeb15b"
+          },
+          {
+            "name": "P(Friend Boost Beats AI Feed)",
+            "expression": "CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = \"Friend boost minus AI feed\")",
+            "formatString": "0.0%",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "307c900d-e6bf-5d9f-801c-34d0dc73367b"
+          },
+          {
+            "name": "Significant Wins",
+            "expression": "CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = \"win\")",
+            "formatString": "0",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "aff79733-0bf8-56fa-90f9-4a6bcf4cdf89"
+          },
+          {
+            "name": "Significant Harms",
+            "expression": "CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = \"harm\")",
+            "formatString": "0",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "f2c024e9-ef32-502f-851a-04b709abfe36"
+          },
+          {
+            "name": "Best Policy Uplift ($/user/yr)",
+            "expression": "MAX(policy_values[uplift_vs_control_usd])",
+            "formatString": "$0.00",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "bba268b7-5de5-5e53-bb3f-0da5860663ba"
+          },
+          {
+            "name": "Churn Model AUC",
+            "expression": "CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[model] = \"LightGBM + isotonic\")",
+            "formatString": "0.000",
+            "displayFolder": "Headline KPIs",
+            "lineageTag": "18d55ac5-ff22-5fe1-a948-af36dd6ac393"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "_Measures",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #table(type table [#\"Measure Holder\" = text], {})",
+                "in",
+                "    Source"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "ce33410b-41b9-58ae-ae41-0f585389020b",
+        "fromTable": "fact_daily",
+        "fromColumn": "date",
+        "toTable": "dim_date",
+        "toColumn": "date"
+      },
+      {
+        "name": "3fd75531-9d35-5186-9e1a-1ec72781aacb",
+        "fromTable": "fact_daily",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "c102e5a9-0927-53dd-b818-53cbd10460d7",
+        "fromTable": "fact_user",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "186e0463-5cca-567a-80d1-bbde343e2854",
+        "fromTable": "metric_results",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "b62301c0-4351-59cb-9e51-b97936ce4ac9",
+        "fromTable": "segment_results",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "d8aeb4c1-2397-5715-b20a-238b7b632491",
+        "fromTable": "daily_lift",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "8f010c25-698f-5124-b4e1-791d0c093b42",
+        "fromTable": "km_survival",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "8b7c5219-31fe-5d51-a205-06e0ea65b3fd",
+        "fromTable": "impact_fan",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "97d59bfb-1231-5020-8a6d-9df1c8fbf05c",
+        "fromTable": "topic_exposure_by_arm",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "948a1eba-5b72-5b75-85ad-d7d1f4b06aba",
+        "fromTable": "content_exposure_summary",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "1f3c894a-5138-5dcc-a22b-c1b68474fc32",
+        "fromTable": "sequential_monitoring",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "42f6698c-2624-5100-ace8-7292e0752fbb",
+        "fromTable": "impact_distribution",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      }
+    ],
+    "expressions": [
+      {
+        "name": "DataFolder",
+        "kind": "m",
+        "lineageTag": "e6c4a43b-658a-519a-932c-969e5ac01fec",
+        "expression": "\"C:\\SEI\\powerbi\\data\\\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"DataFolder\", \"dim_date\", \"dim_arm\", \"fact_daily\", \"fact_user\", \"metric_results\", \"segment_results\", \"daily_lift\", \"sequential_monitoring\", \"power_mde\", \"balance_smd\", \"bayesian_results\", \"km_survival\", \"cox_hazard_ratios\", \"churn_model_metrics\", \"churn_shap_importance\", \"retention_profit_curve\", \"policy_values\", \"qini_curves\", \"cate_deciles\", \"topic_info\", \"content_exposure_summary\", \"sentiment_model_metrics\", \"virality_playbook\", \"virality_shap_importance\", \"virality_weekly\", \"impact_fan\", \"impact_distribution\", \"impact_monte_carlo\", \"impact_sensitivity\", \"topic_exposure_by_arm\", \"_Measures\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      }
+    ]
+  }
+}

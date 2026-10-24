@@ -1,0 +1,121 @@
+// DAX measures for the SEI semantic model (table: _Measures)
+
+// [Experiment]  format: #,0
+Users =
+    COUNTROWS(fact_user)
+
+// [Engagement]  format: #,0
+User-Days =
+    SUM(fact_daily[users_assigned])
+
+// [Engagement]  format: 0.00
+Minutes per User-Day =
+    DIVIDE(SUM(fact_daily[minutes]), [User-Days])
+
+// [Engagement]  format: 0.0%
+DAU Rate =
+    DIVIDE(SUM(fact_daily[active_users]), [User-Days])
+
+// [Engagement]  format: 0.00
+Sessions per User-Day =
+    DIVIDE(SUM(fact_daily[sessions]), [User-Days])
+
+// [Engagement]  format: 0.000
+Friend Interactions per User-Day =
+    DIVIDE(SUM(fact_daily[friend_interactions]), [User-Days])
+
+// [Engagement]  format: 0.000
+Posts per User-Day =
+    DIVIDE(SUM(fact_daily[posts_created]), [User-Days])
+
+// [Monetisation]  format: $0.0000
+Revenue per User-Day =
+    DIVIDE(SUM(fact_daily[ad_revenue]), [User-Days])
+
+// [Monetisation]  format: 0.00%
+Ad CTR =
+    DIVIDE(SUM(fact_daily[ad_clicks]), SUM(fact_daily[ad_impressions]))
+
+// [Guardrails]  format: 0.000
+Negative Feedback per 100 Min =
+    DIVIDE(SUM(fact_daily[negative_feedback]), SUM(fact_daily[minutes])) * 100
+
+// [Lift vs Control]  format: 0.00
+Minutes per User-Day (Control) =
+    CALCULATE([Minutes per User-Day], dim_arm[arm] = "control")
+
+// [Lift vs Control]  format: +0.0%;-0.0%;0.0%
+Minutes Lift vs Control =
+    DIVIDE([Minutes per User-Day], [Minutes per User-Day (Control)]) - 1
+
+// [Lift vs Control]  format: +0.0%;-0.0%;0.0%
+Revenue Lift vs Control =
+    DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], dim_arm[arm] = "control")) - 1
+
+// [Lift vs Control]  format: +0.0%;-0.0%;0.0%
+Friend Interactions Lift vs Control =
+    DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], dim_arm[arm] = "control")) - 1
+
+// [Retention]  format: 0.00%
+Churn Rate =
+    AVERAGE(fact_user[churned])
+
+// [Retention]  format: 0.00%
+Churn Rate (Control) =
+    CALCULATE([Churn Rate], dim_arm[arm] = "control")
+
+// [Retention]  format: +0.00;-0.00;0.00
+Churn Change vs Control (pp) =
+    ([Churn Rate] - [Churn Rate (Control)]) * 100
+
+// [Retention]  format: 0.0%
+Avg Churn Risk =
+    AVERAGE(fact_user[churn_probability])
+
+// [Retention]  format: #,0
+High-Risk Users =
+    CALCULATE(COUNTROWS(fact_user), fact_user[risk_tier] IN {"High", "Critical"})
+
+// [Headline KPIs]  format: +0.0%;-0.0%
+AI Feed Minutes Lift =
+    CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = "ai_feed", metric_results[metric] = "minutes")
+
+// [Headline KPIs]  format: +0.0%;-0.0%
+Friend Boost Minutes Lift =
+    CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = "ai_feed_social", metric_results[metric] = "minutes")
+
+// [Headline KPIs]  format: +0.0%;-0.0%
+AI Feed Churn Change =
+    CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = "ai_feed", metric_results[metric] = "churned")
+
+// [Headline KPIs]  format: +0.0%;-0.0%
+Friend Boost Churn Change =
+    CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = "ai_feed_social", metric_results[metric] = "churned")
+
+// [Headline KPIs]  format: $#,0"M"
+Friend Boost 12M Value ($M) =
+    CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = "AI + friend boost vs control")
+
+// [Headline KPIs]  format: $#,0"M"
+AI Feed 12M Value ($M) =
+    CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = "AI feed vs control")
+
+// [Headline KPIs]  format: 0.0%
+P(Friend Boost Beats AI Feed) =
+    CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = "Friend boost minus AI feed")
+
+// [Headline KPIs]  format: 0
+Significant Wins =
+    CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = "win")
+
+// [Headline KPIs]  format: 0
+Significant Harms =
+    CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = "harm")
+
+// [Headline KPIs]  format: $0.00
+Best Policy Uplift ($/user/yr) =
+    MAX(policy_values[uplift_vs_control_usd])
+
+// [Headline KPIs]  format: 0.000
+Churn Model AUC =
+    CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[model] = "LightGBM + isotonic")

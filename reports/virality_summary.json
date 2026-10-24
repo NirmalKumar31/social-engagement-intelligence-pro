@@ -1,0 +1,22 @@
+{
+  "n_articles": 39644,
+  "train_until": "2014-07-27",
+  "test_from": "2014-07-27",
+  "viral_threshold_shares": 2800.0,
+  "auc_lightgbm": 0.7320860199178829,
+  "auc_logistic": 0.7075846069495302,
+  "r2_log_shares": 0.16184495878708083,
+  "mae_shares_median_abs": 2077.9213564220436,
+  "precision_top10pct": 0.5241935483870968,
+  "base_viral_rate_test": 0.21894864292200586,
+  "top_drivers": [
+    "kw_avg_avg",
+    "self_reference_min_shares",
+    "kw_max_avg",
+    "self_reference_avg_sharess",
+    "kw_min_avg",
+    "is_weekend",
+    "kw_avg_max",
+    "global_subjectivity"
+  ]
+}

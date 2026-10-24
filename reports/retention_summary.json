@@ -1,0 +1,58 @@
+{
+  "survival": {
+    "logrank_p": 2.7852274365527774e-17,
+    "hr_ai_feed": 1.1885338866525026,
+    "hr_ai_feed_social": 0.8784334922756778,
+    "cox_concordance": 0.7279104779976965
+  },
+  "churn_model": {
+    "cohort_size": 57297,
+    "base_churn_rate": 0.026196834040176625,
+    "cv_auc": {
+      "logistic": 0.8874178227481601,
+      "lightgbm": 0.8853206608403615
+    },
+    "holdout": {
+      "Logistic regression": {
+        "roc_auc": 0.8922354971458916,
+        "pr_auc": 0.24030159663571665,
+        "brier": 0.12027486901513447,
+        "log_loss": 0.4227398417803084,
+        "top_decile_lift": 6.555555555555555,
+        "top_decile_precision": 0.17161140197789412,
+        "cv_auc": 0.8874178227481601
+      },
+      "LightGBM (raw)": {
+        "roc_auc": 0.895514005044471,
+        "pr_auc": 0.3605171921508597,
+        "brier": 0.02032184132767813,
+        "log_loss": 0.08309799950170633,
+        "top_decile_lift": 6.888888888888889,
+        "top_decile_precision": 0.18033740546829552,
+        "cv_auc": 0.8853206608403615
+      },
+      "LightGBM + isotonic": {
+        "roc_auc": 0.8959763042612505,
+        "pr_auc": 0.3590046291006604,
+        "brier": 0.02029216008354762,
+        "log_loss": 0.08295619739506416,
+        "top_decile_lift": 6.925276002324231,
+        "top_decile_precision": 0.1812899477048228,
+        "cv_auc": 0.8853206608403615
+      }
+    },
+    "top_drivers": [
+      "recency_days",
+      "minutes_w0",
+      "active_days_w1",
+      "minutes_w1",
+      "minutes_w-2",
+      "log_followers",
+      "like_rate",
+      "minutes_w-1"
+    ],
+    "campaign_optimal_fraction": 0.09,
+    "campaign_optimal_profit_musd": 2.5276009912739967,
+    "campaign_recall_at_optimum": 0.6711111111111111
+  }
+}

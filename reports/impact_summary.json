@@ -1,0 +1,87 @@
+{
+  "inputs": {
+    "rev_per_alive_user_month": 2.7352426052093506,
+    "ai_feed": {
+      "rev_lift": 0.08860256632075014,
+      "rev_lift_se": 0.006670407522761733,
+      "log_hr": 0.17272051952986728,
+      "log_hr_se": 0.032311064233084705
+    },
+    "ai_feed_social": {
+      "rev_lift": 0.07106882715749399,
+      "rev_lift_se": 0.006377582472563402,
+      "log_hr": -0.129615080224611,
+      "log_hr_se": 0.03436854954657619
+    }
+  },
+  "results": [
+    {
+      "comparison": "AI feed vs control",
+      "p05_musd": 39.39525842475506,
+      "p50_musd": 56.81455878053999,
+      "p95_musd": 74.05981722084066,
+      "mean_musd": 56.809117554181626,
+      "prob_positive": 1.0
+    },
+    {
+      "comparison": "AI + friend boost vs control",
+      "p05_musd": 87.49348432379523,
+      "p50_musd": 103.26661960567893,
+      "p95_musd": 119.03957459240394,
+      "mean_musd": 103.26744418078361,
+      "prob_positive": 1.0
+    },
+    {
+      "comparison": "Friend boost minus AI feed",
+      "p05_musd": 22.765701918943513,
+      "p50_musd": 46.44477515595425,
+      "p95_musd": 69.74233345654567,
+      "mean_musd": 46.45832662660199,
+      "prob_positive": 0.99965
+    }
+  ],
+  "sensitivity": [
+    {
+      "assumption": "Friend-boost churn HR at 95% CI low / high",
+      "low_musd": 58.88567938552332,
+      "high_musd": 33.132977178903104,
+      "central_musd": 46.3419566249907,
+      "swing": 25.752702206620214
+    },
+    {
+      "assumption": "AI-feed revenue lift at 95% CI low / high",
+      "low_musd": 60.086278723722934,
+      "high_musd": 32.59763452625799,
+      "central_musd": 46.3419566249907,
+      "swing": 27.488644197464943
+    },
+    {
+      "assumption": "Revenue per user -30% / +30%",
+      "low_musd": 32.43936842566848,
+      "high_musd": 60.24454078489614,
+      "central_musd": 46.3419566249907,
+      "swing": 27.80517235922766
+    },
+    {
+      "assumption": "AI-feed churn HR at 95% CI low / high",
+      "low_musd": 31.33740707140064,
+      "high_musd": 62.01525545871329,
+      "central_musd": 46.3419566249907,
+      "swing": 30.67784838731265
+    },
+    {
+      "assumption": "Eligible MAU 20M / 60M",
+      "low_musd": 23.17097831249535,
+      "high_musd": 69.51293493748545,
+      "central_musd": 46.3419566249907,
+      "swing": 46.341956624990104
+    },
+    {
+      "assumption": "Monthly base churn 2% / 6%",
+      "low_musd": 21.11498535467696,
+      "high_musd": 76.50727436254024,
+      "central_musd": 46.3419566249907,
+      "swing": 55.39228900786328
+    }
+  ]
+}

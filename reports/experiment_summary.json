@@ -1,0 +1,408 @@
+{
+  "design": {
+    "srm": {
+      "chi2": 4.6173,
+      "p_value": 0.09939534474178371,
+      "srm_detected": false,
+      "observed": {
+        "control": 20083.0,
+        "ai_feed": 19756.0,
+        "ai_feed_social": 20161.0
+      }
+    },
+    "max_abs_smd": 0.01904187964960585,
+    "pre_post_corr": 0.820677942401408,
+    "mde_rel_raw": 0.020790497159418685,
+    "mde_rel_cuped": 0.011879504339310263,
+    "n_needed_2pct_raw": 21349,
+    "n_needed_2pct_cuped": 6971,
+    "n_per_arm": 19756
+  },
+  "aa": {
+    "aa_false_positive_rate": 0.051,
+    "n_sims": 1000
+  },
+  "novelty": {
+    "ai_feed": {
+      "steady_state_lift": 0.07659728396314648,
+      "novelty_boost": 0.1455030470472099,
+      "decay_days": 6.607032282115718,
+      "week1_lift": 0.1735692148053309,
+      "week4_lift": 0.07487789167490974
+    },
+    "ai_feed_social": {
+      "steady_state_lift": 0.0672872123184333,
+      "novelty_boost": 0.08856783070351007,
+      "decay_days": 2.798478292459515,
+      "week1_lift": 0.10748307334968486,
+      "week4_lift": 0.06851906242755204
+    }
+  },
+  "sequential": {
+    "peeking_fpr_naive": 0.27475,
+    "peeking_fpr_msprt": 0.00875,
+    "fixed_horizon_fpr": 0.0555,
+    "first_day_always_valid_sig_ai_feed": 0,
+    "first_day_always_valid_sig_ai_feed_social": 0
+  },
+  "interaction": {
+    "minutes_age_interaction_p": 6.797753162761393e-11,
+    "churn_age_interaction_p": 0.0025410280040344714
+  },
+  "metrics": [
+    {
+      "arm": "ai_feed",
+      "metric": "minutes",
+      "rel_lift": 0.11560084631598075,
+      "rel_ci_low": 0.10629659103935842,
+      "rel_ci_high": 0.12490510159260308,
+      "diff": 2.1782581754692067,
+      "p_adj_bh": 8.83915346835283e-144,
+      "verdict": "win",
+      "variance_reduction": 0.6751313858224798
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "active_days",
+      "rel_lift": -0.006946445513555956,
+      "rel_ci_low": -0.01182688998059641,
+      "rel_ci_high": -0.002066001046515503,
+      "diff": -0.004826196400220528,
+      "p_adj_bh": 0.0056864015870646736,
+      "verdict": "harm",
+      "variance_reduction": 0.5291883264236275
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "sessions",
+      "rel_lift": 0.0895948038862354,
+      "rel_ci_low": 0.08119048631459652,
+      "rel_ci_high": 0.09799912145787429,
+      "diff": 0.3035064766893174,
+      "p_adj_bh": 3.983195601576638e-104,
+      "verdict": "win",
+      "variance_reduction": 0.6483651505234196
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "likes",
+      "rel_lift": 0.21019866500294002,
+      "rel_ci_low": 0.19826721210189022,
+      "rel_ci_high": 0.22213011790398982,
+      "diff": 1.2738651587036438,
+      "p_adj_bh": 5.105282308234979e-308,
+      "verdict": "win",
+      "variance_reduction": 0.7340554584246346
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "shares",
+      "rel_lift": 0.271402455558527,
+      "rel_ci_low": 0.2560201636732658,
+      "rel_ci_high": 0.2867847474437882,
+      "diff": 0.18385979105724537,
+      "p_adj_bh": 0.0,
+      "verdict": "win",
+      "variance_reduction": 0.6635985844376355
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "posts_created",
+      "rel_lift": 0.023697779822256442,
+      "rel_ci_low": 0.005151991811087154,
+      "rel_ci_high": 0.04224356783342573,
+      "diff": 0.00317028431946223,
+      "p_adj_bh": 0.01134349132514204,
+      "verdict": "win",
+      "variance_reduction": 0.6748253408391629
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "ad_revenue",
+      "rel_lift": 0.1154090593628379,
+      "rel_ci_low": 0.1043640413519171,
+      "rel_ci_high": 0.12645407737375872,
+      "diff": 0.009599186078863994,
+      "p_adj_bh": 3.0305720992237686e-102,
+      "verdict": "win",
+      "variance_reduction": 0.7593430975613021
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "churned",
+      "rel_lift": 0.1696123099541681,
+      "rel_ci_low": 0.09852407813095344,
+      "rel_ci_high": 0.24070054177738276,
+      "diff": 0.014864196859001935,
+      "p_adj_bh": 5.843347280696647e-07,
+      "verdict": "harm",
+      "variance_reduction": 0.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "friend_interactions",
+      "rel_lift": -0.08985140248387634,
+      "rel_ci_low": -0.09902969147514044,
+      "rel_ci_high": -0.08067311349261223,
+      "diff": -0.22988722778357396,
+      "p_adj_bh": 1.7786366396603177e-74,
+      "verdict": "harm",
+      "variance_reduction": 0.7071818349146117
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "neg_feedback_rate",
+      "rel_lift": 0.19105050182896582,
+      "rel_ci_low": 0.16776261374458123,
+      "rel_ci_high": 0.2143383899133504,
+      "diff": 0.15192737852178428,
+      "p_adj_bh": 8.056150067528303e-68,
+      "verdict": "harm",
+      "variance_reduction": 0.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "ad_ctr",
+      "rel_lift": 0.034007772562504715,
+      "rel_ci_low": 0.02296454843764255,
+      "rel_ci_high": 0.04505099668736688,
+      "diff": 0.0003747238301596203,
+      "p_adj_bh": 1.2236955845697653e-09,
+      "verdict": "win",
+      "variance_reduction": 0.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "minutes",
+      "rel_lift": 0.0789487558681985,
+      "rel_ci_low": 0.07017875481552892,
+      "rel_ci_high": 0.08771875692086807,
+      "diff": 1.4885067752052237,
+      "p_adj_bh": 1.7786366396603177e-74,
+      "verdict": "win",
+      "variance_reduction": 0.6792745031549058
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "active_days",
+      "rel_lift": 0.009561030137555373,
+      "rel_ci_low": 0.004840439833878071,
+      "rel_ci_high": 0.014281620441232675,
+      "diff": 0.00664158590000008,
+      "p_adj_bh": 7.672373905361074e-05,
+      "verdict": "win",
+      "variance_reduction": 0.5437974795893608
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "sessions",
+      "rel_lift": 0.06505433865188315,
+      "rel_ci_low": 0.05706395162544464,
+      "rel_ci_high": 0.07304472567832165,
+      "diff": 0.22037973976176284,
+      "p_adj_bh": 1.4206465582664664e-60,
+      "verdict": "win",
+      "variance_reduction": 0.6518582928706528
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "likes",
+      "rel_lift": 0.13710796447600598,
+      "rel_ci_low": 0.12620197385519638,
+      "rel_ci_high": 0.14801395509681559,
+      "diff": 0.8344296123036212,
+      "p_adj_bh": 1.896176199227837e-150,
+      "verdict": "win",
+      "variance_reduction": 0.746103481850824
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "shares",
+      "rel_lift": 0.18315466036728892,
+      "rel_ci_low": 0.16930239635456762,
+      "rel_ci_high": 0.19700692438001022,
+      "diff": 0.12442360864045887,
+      "p_adj_bh": 3.2453576929431215e-172,
+      "verdict": "win",
+      "variance_reduction": 0.6847577159870271
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "posts_created",
+      "rel_lift": 0.042152218547568204,
+      "rel_ci_low": 0.023648967287604596,
+      "rel_ci_high": 0.06065546980753181,
+      "diff": 0.005565712115791294,
+      "p_adj_bh": 6.349031202164325e-06,
+      "verdict": "win",
+      "variance_reduction": 0.6668817852366343
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "ad_revenue",
+      "rel_lift": 0.08069935214290894,
+      "rel_ci_low": 0.07024887116417103,
+      "rel_ci_high": 0.09114983312164684,
+      "diff": 0.006719503650312347,
+      "p_adj_bh": 2.134126847781339e-55,
+      "verdict": "win",
+      "variance_reduction": 0.7654632088414767
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "churned",
+      "rel_lift": -0.11140574060630108,
+      "rel_ci_low": -0.1693202009608867,
+      "rel_ci_high": -0.05349128025171545,
+      "diff": -0.009763187943389429,
+      "p_adj_bh": 0.00041619811590425196,
+      "verdict": "win",
+      "variance_reduction": 0.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "friend_interactions",
+      "rel_lift": 0.10665901758428659,
+      "rel_ci_low": 0.09591011984337967,
+      "rel_ci_high": 0.1174079153251935,
+      "diff": 0.2719161813451416,
+      "p_adj_bh": 1.7275401861642205e-92,
+      "verdict": "win",
+      "variance_reduction": 0.7130911978968315
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "neg_feedback_rate",
+      "rel_lift": 0.08132529359744377,
+      "rel_ci_low": 0.060172264517620734,
+      "rel_ci_high": 0.10247832267726681,
+      "diff": 0.06467158445275967,
+      "p_adj_bh": 7.747339917602501e-15,
+      "verdict": "harm",
+      "variance_reduction": 0.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "ad_ctr",
+      "rel_lift": 0.02715258532373357,
+      "rel_ci_low": 0.016214630021337724,
+      "rel_ci_high": 0.03809054062612942,
+      "diff": 0.00029918809744286165,
+      "p_adj_bh": 1.0524535641657885e-06,
+      "verdict": "win",
+      "variance_reduction": 0.0
+    }
+  ],
+  "bayes": [
+    {
+      "arm": "ai_feed",
+      "metric": "minutes",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "active_days",
+      "p_improves": 0.0027212212956661853
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "sessions",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "likes",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "shares",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "posts_created",
+      "p_improves": 0.9941452134590405
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "ad_revenue",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "churned",
+      "p_improves": 5e-06
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "friend_interactions",
+      "p_improves": 6.033333398221535e-75
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "neg_feedback_rate",
+      "p_improves": 0.0
+    },
+    {
+      "arm": "ai_feed",
+      "metric": "ad_ctr",
+      "p_improves": 0.999999999557429
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "minutes",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "active_days",
+      "p_improves": 0.9999667090706895
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "sessions",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "likes",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "shares",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "posts_created",
+      "p_improves": 0.999997155837669
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "ad_revenue",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "churned",
+      "p_improves": 0.999825
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "friend_interactions",
+      "p_improves": 1.0
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "neg_feedback_rate",
+      "p_improves": 3.4416913763379853e-15
+    },
+    {
+      "arm": "ai_feed_social",
+      "metric": "ad_ctr",
+      "p_improves": 0.9999995775532718
+    }
+  ]
+}
