@@ -3,7 +3,7 @@
 Outputs (all under powerbi/):
   data/*.csv                      star schema + analysis result tables
   SEI_Dashboard.pbip              open this in Power BI Desktop (Windows, PBIP preview feature on)
-  SEI_Dashboard.SemanticModel/    model.bim: tables, relationships, DAX measures, DataFolder parameter
+  SEI_Dashboard.SemanticModel/    model.bim: tables, relationships, DAX measures, DataPath parameter (GitHub or local)
   SEI_Dashboard.Report/           report.json: 9 report pages
   SEI_Theme.json                  palette theme (View > Themes > Browse for themes)
   measures.dax                    every DAX measure, for copy/paste into any model
@@ -132,11 +132,14 @@ def _dtype(s: pd.Series) -> tuple[str, str]:
     return "string", "type text"
 
 
-def m_expression(table: str, df: pd.DataFrame) -> list[str]:
+def m_expression(table: str, df: pd.DataFrame, source: str) -> list[str]:
     types = ", ".join(f'{{"{c}", {_dtype(df[c])[1]}}}' for c in df.columns)
+    # Static base URL + RelativePath keeps the query refreshable in the Power BI Service (no gateway needed)
+    content = (f'Web.Contents("https://raw.githubusercontent.com", [RelativePath = DataPath & "{table}.csv"])'
+               if source == "github" else f'File.Contents(DataPath & "{table}.csv")')
     return [
         "let",
-        f'    Source = Csv.Document(File.Contents(DataFolder & "{table}.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),',
+        f'    Source = Csv.Document({content}, [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),',
         "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
         '    Blanks = Table.TransformColumns(Promoted, {}, each if _ = "" then null else _),',
         f'    Typed = Table.TransformColumnTypes(Blanks, {{{types}}}, "en-US")',
@@ -189,7 +192,7 @@ RELATIONSHIPS = [
 ]
 
 
-def build_model(tables: dict[str, pd.DataFrame], data_folder: str) -> dict:
+def build_model(tables: dict[str, pd.DataFrame], data_path: str, source: str) -> dict:
     tmsl_tables = []
     for t, df in tables.items():
         cols = []
@@ -207,7 +210,7 @@ def build_model(tables: dict[str, pd.DataFrame], data_folder: str) -> dict:
                 col["sortByColumn"] = "sort_order"
             cols.append(col)
         tmsl_tables.append({"name": t, "lineageTag": str(uuid.uuid5(uuid.NAMESPACE_URL, t)), "columns": cols,
-                            "partitions": [{"name": t, "mode": "import", "source": {"type": "m", "expression": m_expression(t, df)}}]})
+                            "partitions": [{"name": t, "mode": "import", "source": {"type": "m", "expression": m_expression(t, df, source)}}]})
     tmsl_tables.append({
         "name": "_Measures", "lineageTag": str(uuid.uuid5(uuid.NAMESPACE_URL, "_Measures")),
         "columns": [{"name": "Measure Holder", "dataType": "string", "sourceColumn": "Measure Holder", "isHidden": True,
@@ -225,9 +228,9 @@ def build_model(tables: dict[str, pd.DataFrame], data_folder: str) -> dict:
             "culture": "en-US", "defaultPowerBIDataSourceVersion": "powerBI_V3", "sourceQueryCulture": "en-US",
             "dataAccessOptions": {"legacyRedirects": True, "returnErrorValuesAsNull": True},
             "tables": tmsl_tables, "relationships": rels,
-            "expressions": [{"name": "DataFolder", "kind": "m", "lineageTag": str(uuid.uuid5(uuid.NAMESPACE_URL, "DataFolder")),
-                             "expression": f'"{data_folder}" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]'}],
-            "annotations": [{"name": "PBI_QueryOrder", "value": json.dumps(["DataFolder"] + list(tables) + ["_Measures"])},
+            "expressions": [{"name": "DataPath", "kind": "m", "lineageTag": str(uuid.uuid5(uuid.NAMESPACE_URL, "DataPath")),
+                             "expression": f'"{data_path}" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]'}],
+            "annotations": [{"name": "PBI_QueryOrder", "value": json.dumps(["DataPath"] + list(tables) + ["_Measures"])},
                             {"name": "__PBI_TimeIntelligenceEnabled", "value": "0"}],
         },
     }
@@ -479,7 +482,16 @@ def theme() -> dict:
                                          "border": [{"show": True, "color": {"solid": {"color": "#E1E0D9"}}, "radius": 6}]}}}}
 
 
-def write_pbip(tables, data_folder: str):
+def platform(item_type: str) -> str:
+    """Fabric Git-integration metadata; without it a synced workspace ignores the item folder."""
+    return json.dumps({
+        "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+        "metadata": {"type": item_type, "displayName": NAME},
+        "config": {"version": "2.0", "logicalId": str(uuid.uuid5(uuid.NAMESPACE_URL, f"{NAME}.{item_type}"))},
+    }, indent=2)
+
+
+def write_pbip(tables, data_path: str, source: str):
     model_dir, report_dir = OUT / f"{NAME}.SemanticModel", OUT / f"{NAME}.Report"
     for d in (model_dir, report_dir):
         if d.exists():
@@ -488,7 +500,9 @@ def write_pbip(tables, data_folder: str):
     (OUT / f"{NAME}.pbip").write_text(json.dumps({"version": "1.0", "artifacts": [{"report": {"path": f"{NAME}.Report"}}],
                                                  "settings": {"enableAutoRecovery": True}}, indent=2))
     (model_dir / "definition.pbism").write_text(json.dumps({"version": "1.0", "settings": {}}, indent=2))
-    (model_dir / "model.bim").write_text(json.dumps(build_model(tables, data_folder), indent=2))
+    (model_dir / "model.bim").write_text(json.dumps(build_model(tables, data_path, source), indent=2))
+    (model_dir / ".platform").write_text(platform("SemanticModel"))
+    (report_dir / ".platform").write_text(platform("Report"))
     (report_dir / "definition.pbir").write_text(json.dumps(
         {"version": "1.0", "datasetReference": {"byPath": {"path": f"../{NAME}.SemanticModel"}, "byConnection": None}}, indent=2))
     (report_dir / "report.json").write_text(json.dumps(build_report(), indent=2))
@@ -519,16 +533,24 @@ def write_excel(tables: dict[str, pd.DataFrame]):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--source", choices=["github", "local"], default="github",
+                    help="github: read CSVs from the public repo (works in Desktop AND the Power BI Service); "
+                         "local: read from a folder on disk (Desktop only)")
+    ap.add_argument("--github-path", default=C.GITHUB_DATA_PATH, help="owner/repo/branch/path/ to powerbi/data/")
     ap.add_argument("--data-folder", default="C:\\SEI\\powerbi\\data\\",
-                    help="absolute path (with trailing slash) to powerbi/data on the machine running Power BI Desktop")
+                    help="absolute path (with trailing slash) to powerbi/data, used with --source local")
     args = ap.parse_args()
-    folder = args.data_folder if args.data_folder.endswith(("\\", "/")) else args.data_folder + "\\"
+    if args.source == "github":
+        data_path = args.github_path if args.github_path.endswith("/") else args.github_path + "/"
+    else:
+        data_path = args.data_folder if args.data_folder.endswith(("\\", "/")) else args.data_folder + "\\"
     tables = export_data()
-    write_pbip(tables, folder)
+    write_pbip(tables, data_path, args.source)
     xlsx = write_excel(tables)
     print(f"wrote {xlsx.name} for the Power BI web app")
     total = sum(len(t) for t in tables.values())
-    print(f"exported {len(tables)} tables ({total:,} rows) to {DATA} and wrote {NAME}.pbip (DataFolder = {folder})")
+    print(f"exported {len(tables)} tables ({total:,} rows) to {DATA} and wrote {NAME}.pbip "
+          f"(source = {args.source}, DataPath = {data_path})")
 
 
 if __name__ == "__main__":

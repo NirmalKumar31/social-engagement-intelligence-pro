@@ -19,8 +19,8 @@ test:
 dashboard:
 	.venv/bin/streamlit run dashboard/app.py
 
-powerbi:          ## re-export Power BI files; set DATA_FOLDER to your Windows path to powerbi\data\
-	$(PY) -m sei.powerbi $(if $(DATA_FOLDER),--data-folder "$(DATA_FOLDER)",)
+powerbi:          ## re-export Power BI files (reads CSVs from GitHub); DATA_FOLDER=C:\path\ for a local-file model
+	$(PY) -m sei.powerbi $(if $(DATA_FOLDER),--source local --data-folder "$(DATA_FOLDER)",)
 
 clean:
 	rm -rf data/raw/*.parquet data/processed/*.parquet reports/figures/*.png reports/tables/*.csv

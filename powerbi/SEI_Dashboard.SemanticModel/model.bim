@@ -66,7 +66,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_date.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"dim_date.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"date\", type date}, {\"experiment_day\", Int64.Type}, {\"period\", type text}, {\"experiment_week\", Int64.Type}, {\"weekday\", type text}, {\"is_weekend\", Int64.Type}}, \"en-US\")",
@@ -126,7 +126,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"dim_arm.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"dim_arm.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"arm_label\", type text}, {\"is_treatment\", Int64.Type}, {\"sort_order\", Int64.Type}, {\"color_hex\", type text}}, \"en-US\")",
@@ -293,7 +293,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_daily.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"fact_daily.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"age_group\", type text}, {\"region\", type text}, {\"device\", type text}, {\"account_type\", type text}, {\"users_assigned\", Int64.Type}, {\"sessions\", Int64.Type}, {\"minutes\", type number}, {\"likes\", Int64.Type}, {\"comments\", Int64.Type}, {\"dms_sent\", Int64.Type}, {\"shares\", Int64.Type}, {\"posts_created\", Int64.Type}, {\"negative_feedback\", Int64.Type}, {\"ad_impressions\", Int64.Type}, {\"ad_clicks\", Int64.Type}, {\"ad_revenue\", type number}, {\"active_users\", Int64.Type}, {\"date\", type date}, {\"friend_interactions\", Int64.Type}}, \"en-US\")",
@@ -512,7 +512,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"fact_user.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"fact_user.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"user_id\", Int64.Type}, {\"arm\", type text}, {\"age_group\", type text}, {\"region\", type text}, {\"device\", type text}, {\"account_type\", type text}, {\"acquisition_channel\", type text}, {\"tenure_days\", Int64.Type}, {\"friend_count\", Int64.Type}, {\"is_new_user\", Int64.Type}, {\"churned\", Int64.Type}, {\"pre_minutes_per_day\", type number}, {\"exp_minutes_per_day\", type number}, {\"pre_active_days_per_day\", type number}, {\"exp_active_days_per_day\", type number}, {\"exp_friend_interactions_per_day\", type number}, {\"pre_ad_revenue_per_day\", type number}, {\"exp_ad_revenue_per_day\", type number}, {\"late_ad_revenue_per_day\", type number}, {\"churn_probability\", type number}, {\"risk_tier\", type text}, {\"risk_decile\", type number}, {\"actual_churn_next_14d\", type number}, {\"cate_ai_feed\", type number}, {\"cate_ai_feed_social\", type number}, {\"policy_arm\", type text}}, \"en-US\")",
@@ -712,7 +712,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"metric_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"metric_results.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"tier\", type text}, {\"higher_is_better\", Int64.Type}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"diff\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"rel_lift\", type number}, {\"rel_ci_low\", type number}, {\"rel_ci_high\", type number}, {\"p_value\", type number}, {\"p_value_raw_ttest\", type number}, {\"se_raw\", type number}, {\"se_cuped\", type number}, {\"variance_reduction\", type number}, {\"p_adj_bh\", type number}, {\"p_adj_holm\", type number}, {\"significant\", Int64.Type}, {\"verdict\", type text}, {\"metric_label\", type text}}, \"en-US\")",
@@ -890,7 +890,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"segment_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"segment_results.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"segment\", type text}, {\"arm\", type text}, {\"n_treatment\", Int64.Type}, {\"n_control\", Int64.Type}, {\"minutes_lift\", type number}, {\"minutes_ci_low\", type number}, {\"minutes_ci_high\", type number}, {\"minutes_p\", type number}, {\"churn_control\", type number}, {\"churn_treatment\", type number}, {\"churn_diff_pp\", type number}, {\"churn_ci_low_pp\", type number}, {\"churn_ci_high_pp\", type number}, {\"churn_p\", type number}, {\"friend_int_lift\", type number}, {\"revenue_lift\", type number}, {\"minutes_p_adj\", type number}, {\"churn_p_adj\", type number}, {\"status\", type text}}, \"en-US\")",
@@ -984,7 +984,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"daily_lift.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"daily_lift.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"day\", Int64.Type}, {\"date\", type date}, {\"arm\", type text}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"rel_lift\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"fitted\", type number}}, \"en-US\")",
@@ -1054,7 +1054,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"sequential_monitoring.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"sequential_monitoring.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"day\", Int64.Type}, {\"diff\", type number}, {\"se\", type number}, {\"p_naive\", type number}, {\"p_always_valid\", type number}}, \"en-US\")",
@@ -1108,7 +1108,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"power_mde.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"power_mde.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"method\", type text}, {\"n_per_arm\", Int64.Type}, {\"mde_abs\", type number}, {\"mde_rel\", type number}}, \"en-US\")",
@@ -1161,7 +1161,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"balance_smd.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"balance_smd.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"covariate\", type text}, {\"smd\", type number}, {\"balanced\", type text}}, \"en-US\")",
@@ -1246,7 +1246,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"bayesian_results.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"bayesian_results.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"post_mean\", type number}, {\"post_sd\", type number}, {\"p_improves\", type number}, {\"cred_low\", type number}, {\"cred_high\", type number}}, \"en-US\")",
@@ -1309,7 +1309,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"km_survival.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"km_survival.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"day\", type number}, {\"survival\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"arm\", type text}}, \"en-US\")",
@@ -1372,7 +1372,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"cox_hazard_ratios.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"cox_hazard_ratios.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"covariate\", type text}, {\"hazard_ratio\", type number}, {\"hr_ci_low\", type number}, {\"hr_ci_high\", type number}, {\"p_value\", type number}}, \"en-US\")",
@@ -1459,7 +1459,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"churn_model_metrics.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"churn_model_metrics.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"roc_auc\", type number}, {\"pr_auc\", type number}, {\"brier\", type number}, {\"log_loss\", type number}, {\"top_decile_lift\", type number}, {\"top_decile_precision\", type number}, {\"cv_auc\", type number}}, \"en-US\")",
@@ -1498,7 +1498,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"churn_shap_importance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"churn_shap_importance.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
@@ -1576,7 +1576,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"retention_profit_curve.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"retention_profit_curve.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"users_targeted\", Int64.Type}, {\"churners_caught\", Int64.Type}, {\"recall\", type number}, {\"precision\", type number}, {\"profit_test_usd\", type number}, {\"profit_at_scale_musd\", type number}}, \"en-US\")",
@@ -1671,7 +1671,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"policy_values.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"policy_values.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"uplift_vs_control_usd\", type number}, {\"annual_value_at_scale_musd\", type number}}, \"en-US\")",
@@ -1733,7 +1733,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"qini_curves.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"qini_curves.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"cumulative_gain\", type number}, {\"random\", type number}, {\"model\", type text}, {\"arm\", type text}}, \"en-US\")",
@@ -1795,7 +1795,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"cate_deciles.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"cate_deciles.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"decile\", Int64.Type}, {\"predicted_cate\", type number}, {\"observed_uplift\", type number}, {\"share_35_plus\", type number}}, \"en-US\")",
@@ -1871,7 +1871,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"topic_info.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"topic_info.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"topic_id\", Int64.Type}, {\"label\", type text}, {\"top_words\", type text}, {\"n_posts\", Int64.Type}, {\"share_negative_pred\", type number}, {\"share_positive_pred\", type number}, {\"mean_p_negative\", type number}}, \"en-US\")",
@@ -2022,7 +2022,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"content_exposure_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"content_exposure_summary.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_entropy\", type number}, {\"top_topic_share\", type number}, {\"distinct_topics\", type number}, {\"negative_share\", type number}, {\"expected_engagements\", type number}, {\"topic_entropy_rel_change\", type number}, {\"topic_entropy_p\", type number}, {\"top_topic_share_rel_change\", type number}, {\"top_topic_share_p\", type number}, {\"distinct_topics_rel_change\", type number}, {\"distinct_topics_p\", type number}, {\"negative_share_rel_change\", type number}, {\"negative_share_p\", type number}, {\"expected_engagements_rel_change\", type number}, {\"expected_engagements_p\", type number}}, \"en-US\")",
@@ -2093,7 +2093,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"sentiment_model_metrics.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"sentiment_model_metrics.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"macro_recall\", type number}, {\"macro_f1\", type number}, {\"accuracy\", type number}, {\"f1_negative\", type number}, {\"f1_positive\", type number}}, \"en-US\")",
@@ -2154,7 +2154,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_playbook.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"virality_playbook.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"level\", type text}, {\"articles\", Int64.Type}, {\"median_shares\", type number}, {\"viral_rate\", type number}}, \"en-US\")",
@@ -2193,7 +2193,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_shap_importance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"virality_shap_importance.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
@@ -2248,7 +2248,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"virality_weekly.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"virality_weekly.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"week\", type date}, {\"median_shares\", type number}, {\"viral_rate\", type number}, {\"articles\", Int64.Type}}, \"en-US\")",
@@ -2310,7 +2310,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_fan.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_fan.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"month\", Int64.Type}, {\"p05\", type number}, {\"p50\", type number}, {\"p95\", type number}}, \"en-US\")",
@@ -2357,7 +2357,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_distribution.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_distribution.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"bin_mid_musd\", type number}, {\"share_of_draws\", type number}}, \"en-US\")",
@@ -2428,7 +2428,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_monte_carlo.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_monte_carlo.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"comparison\", type text}, {\"p05_musd\", type number}, {\"p50_musd\", type number}, {\"p95_musd\", type number}, {\"mean_musd\", type number}, {\"prob_positive\", type number}}, \"en-US\")",
@@ -2491,7 +2491,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"impact_sensitivity.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_sensitivity.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"assumption\", type text}, {\"low_musd\", type number}, {\"high_musd\", type number}, {\"central_musd\", type number}, {\"swing\", type number}}, \"en-US\")",
@@ -2544,7 +2544,7 @@
               "type": "m",
               "expression": [
                 "let",
-                "    Source = Csv.Document(File.Contents(DataFolder & \"topic_exposure_by_arm.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"topic_exposure_by_arm.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
                 "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_id\", Int64.Type}, {\"share\", type number}, {\"label\", type text}}, \"en-US\")",
@@ -2885,16 +2885,16 @@
     ],
     "expressions": [
       {
-        "name": "DataFolder",
+        "name": "DataPath",
         "kind": "m",
-        "lineageTag": "e6c4a43b-658a-519a-932c-969e5ac01fec",
-        "expression": "\"C:\\SEI\\powerbi\\data\\\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+        "lineageTag": "113f801f-fbf3-5500-a03b-6246485ca24b",
+        "expression": "\"NirmalKumar31/social-engagement-intelligence-pro/main/powerbi/data/\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
       }
     ],
     "annotations": [
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"DataFolder\", \"dim_date\", \"dim_arm\", \"fact_daily\", \"fact_user\", \"metric_results\", \"segment_results\", \"daily_lift\", \"sequential_monitoring\", \"power_mde\", \"balance_smd\", \"bayesian_results\", \"km_survival\", \"cox_hazard_ratios\", \"churn_model_metrics\", \"churn_shap_importance\", \"retention_profit_curve\", \"policy_values\", \"qini_curves\", \"cate_deciles\", \"topic_info\", \"content_exposure_summary\", \"sentiment_model_metrics\", \"virality_playbook\", \"virality_shap_importance\", \"virality_weekly\", \"impact_fan\", \"impact_distribution\", \"impact_monte_carlo\", \"impact_sensitivity\", \"topic_exposure_by_arm\", \"_Measures\"]"
+        "value": "[\"DataPath\", \"dim_date\", \"dim_arm\", \"fact_daily\", \"fact_user\", \"metric_results\", \"segment_results\", \"daily_lift\", \"sequential_monitoring\", \"power_mde\", \"balance_smd\", \"bayesian_results\", \"km_survival\", \"cox_hazard_ratios\", \"churn_model_metrics\", \"churn_shap_importance\", \"retention_profit_curve\", \"policy_values\", \"qini_curves\", \"cate_deciles\", \"topic_info\", \"content_exposure_summary\", \"sentiment_model_metrics\", \"virality_playbook\", \"virality_shap_importance\", \"virality_weekly\", \"impact_fan\", \"impact_distribution\", \"impact_monte_carlo\", \"impact_sensitivity\", \"topic_exposure_by_arm\", \"_Measures\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",

@@ -46,3 +46,6 @@ STATUS = {"good": "#0ca30c", "warning": "#fab219", "serious": "#ec835a", "critic
 SEQ_BLUE = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 MONTHLY_BASE_CHURN = 0.035    # platform-wide monthly churn of mature users (measured HRs scale it)
 MC_DRAWS = 20_000
+
+# Power BI reads its CSVs from here (raw.githubusercontent.com/<this path><table>.csv)
+GITHUB_DATA_PATH = "NirmalKumar31/social-engagement-intelligence-pro/main/powerbi/data/"

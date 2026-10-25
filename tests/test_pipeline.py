@@ -39,3 +39,12 @@ def test_powerbi_export_consistent():
     names = {t["name"] for t in bim["model"]["tables"]}
     for t in names - {"_Measures"}:
         assert (C.POWERBI / "data" / f"{t}.csv").exists()
+
+
+def test_pbip_is_fabric_git_ready():
+    import json
+    for item, kind in [("SemanticModel", "SemanticModel"), ("Report", "Report")]:
+        meta = json.loads((C.POWERBI / f"SEI_Dashboard.{item}" / ".platform").read_text())
+        assert meta["metadata"]["type"] == kind
+    bim = json.loads((C.POWERBI / "SEI_Dashboard.SemanticModel" / "model.bim").read_text())
+    assert bim["model"]["expressions"][0]["name"] == "DataPath"

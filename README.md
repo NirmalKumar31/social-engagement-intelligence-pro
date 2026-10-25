@@ -66,9 +66,10 @@ Individual modules run on their own: `python -m sei.experiment`, `python -m sei.
 `python -m sei.pipeline --llm` also writes a Claude-polished executive brief (`claude-opus-5-5`). It uses the
 `ANTHROPIC_API_KEY` or `ant auth login` credentials, and is skipped gracefully when neither is present.
 
-**Power BI:** see [`powerbi/README.md`](powerbi/README.md). Open `powerbi/SEI_Dashboard.pbip` in Power BI Desktop
-(Windows) after setting the `DataFolder` parameter, or regenerate with
-`make powerbi DATA_FOLDER="C:\path\to\powerbi\data\"`.
+**Power BI:** see [`powerbi/README.md`](powerbi/README.md). The semantic model reads its CSVs straight from this
+GitHub repo, so it refreshes anywhere. On a Mac, sync the `powerbi/` folder into a Fabric workspace with Git
+integration to get the full 9-page report in the browser, or upload `powerbi/SEI_Dashboard_data.xlsx`. On Windows,
+open `powerbi/SEI_Dashboard.pbip` in Power BI Desktop.
 
 ## Project layout
 
