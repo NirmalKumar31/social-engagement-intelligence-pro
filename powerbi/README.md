@@ -20,6 +20,15 @@ Desktop and the Power BI Service. Re-running the pipeline and pushing to `main` 
 
 ---
 
+## Option 0: Fabric notebook deploy (full 9-page report, no Git, works on a Mac)
+
+Use this when your organisation blocks Git integration. Needs a workspace on a Fabric trial or capacity.
+
+1. In the workspace: **Import → Notebook → From this computer** → `powerbi/deploy_to_fabric.ipynb`.
+2. Open the notebook → **Run all**. It creates the **SEI_Dashboard** semantic model and report from this repo.
+3. If the last cell reports a credentials error: semantic model **… → Settings → Data source credentials →
+   Edit credentials → Anonymous / Public → Sign in**, then re-run the last cell.
+
 ## Option A: Power BI web app via Git sync (full 9-page report, works on a Mac)
 
 Requires a workspace on **Fabric capacity** (a Fabric trial works), Premium, or Premium Per User.
