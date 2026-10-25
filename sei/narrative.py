@@ -6,6 +6,8 @@ change the data and every narrative follows the decision rule and the numbers.
 from __future__ import annotations
 
 import json
+import subprocess
+from datetime import date
 
 import pandas as pd
 
@@ -74,7 +76,30 @@ def facts() -> dict:
     sv = ret["survival"]
     cm = ret["churn_model"]
     rr = sv["rate_ratio"]
+    mt_row = pol.loc["Model-targeted (DR-learner)"]
+    dep = cm["holdout"][cm["deployed_model"]]
+    story = [
+        ("Novelty", f"{retained:.0%}", f"of the AI feed's {nov['headline_lift']:+.1%} minutes lift survives the novelty fade "
+                                        f"(fitted asymptote {nov['fitted_asymptote_lift']:+.1%}, an extrapolation).", "#1D3557"),
+        ("Retention", f"HR {sv['hr_ai_feed']:.2f} vs {sv['hr_ai_feed_social']:.2f}",
+         "Hazard of a 7-day lapse vs control: the AI feed raises it, the friend boost lowers it.", C.ARM_COLORS["ai_feed"]),
+        ("Revenue", musd(fb_ai["p50_musd"]), "12-month friend boost minus AI feed if effects persist. The 90% range spans zero, so "
+                                             "revenue does not pick the winner.", "#1D3557"),
+        ("Personalisation", f"{mt_row.diff_vs_friend_boost_usd:+.2f}", "utility/user for model targeting vs blanket friend boost "
+                                                                        "(CI spans zero): no gain shown.", "#8A94A6"),
+        ("Early warning", f"AUC {dep['roc_auc']:.2f}", f"Lapse model on users active at day 13, top decile "
+                                                        f"{dep['top_decile_lift']:.1f}× the base rate.", C.ARM_COLORS["ai_feed_social"]),
+        ("Content (scenario)", f"{expo['ai_feed']['negative_share']:.0%}", f"negative posts served by the assumed AI ranker vs "
+                                                                            f"{expo['control']['negative_share']:.0%} control; set by "
+                                                                            "assumed weights.", C.STATUS["critical"]),
+    ]
+    try:
+        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=C.ROOT, capture_output=True, text=True,
+                                timeout=10).stdout.strip() or "unknown"
+    except (OSError, subprocess.SubprocessError):
+        commit = "unknown"
     return {
+        "story": story, "commit": commit, "generated": date.today().isoformat(),
         "notice": C.SYNTHETIC_NOTICE, "decision": dec, "recommended_arm": rec, "state": dec["recommendation_state"],
         "headline": headline(dec), "novelty": novelty_sentence, "revenue": revenue_sentence,
         "personalisation": personal_sentence, "segments": seg_sentence, "content": content_sentence,

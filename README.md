@@ -40,7 +40,7 @@ The pure AI "For You" feed has the biggest headline lift. Should we ship it?
 | **Virality on real data** (`sei/virality.py`) | UCI news (39,644 articles), whole-date split, training-only threshold, ablation without unverifiable share features | AUC 0.731; 0.691 without share-history features |
 | **Revenue scenarios** (`sei/impact.py`) | Revenue per not-lapsed user-day × lapse survival, joint bootstrap with shared control, persistence scenarios, one-way + joint stress | Variants indistinguishable on revenue; joint stress −$94M |
 | **Executive memo** (`sei/report.py`, `sei/narrative.py`) | Every sentence derived from results + decision rule; optional Claude API brief | [`reports/EXECUTIVE_MEMO.md`](reports/EXECUTIVE_MEMO.md) |
-| **Dashboards** | Streamlit (9 pages) + **Power BI PBIP** (9 pages, 30 DAX measures, Fabric deploy notebook) | [`dashboard/`](dashboard/app.py) · [`powerbi/`](powerbi/README.md) |
+| **Dashboards** | Streamlit (9 pages) + **Power BI "Feed Ranking Launch Review"** (11 pages, 30 DAX measures, Fabric deploy notebook) | [`dashboard/`](dashboard/app.py) · [`powerbi/`](powerbi/README.md) |
 | **Engineering** | `make fixture` / CI runs the whole pipeline on a 3,000-user fixture in a scratch dir; run manifest with commit, versions, input/output hashes; 31 tests incl. audit regressions | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
 ## What v2 fixes from the original project
@@ -79,8 +79,8 @@ Individual modules run on their own: `python -m sei.experiment`, `python -m sei.
 `ANTHROPIC_API_KEY` or `ant auth login` credentials, and is skipped gracefully when neither is present.
 
 **Power BI:** see [`powerbi/README.md`](powerbi/README.md). The semantic model reads its CSVs straight from this
-GitHub repo. In a Fabric workspace, import and run `powerbi/deploy_to_fabric.ipynb` (creates or updates the model and
-report); on Windows, open `powerbi/SEI_Dashboard.pbip` in Power BI Desktop. The DAX was checked statically (field references,
+GitHub repo. In a Fabric workspace, import and run `powerbi/Feed_Ranking_Launch_Review.ipynb` (creates or updates the
+**Feed Ranking Launch Review** model and 11-page report); on Windows, open `powerbi/Feed_Ranking_Launch_Review.pbip` in Power BI Desktop. The DAX was checked statically (field references,
 filters, control baselines that clear arm filters), not executed in a live Power BI engine.
 
 ## Explore the data yourself

@@ -2,15 +2,19 @@
 
 Outputs (all under powerbi/):
   data/*.csv                      star schema + analysis result tables
-  SEI_Dashboard.pbip              open this in Power BI Desktop (Windows, PBIP preview feature on)
-  SEI_Dashboard.SemanticModel/    model.bim: tables, relationships, DAX measures, DataPath parameter (GitHub or local)
-  SEI_Dashboard.Report/           report.json: 9 report pages
-  SEI_Theme.json                  palette theme (View > Themes > Browse for themes)
+  Feed_Ranking_Launch_Review.pbip              open in Power BI Desktop (Windows)
+  Feed_Ranking_Launch_Review.ipynb             Fabric notebook: creates/updates the model + report (Run all)
+  Feed_Ranking_Launch_Review.SemanticModel/    model.bim: tables, relationships, DAX measures, DataPath parameter
+  Feed_Ranking_Launch_Review.Report/           report.json: 11 report pages
+  Feed_Ranking_Launch_Review_Theme.json        palette theme (View > Themes > Browse for themes)
+  Feed_Ranking_Launch_Review_data.xlsx         all tables as one workbook (web-app upload fallback)
   measures.dax                    every DAX measure, for copy/paste into any model
 """
 from __future__ import annotations
 
 import argparse
+import glob
+import os
 import json
 import shutil
 import uuid
@@ -24,7 +28,8 @@ from .pbi_report import build_report
 
 OUT = C.POWERBI
 DATA = OUT / "data"
-NAME = "SEI_Dashboard"
+NAME = "Feed_Ranking_Launch_Review"          # folder / file stem
+DISPLAY = "Feed Ranking Launch Review"      # item name in Power BI / Fabric
 SEGMENTS = ["age_group", "region", "device", "account_type"]
 SUMS = ["sessions", "minutes", "likes", "comments", "dms_sent", "shares", "posts_created", "negative_feedback",
         "ad_impressions", "ad_clicks", "ad_revenue"]
@@ -195,6 +200,24 @@ def add_display_columns(tables: dict[str, pd.DataFrame]):
                                             "videos_bucket": "Videos", "title_sentiment_bucket": "Title sentiment"})
     pb["Level name"] = pb.level.astype(str).str.title()
     pb["Viral rate"] = pb.viral_rate
+    dec = json.loads((C.REPORTS / "experiment_summary.json").read_text())["decision"]
+    icon = {"PASS": "✔ PASS", "FAIL": "✖ FAIL", "INCONCLUSIVE": "◐ INCONCLUSIVE"}
+    rows = []
+    for arm, a in dec["arms"].items():
+        for metric, g in a["guardrails"].items():
+            rows.append({"arm": arm, "Arm name": arm_label[arm], "Guardrail": SHORT_METRIC[metric] + (" ★" if g["severity"] == "critical" else ""),
+                         "Observed change": g["rel_change"], "Harm bound": g["harm_bound"], "margin": g["margin"],
+                         "Allowed harm": f"{'↑' if g['direction'] == 'increase' else '↓'} ≤ {g['margin']:.0%}",
+                         "Status": icon[g["status"]], "Arm decision": a["state"]})
+    tables["decision_guardrails"] = pd.DataFrame(rows)
+    sc = pd.read_csv(C.TABLES / "impact_scenarios.csv")
+    sc["Effect persistence"] = sc.persistence.str.capitalize()
+    sc["Scenario"] = sc.comparison
+    sc["Median ($M)"] = sc.p50_musd
+    sc["90% range"] = [f"{'-' if lo < 0 else ''}${abs(lo):,.0f}M to {'-' if hi < 0 else ''}${abs(hi):,.0f}M"
+                       for lo, hi in zip(sc.p05_musd, sc.p95_musd)]
+    sc["Share of draws > 0"] = sc.prob_positive
+    tables["impact_scenarios"] = sc
     mde = tables["power_mde"]
     mde["Method name"] = mde.method.map({"raw": "Raw t-test", "cuped": "With CUPED"})
     mde["Minimum detectable lift"] = mde.mde_rel
@@ -209,7 +232,8 @@ DISPLAY_FORMATS = {"Lift": "+0.0%;-0.0%;0.0%", "CI low": "+0.0%;-0.0%;0.0%", "CI
                    "Topic diversity": "0.00", "Impression share": "0.0%", "Viral rate": "0%",
                    "Minimum detectable lift": "0.0%", "uplift_vs_control_usd": "$0.00", "p50": "$#,0", "bin_mid_musd": "$#,0",
                    "mean_abs_shap": "0.000", "profit_at_scale_musd": "$#,0.0", "predicted_cate": "$0.00",
-                   "observed_uplift": "$0.00", "cumulative_gain": "#,0", "churn_diff_pp": "+0.00;-0.00;0.00"}
+                   "observed_uplift": "$0.00", "cumulative_gain": "#,0", "churn_diff_pp": "+0.00;-0.00;0.00",
+                   "Observed change": "+0.0%;-0.0%;0.0%", "Harm bound": "+0.0%;-0.0%;0.0%", "Share of draws > 0": "0%"}
 
 PCT_COLS = {"rel_lift", "rel_ci_low", "rel_ci_high", "minutes_lift", "minutes_ci_low", "minutes_ci_high", "friend_int_lift",
             "revenue_lift", "variance_reduction", "mde_rel", "survival", "ci_low_surv", "churn_probability", "share",
@@ -291,6 +315,7 @@ RELATIONSHIPS = [
     ("topic_exposure_by_arm", "arm", "dim_arm", "arm"), ("content_exposure_summary", "arm", "dim_arm", "arm"),
     ("sequential_monitoring", "arm", "dim_arm", "arm"), ("impact_distribution", "arm", "dim_arm", "arm"),
     ("qini_curves", "arm", "dim_arm", "arm"), ("cate_deciles", "arm", "dim_arm", "arm"),
+    ("decision_guardrails", "arm", "dim_arm", "arm"),
 ]
 
 
@@ -345,7 +370,7 @@ def build_model(tables: dict[str, pd.DataFrame], data_path: str, source: str) ->
 
 
 def theme() -> dict:
-    return {"name": "SEI Analytics", "dataColors": [C.ARM_COLORS["control"], C.ARM_COLORS["ai_feed"], C.ARM_COLORS["ai_feed_social"],
+    return {"name": "Feed Ranking Launch Review", "dataColors": [C.ARM_COLORS["control"], C.ARM_COLORS["ai_feed"], C.ARM_COLORS["ai_feed_social"],
                                                     "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"],
             "background": "#FCFCFB", "foreground": "#0B0B0B", "tableAccent": "#2a78d6",
             "good": C.STATUS["good"], "neutral": "#898781", "bad": C.STATUS["critical"],
@@ -361,12 +386,62 @@ def platform(item_type: str) -> str:
     """Fabric Git-integration metadata; without it a synced workspace ignores the item folder."""
     return json.dumps({
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
-        "metadata": {"type": item_type, "displayName": NAME},
+        "metadata": {"type": item_type, "displayName": DISPLAY},
         "config": {"version": "2.0", "logicalId": str(uuid.uuid5(uuid.NAMESPACE_URL, f"{NAME}.{item_type}"))},
     }, indent=2)
 
 
+def write_notebook():
+    """Fabric notebook that creates or updates the semantic model and report from this repo (no Git integration needed)."""
+    def md(t): return {"cell_type": "markdown", "metadata": {}, "source": t}
+    def code(t): return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": t}
+    repo = "https://raw.githubusercontent.com/" + C.GITHUB_DATA_PATH.rsplit("/data/", 1)[0]
+    cells = [
+        md(f"# {DISPLAY}\n\nCreates **or updates** the **{DISPLAY}** semantic model and report in this Fabric workspace from the "
+           "public GitHub repo. Just **Run all** (about 2-3 minutes); re-run any time the repo changes."),
+        code("%pip install -q semantic-link-labs"),
+        code(f'''import time
+import requests
+import sempy.fabric as fabric
+import sempy_labs as labs
+from sempy_labs.report import create_report_from_reportjson, update_report_from_reportjson
+
+REPO = "{repo}"
+FOLDER = "{NAME}"
+NAME = "{DISPLAY}"
+nocache = {{"Cache-Control": "no-cache"}}
+
+bim = requests.get(f"{{REPO}}/{{FOLDER}}.SemanticModel/model.bim", headers=nocache, timeout=60).json()
+report_json = requests.get(f"{{REPO}}/{{FOLDER}}.Report/report.json", headers=nocache, timeout=60).json()
+print(f"Loaded model: {{len(bim['model']['tables'])}} tables; report: {{len(report_json['sections'])}} pages")'''),
+        md("## 1. Semantic model (create or update)"),
+        code('''if NAME in fabric.list_datasets(mode="rest")["Dataset Name"].values:
+    labs.update_semantic_model_from_bim(dataset=NAME, bim_file=bim)
+else:
+    labs.create_semantic_model_from_bim(dataset=NAME, bim_file=bim)
+for _ in range(30):
+    if NAME in fabric.list_datasets(mode="rest")["Dataset Name"].values:
+        print("semantic model is ready")
+        break
+    time.sleep(5)'''),
+        md("## 2. Load the data\n\nFirst run only: if this fails with a **credentials** error, open the semantic model "
+           "**... → Settings → Data source credentials → Edit (pencil) → Anonymous / Public → Sign in**, then re-run this cell."),
+        code("labs.refresh_semantic_model(dataset=NAME)"),
+        md("## 3. Report (create or update)"),
+        code('''if NAME in fabric.list_reports()["Name"].values:
+    update_report_from_reportjson(report=NAME, report_json=report_json)
+else:
+    create_report_from_reportjson(report=NAME, dataset=NAME, report_json=report_json)
+print(f"Done. Open the '{NAME}' report (refresh the browser tab if it was already open).")'''),
+    ]
+    nb = {"cells": cells, "metadata": {"kernelspec": {"name": "synapse_pyspark", "display_name": "Synapse PySpark"},
+                                       "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
+    (OUT / f"{NAME}.ipynb").write_text(json.dumps(nb, indent=1))
+
+
 def write_pbip(tables, data_path: str, source: str):
+    for old in glob.glob(str(OUT / "SEI_*")) + glob.glob(str(OUT / "deploy_to_fabric.ipynb")):   # pre-rename artefacts
+        shutil.rmtree(old) if os.path.isdir(old) else os.remove(old)
     model_dir, report_dir = OUT / f"{NAME}.SemanticModel", OUT / f"{NAME}.Report"
     for d in (model_dir, report_dir):
         if d.exists():
@@ -381,9 +456,10 @@ def write_pbip(tables, data_path: str, source: str):
     (report_dir / "definition.pbir").write_text(json.dumps(
         {"version": "1.0", "datasetReference": {"byPath": {"path": f"../{NAME}.SemanticModel"}, "byConnection": None}}, indent=2))
     (report_dir / "report.json").write_text(json.dumps(build_report(facts()), indent=2))
-    (OUT / "SEI_Theme.json").write_text(json.dumps(theme(), indent=2))
+    (OUT / f"{NAME}_Theme.json").write_text(json.dumps(theme(), indent=2))
+    write_notebook()
     (OUT / ".gitignore").write_text("**/.pbi/localSettings.json\n**/.pbi/cache.abf\n")
-    dax = ["// DAX measures for the SEI semantic model (table: _Measures)\n"]
+    dax = [f"// DAX measures for the {DISPLAY} semantic model (table: _Measures)\n"]
     for n, e, f, folder in MEASURES:
         dax.append(f"// [{folder}]  format: {f}\n{n} =\n    {e}\n")
     (OUT / "measures.dax").write_text("\n".join(dax))
@@ -394,7 +470,7 @@ def write_excel(tables: dict[str, pd.DataFrame]):
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.table import Table, TableStyleInfo
 
-    path = OUT / f"{NAME}_data.xlsx"
+    path = OUT / f"{NAME}_data.xlsx"   # web-app upload fallback
     with pd.ExcelWriter(path, engine="openpyxl") as xw:
         for t, df in tables.items():
             df.to_excel(xw, sheet_name=t, index=False)
