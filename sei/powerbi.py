@@ -238,6 +238,7 @@ def build_model(tables: dict[str, pd.DataFrame], data_path: str, source: str) ->
 
 # ---------------------------------------------------------------- report
 AGG = {"sum": 0, "avg": 1, "min": 3, "max": 4}
+BASE_THEME = "CY24SU06"
 
 
 class Page:
@@ -294,7 +295,8 @@ class Page:
 
     def section(self, i):
         return {"name": f"ReportSection{uuid.uuid5(uuid.NAMESPACE_URL, self.name).hex[:18]}", "displayName": self.name,
-                "displayOption": 1, "width": 1280, "height": 720, "ordinal": i, "config": "{}", "filters": "[]",
+                "displayOption": 1, "width": 1280, "height": 720, "ordinal": i, "config": json.dumps({"filterSortOrder": 3}),
+                "filters": "[]",
                 "visualContainers": self.visuals}
 
 
@@ -463,10 +465,19 @@ def build_report() -> dict:
                                             "Y": [agg("virality_weekly", "viral_rate", "avg")]}, "Weekly viral rate")
     pages.append(p)
 
-    return {"config": json.dumps({"version": "5.59", "activeSectionIndex": 0, "defaultDrillFilterOtherVisuals": True,
-                                  "settings": {"useNewFilterPaneExperience": True, "allowChangeFilterTypes": True,
-                                               "useStylableVisualContainerHeader": True, "exportDataMode": 1}}),
-            "layoutOptimization": 0, "sections": [pg.section(i) for i, pg in enumerate(pages)]}
+    # Header mirrors a report.json known to render in the Power BI Service: the base theme is a built-in one
+    # that the service resolves itself, and an explicit (empty) report-level filter list is required.
+    config = {"version": "5.55", "themeCollection": {"baseTheme": {"name": BASE_THEME, "version": "5.56", "type": 2}},
+              "activeSectionIndex": 0, "defaultDrillFilterOtherVisuals": True, "filterSortOrder": 3,
+              "linguisticSchemaSyncVersion": 2,
+              "settings": {"useNewFilterPaneExperience": True, "allowChangeFilterTypes": True,
+                           "useStylableVisualContainerHeader": True, "queryLimitOption": 6, "useEnhancedTooltips": True,
+                           "exportDataMode": 1, "useDefaultAggregateDisplayName": True},
+              "objects": {"section": [{"properties": {"verticalAlignment": {"expr": {"Literal": {"Value": "'Top'"}}}}}]}}
+    return {"config": json.dumps(config), "filters": "[]", "layoutOptimization": 0,
+            "resourcePackages": [{"resourcePackage": {"disabled": False, "name": "SharedResources", "type": 2, "items": [
+                {"name": BASE_THEME, "path": f"BaseThemes/{BASE_THEME}.json", "type": 202}]}}],
+            "sections": [pg.section(i) for i, pg in enumerate(pages)]}
 
 
 def theme() -> dict:

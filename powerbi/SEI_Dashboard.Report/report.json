@@ -1,6 +1,23 @@
 {
-  "config": "{\"version\": \"5.59\", \"activeSectionIndex\": 0, \"defaultDrillFilterOtherVisuals\": true, \"settings\": {\"useNewFilterPaneExperience\": true, \"allowChangeFilterTypes\": true, \"useStylableVisualContainerHeader\": true, \"exportDataMode\": 1}}",
+  "config": "{\"version\": \"5.55\", \"themeCollection\": {\"baseTheme\": {\"name\": \"CY24SU06\", \"version\": \"5.56\", \"type\": 2}}, \"activeSectionIndex\": 0, \"defaultDrillFilterOtherVisuals\": true, \"filterSortOrder\": 3, \"linguisticSchemaSyncVersion\": 2, \"settings\": {\"useNewFilterPaneExperience\": true, \"allowChangeFilterTypes\": true, \"useStylableVisualContainerHeader\": true, \"queryLimitOption\": 6, \"useEnhancedTooltips\": true, \"exportDataMode\": 1, \"useDefaultAggregateDisplayName\": true}, \"objects\": {\"section\": [{\"properties\": {\"verticalAlignment\": {\"expr\": {\"Literal\": {\"Value\": \"'Top'\"}}}}}]}}",
+  "filters": "[]",
   "layoutOptimization": 0,
+  "resourcePackages": [
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "name": "SharedResources",
+        "type": 2,
+        "items": [
+          {
+            "name": "CY24SU06",
+            "path": "BaseThemes/CY24SU06.json",
+            "type": 202
+          }
+        ]
+      }
+    }
+  ],
   "sections": [
     {
       "name": "ReportSectionc82b5350adf9525d95",
@@ -9,7 +26,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 0,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -111,7 +128,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 1,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -186,7 +203,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 2,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -279,7 +296,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 3,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -336,7 +353,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 4,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -420,7 +437,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 5,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -486,7 +503,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 6,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -543,7 +560,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 7,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
@@ -627,7 +644,7 @@
       "width": 1280,
       "height": 720,
       "ordinal": 8,
-      "config": "{}",
+      "config": "{\"filterSortOrder\": 3}",
       "filters": "[]",
       "visualContainers": [
         {
