@@ -101,6 +101,7 @@ def export_data() -> dict[str, pd.DataFrame]:
             if tables[t][c].dtype == bool:
                 tables[t][c] = tables[t][c].astype(int)
     tables["metric_results"]["metric_label"] = tables["metric_results"]["label"]
+    add_display_columns(tables)
 
     if DATA.exists():
         shutil.rmtree(DATA)
@@ -114,7 +115,101 @@ def export_data() -> dict[str, pd.DataFrame]:
     return tables
 
 
+# ---------------------------------------------------------------- display columns
+# Short, human-readable columns for report visuals. Names must not collide case-insensitively with
+# existing columns (Power BI column names are case-insensitive).
+SHORT_METRIC = {"minutes": "Minutes / user", "active_days": "DAU rate", "sessions": "Sessions", "likes": "Likes",
+                "shares": "Shares", "posts_created": "Posts created", "ad_revenue": "Ad revenue",
+                "churned": "Churn (28-day)", "friend_interactions": "Friend interactions",
+                "neg_feedback_rate": "Negative feedback", "ad_ctr": "Ad CTR"}
+SHORT_POLICY = {"Ship nothing (control)": "Ship nothing", "Ship AI feed to all": "AI feed → all",
+                "Ship AI + friend boost to all": "Friend boost → all", "Rule: AI feed <35, friend boost 35+": "Age rule (<35 / 35+)",
+                "Model-targeted (DR-learner)": "Model-targeted"}
+SHORT_DRIVER = {"Monthly base churn 2% / 6%": "Base churn 2–6%", "Eligible MAU 20M / 60M": "MAU 20–60M",
+                "Revenue per user -30% / +30%": "Revenue/user ±30%",
+                "AI-feed revenue lift at 95% CI low / high": "AI-feed revenue lift (CI)",
+                "AI-feed churn HR at 95% CI low / high": "AI-feed churn HR (CI)",
+                "Friend-boost churn HR at 95% CI low / high": "Friend-boost churn HR (CI)"}
+FEATURE_NAMES = {"kw_avg_avg": "Keyword avg shares", "kw_max_avg": "Keyword max-avg shares", "kw_min_avg": "Keyword min-avg shares",
+                 "kw_avg_max": "Keyword avg-max shares", "kw_max_max": "Keyword max shares", "kw_avg_min": "Keyword avg-min shares",
+                 "self_reference_min_shares": "Linked-article min shares", "self_reference_avg_sharess": "Linked-article avg shares",
+                 "self_reference_max_shares": "Linked-article max shares", "is_weekend": "Published on weekend",
+                 "global_subjectivity": "Text subjectivity", "n_unique_tokens": "Unique-word ratio",
+                 "n_non_stop_unique_tokens": "Unique non-stop words", "num_hrefs": "Number of links", "num_imgs": "Number of images",
+                 "num_videos": "Number of videos", "n_tokens_content": "Article length", "n_tokens_title": "Title length",
+                 "average_token_length": "Avg word length", "data_channel_is_entertainment": "Channel: entertainment",
+                 "data_channel_is_world": "Channel: world", "data_channel_is_tech": "Channel: tech",
+                 "data_channel_is_socmed": "Channel: social media", "global_rate_positive_words": "Positive-word rate",
+                 "LDA_00": "Topic LDA 0", "LDA_01": "Topic LDA 1", "LDA_02": "Topic LDA 2", "LDA_03": "Topic LDA 3", "LDA_04": "Topic LDA 4",
+                 "recency_days": "Days since last active", "minutes_w0": "Minutes, exp. week 1", "minutes_w1": "Minutes, exp. week 2",
+                 "minutes_w-1": "Minutes, pre week 2", "minutes_w-2": "Minutes, pre week 1", "active_days_w0": "Active days, exp. week 1",
+                 "active_days_w1": "Active days, exp. week 2", "active_days_w-1": "Active days, pre week 2",
+                 "active_days_w-2": "Active days, pre week 1", "log_followers": "Followers (log)", "like_rate": "Likes per minute",
+                 "minutes_per_session": "Minutes per session", "tenure_days": "Account tenure", "following_count": "Following count",
+                 "friend_count": "Friend count", "ctr": "Ad CTR", "engagement_trend": "Engagement trend",
+                 "activity_drop": "Activity drop", "friend_interactions_rate": "Friend interaction rate",
+                 "neg_feedback_rate": "Negative feedback rate", "posts_total": "Posts created", "arm": "Experiment arm",
+                 "age_group": "Age group", "region": "Region", "device": "Device", "account_type": "Account type",
+                 "acquisition_channel": "Acquisition channel", "is_new_user": "New user"}
+SEGMENT_DIM = {"age_group": "Age", "region": "Region", "device": "Device", "account_type": "Account type",
+               "is_new_user": "New user", "acquisition_channel": "Channel"}
+
+
+def add_display_columns(tables: dict[str, pd.DataFrame]):
+    arm_label = tables["dim_arm"].set_index("arm").arm_label
+    mr = tables["metric_results"]
+    mr["Arm name"] = mr.arm.map(arm_label)
+    mr["Metric name"] = mr.metric.map(SHORT_METRIC)
+    mr["Lift"], mr["CI low"], mr["CI high"] = mr.rel_lift, mr.rel_ci_low, mr.rel_ci_high
+    mr["p-value (BH)"] = mr.p_adj_bh
+    mr["Variance removed"] = mr.variance_reduction
+    mr["Result"] = mr.verdict.map({"win": "✔ Win", "harm": "✖ Harm", "neutral": "– Neutral"})
+    sr = tables["segment_results"]
+    sr["Arm name"] = sr.arm.map(arm_label)
+    sr["Dimension name"] = sr.dimension.map(SEGMENT_DIM)
+    sr["Segment value"] = np.where(sr.dimension == "is_new_user", sr.segment.map({"0": "Established", "1": "New (<90d)"}),
+                                   sr.segment)
+    sr["Minutes lift %"] = sr.minutes_lift
+    sr["Churn change (pp)"] = sr.churn_diff_pp
+    sr["Verdict"] = sr.status.map({"churn risk": "⚠ Churn risk", "clear win": "✔ Clear win", "inconclusive": "– Inconclusive"})
+    pv = tables["policy_values"]
+    pv["Policy name"] = pv.policy.map(SHORT_POLICY).fillna(pv.policy)
+    sens = tables["impact_sensitivity"]
+    sens["Driver"] = sens.assumption.map(SHORT_DRIVER).fillna(sens.assumption)
+    sens["Low case ($M)"], sens["High case ($M)"] = sens.low_musd, sens.high_musd
+    for t in ("virality_shap_importance", "churn_shap_importance"):
+        tables[t]["Feature name"] = tables[t].feature.map(FEATURE_NAMES).fillna(tables[t].feature.str.replace("_", " "))
+    sm = tables["sentiment_model_metrics"]
+    sm["Model name"] = sm.model.str.replace(" (lexicon baseline)", "", regex=False).str.replace(" (ours)", "", regex=False)
+    sm["Macro recall"], sm["Macro F1"], sm["Accuracy %"] = sm.macro_recall, sm.macro_f1, sm.accuracy
+    mc = tables["impact_monte_carlo"]
+    mc["Scenario"] = mc.comparison
+    mc["P5 ($M)"], mc["Median ($M)"], mc["P95 ($M)"], mc["P(> 0)"] = mc.p05_musd, mc.p50_musd, mc.p95_musd, mc.prob_positive
+    ce = tables["content_exposure_summary"]
+    ce["Negative share"], ce["Topic diversity"] = ce.negative_share, ce.topic_entropy
+    tables["topic_exposure_by_arm"]["Topic"] = tables["topic_exposure_by_arm"]["label"].str.title()
+    tables["topic_exposure_by_arm"]["Impression share"] = tables["topic_exposure_by_arm"]["share"]
+    pb = tables["virality_playbook"]
+    pb["Playbook view"] = pb.dimension.map({"channel": "Channel", "weekday": "Weekday", "images_bucket": "Images",
+                                            "videos_bucket": "Videos", "title_sentiment_bucket": "Title sentiment"})
+    pb["Level name"] = pb.level.astype(str).str.title()
+    pb["Viral rate"] = pb.viral_rate
+    mde = tables["power_mde"]
+    mde["Method name"] = mde.method.map({"raw": "Raw t-test", "cuped": "With CUPED"})
+    mde["Minimum detectable lift"] = mde.mde_rel
+
+
 # ---------------------------------------------------------------- semantic model
+DISPLAY_FORMATS = {"Lift": "+0.0%;-0.0%;0.0%", "CI low": "+0.0%;-0.0%;0.0%", "CI high": "+0.0%;-0.0%;0.0%",
+                   "p-value (BH)": "0.0000", "Variance removed": "0%", "Minutes lift %": "+0.0%;-0.0%;0.0%",
+                   "Churn change (pp)": "+0.00;-0.00;0.00", "Low case ($M)": "$#,0", "High case ($M)": "$#,0",
+                   "Macro recall": "0.000", "Macro F1": "0.000", "Accuracy %": "0.0%", "P5 ($M)": "$#,0",
+                   "Median ($M)": "$#,0", "P95 ($M)": "$#,0", "P(> 0)": "0.00%", "Negative share": "0.0%",
+                   "Topic diversity": "0.00", "Impression share": "0.0%", "Viral rate": "0%",
+                   "Minimum detectable lift": "0.0%", "uplift_vs_control_usd": "$0.00", "p50": "$#,0", "bin_mid_musd": "$#,0",
+                   "mean_abs_shap": "0.000", "profit_at_scale_musd": "$#,0.0", "predicted_cate": "$0.00",
+                   "observed_uplift": "$0.00", "cumulative_gain": "#,0", "churn_diff_pp": "+0.00;-0.00;0.00"}
+
 PCT_COLS = {"rel_lift", "rel_ci_low", "rel_ci_high", "minutes_lift", "minutes_ci_low", "minutes_ci_high", "friend_int_lift",
             "revenue_lift", "variance_reduction", "mde_rel", "survival", "ci_low_surv", "churn_probability", "share",
             "negative_share", "share_of_draws", "viral_rate", "recall", "precision", "p_improves", "fraction_targeted",
@@ -201,8 +296,10 @@ def build_model(tables: dict[str, pd.DataFrame], data_path: str, source: str) ->
             dt, _ = _dtype(df[c])
             col = {"name": c, "dataType": dt, "sourceColumn": c, "summarizeBy": "none" if dt in ("string", "dateTime") or c.endswith("_id") else "sum",
                    "lineageTag": str(uuid.uuid5(uuid.NAMESPACE_URL, f"{t}.{c}"))}
-            if dt == "dateTime":
-                col["formatString"] = "yyyy-mm-dd"
+            if c in DISPLAY_FORMATS:
+                col["formatString"] = DISPLAY_FORMATS[c]
+            elif dt == "dateTime":
+                col["formatString"] = "d mmm"
             elif c in PCT_COLS or c.endswith("_lift") or c.endswith("_rel_change"):
                 col["formatString"] = "0.0%"
             elif dt == "double":

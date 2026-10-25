@@ -20,7 +20,7 @@
             "sourceColumn": "date",
             "summarizeBy": "none",
             "lineageTag": "2870fb2f-b84e-5223-b987-41e5d6f40ae6",
-            "formatString": "yyyy-mm-dd"
+            "formatString": "d mmm"
           },
           {
             "name": "experiment_day",
@@ -275,7 +275,7 @@
             "sourceColumn": "date",
             "summarizeBy": "none",
             "lineageTag": "b79c87c5-66fb-513a-817b-02d87e10f4bd",
-            "formatString": "yyyy-mm-dd"
+            "formatString": "d mmm"
           },
           {
             "name": "friend_interactions",
@@ -702,6 +702,67 @@
             "sourceColumn": "metric_label",
             "summarizeBy": "none",
             "lineageTag": "ac940a1c-1a34-57d8-984c-b23254eedb43"
+          },
+          {
+            "name": "Arm name",
+            "dataType": "string",
+            "sourceColumn": "Arm name",
+            "summarizeBy": "none",
+            "lineageTag": "abaa38bb-a142-5205-8dc4-df9f071c8f1a"
+          },
+          {
+            "name": "Metric name",
+            "dataType": "string",
+            "sourceColumn": "Metric name",
+            "summarizeBy": "none",
+            "lineageTag": "e8b3cc97-a47c-52e6-a3b8-4de40b1e36dc"
+          },
+          {
+            "name": "Lift",
+            "dataType": "double",
+            "sourceColumn": "Lift",
+            "summarizeBy": "sum",
+            "lineageTag": "04ac642a-5d7d-5a08-a8c4-32319e0b1bb3",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "CI low",
+            "dataType": "double",
+            "sourceColumn": "CI low",
+            "summarizeBy": "sum",
+            "lineageTag": "b2c2db7e-3996-5d39-a718-0fdf80ca8b5d",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "CI high",
+            "dataType": "double",
+            "sourceColumn": "CI high",
+            "summarizeBy": "sum",
+            "lineageTag": "5880abce-cc35-55d4-9a21-1b040d19f844",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "p-value (BH)",
+            "dataType": "double",
+            "sourceColumn": "p-value (BH)",
+            "summarizeBy": "sum",
+            "lineageTag": "4077527b-c896-503c-a8c2-a1eda2410de2",
+            "formatString": "0.0000"
+          },
+          {
+            "name": "Variance removed",
+            "dataType": "double",
+            "sourceColumn": "Variance removed",
+            "summarizeBy": "sum",
+            "lineageTag": "f115544f-890a-59a7-8c5a-bc71041ede54",
+            "formatString": "0%"
+          },
+          {
+            "name": "Result",
+            "dataType": "string",
+            "sourceColumn": "Result",
+            "summarizeBy": "none",
+            "lineageTag": "f80f5a08-2498-5c20-9bef-3cebb10729ce"
           }
         ],
         "partitions": [
@@ -715,7 +776,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"metric_results.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"tier\", type text}, {\"higher_is_better\", Int64.Type}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"diff\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"rel_lift\", type number}, {\"rel_ci_low\", type number}, {\"rel_ci_high\", type number}, {\"p_value\", type number}, {\"p_value_raw_ttest\", type number}, {\"se_raw\", type number}, {\"se_cuped\", type number}, {\"variance_reduction\", type number}, {\"p_adj_bh\", type number}, {\"p_adj_holm\", type number}, {\"significant\", Int64.Type}, {\"verdict\", type text}, {\"metric_label\", type text}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"metric\", type text}, {\"label\", type text}, {\"tier\", type text}, {\"higher_is_better\", Int64.Type}, {\"mean_control\", type number}, {\"mean_treatment\", type number}, {\"diff\", type number}, {\"ci_low\", type number}, {\"ci_high\", type number}, {\"rel_lift\", type number}, {\"rel_ci_low\", type number}, {\"rel_ci_high\", type number}, {\"p_value\", type number}, {\"p_value_raw_ttest\", type number}, {\"se_raw\", type number}, {\"se_cuped\", type number}, {\"variance_reduction\", type number}, {\"p_adj_bh\", type number}, {\"p_adj_holm\", type number}, {\"significant\", Int64.Type}, {\"verdict\", type text}, {\"metric_label\", type text}, {\"Arm name\", type text}, {\"Metric name\", type text}, {\"Lift\", type number}, {\"CI low\", type number}, {\"CI high\", type number}, {\"p-value (BH)\", type number}, {\"Variance removed\", type number}, {\"Result\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -816,7 +877,7 @@
             "sourceColumn": "churn_diff_pp",
             "summarizeBy": "sum",
             "lineageTag": "be736ea6-b9f1-51e3-a688-afd28ff87345",
-            "formatString": "#,0.0000"
+            "formatString": "+0.00;-0.00;0.00"
           },
           {
             "name": "churn_ci_low_pp",
@@ -880,6 +941,50 @@
             "sourceColumn": "status",
             "summarizeBy": "none",
             "lineageTag": "798fdce8-fb48-543f-9f1b-a32af941c0d5"
+          },
+          {
+            "name": "Arm name",
+            "dataType": "string",
+            "sourceColumn": "Arm name",
+            "summarizeBy": "none",
+            "lineageTag": "ba1c60bd-3618-5c99-91ac-74d9d34fb259"
+          },
+          {
+            "name": "Dimension name",
+            "dataType": "string",
+            "sourceColumn": "Dimension name",
+            "summarizeBy": "none",
+            "lineageTag": "513f14f7-9060-5277-a61b-03c1179fc970"
+          },
+          {
+            "name": "Segment value",
+            "dataType": "string",
+            "sourceColumn": "Segment value",
+            "summarizeBy": "none",
+            "lineageTag": "b2960028-1e81-5855-8715-0a29542662f2"
+          },
+          {
+            "name": "Minutes lift %",
+            "dataType": "double",
+            "sourceColumn": "Minutes lift %",
+            "summarizeBy": "sum",
+            "lineageTag": "91f31d16-a127-53fe-95c3-6b850db1c9ab",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "Churn change (pp)",
+            "dataType": "double",
+            "sourceColumn": "Churn change (pp)",
+            "summarizeBy": "sum",
+            "lineageTag": "df342c25-5816-55e5-b5a6-97a2e8ae7936",
+            "formatString": "+0.00;-0.00;0.00"
+          },
+          {
+            "name": "Verdict",
+            "dataType": "string",
+            "sourceColumn": "Verdict",
+            "summarizeBy": "none",
+            "lineageTag": "a617ef75-4283-5ec8-bda2-e4cdd65cd6e8"
           }
         ],
         "partitions": [
@@ -893,7 +998,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"segment_results.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"segment\", type text}, {\"arm\", type text}, {\"n_treatment\", Int64.Type}, {\"n_control\", Int64.Type}, {\"minutes_lift\", type number}, {\"minutes_ci_low\", type number}, {\"minutes_ci_high\", type number}, {\"minutes_p\", type number}, {\"churn_control\", type number}, {\"churn_treatment\", type number}, {\"churn_diff_pp\", type number}, {\"churn_ci_low_pp\", type number}, {\"churn_ci_high_pp\", type number}, {\"churn_p\", type number}, {\"friend_int_lift\", type number}, {\"revenue_lift\", type number}, {\"minutes_p_adj\", type number}, {\"churn_p_adj\", type number}, {\"status\", type text}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"segment\", type text}, {\"arm\", type text}, {\"n_treatment\", Int64.Type}, {\"n_control\", Int64.Type}, {\"minutes_lift\", type number}, {\"minutes_ci_low\", type number}, {\"minutes_ci_high\", type number}, {\"minutes_p\", type number}, {\"churn_control\", type number}, {\"churn_treatment\", type number}, {\"churn_diff_pp\", type number}, {\"churn_ci_low_pp\", type number}, {\"churn_ci_high_pp\", type number}, {\"churn_p\", type number}, {\"friend_int_lift\", type number}, {\"revenue_lift\", type number}, {\"minutes_p_adj\", type number}, {\"churn_p_adj\", type number}, {\"status\", type text}, {\"Arm name\", type text}, {\"Dimension name\", type text}, {\"Segment value\", type text}, {\"Minutes lift %\", type number}, {\"Churn change (pp)\", type number}, {\"Verdict\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -918,7 +1023,7 @@
             "sourceColumn": "date",
             "summarizeBy": "none",
             "lineageTag": "5b17a6c0-61b2-53ad-a123-413712be6cea",
-            "formatString": "yyyy-mm-dd"
+            "formatString": "d mmm"
           },
           {
             "name": "arm",
@@ -1098,6 +1203,21 @@
             "summarizeBy": "sum",
             "lineageTag": "18bc1237-9bb1-5d59-8452-b7d2ac4b39ea",
             "formatString": "0.0%"
+          },
+          {
+            "name": "Method name",
+            "dataType": "string",
+            "sourceColumn": "Method name",
+            "summarizeBy": "none",
+            "lineageTag": "bf04266c-b947-506b-9394-f0c23bad4a01"
+          },
+          {
+            "name": "Minimum detectable lift",
+            "dataType": "double",
+            "sourceColumn": "Minimum detectable lift",
+            "summarizeBy": "sum",
+            "lineageTag": "fcb6a901-1006-546d-8756-7415f9ac7260",
+            "formatString": "0.0%"
           }
         ],
         "partitions": [
@@ -1111,7 +1231,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"power_mde.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"method\", type text}, {\"n_per_arm\", Int64.Type}, {\"mde_abs\", type number}, {\"mde_rel\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"method\", type text}, {\"n_per_arm\", Int64.Type}, {\"mde_abs\", type number}, {\"mde_rel\", type number}, {\"Method name\", type text}, {\"Minimum detectable lift\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1487,7 +1607,14 @@
             "sourceColumn": "mean_abs_shap",
             "summarizeBy": "sum",
             "lineageTag": "9c128fa2-6faa-52f9-bf93-e08a67029af2",
-            "formatString": "#,0.0000"
+            "formatString": "0.000"
+          },
+          {
+            "name": "Feature name",
+            "dataType": "string",
+            "sourceColumn": "Feature name",
+            "summarizeBy": "none",
+            "lineageTag": "913fecd9-87aa-5bb2-b415-5f7beb6248e8"
           }
         ],
         "partitions": [
@@ -1501,7 +1628,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"churn_shap_importance.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}, {\"Feature name\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1565,7 +1692,7 @@
             "sourceColumn": "profit_at_scale_musd",
             "summarizeBy": "sum",
             "lineageTag": "e1046a34-887e-5241-8436-fcc0febffcca",
-            "formatString": "#,0.0000"
+            "formatString": "$#,0.0"
           }
         ],
         "partitions": [
@@ -1652,7 +1779,7 @@
             "sourceColumn": "uplift_vs_control_usd",
             "summarizeBy": "sum",
             "lineageTag": "247898ca-3387-5230-abbb-35548982b219",
-            "formatString": "#,0.0000"
+            "formatString": "$0.00"
           },
           {
             "name": "annual_value_at_scale_musd",
@@ -1661,6 +1788,13 @@
             "summarizeBy": "sum",
             "lineageTag": "dc0d8f38-9cef-5815-b18a-82f50285e5b1",
             "formatString": "#,0.0000"
+          },
+          {
+            "name": "Policy name",
+            "dataType": "string",
+            "sourceColumn": "Policy name",
+            "summarizeBy": "none",
+            "lineageTag": "7ef5d3f5-9353-5710-b40f-daae2b0f014e"
           }
         ],
         "partitions": [
@@ -1674,7 +1808,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"policy_values.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"uplift_vs_control_usd\", type number}, {\"annual_value_at_scale_musd\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"uplift_vs_control_usd\", type number}, {\"annual_value_at_scale_musd\", type number}, {\"Policy name\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1700,7 +1834,7 @@
             "sourceColumn": "cumulative_gain",
             "summarizeBy": "sum",
             "lineageTag": "96cdc033-36aa-51bd-b621-d9e204f0fcd4",
-            "formatString": "#,0.0000"
+            "formatString": "#,0"
           },
           {
             "name": "random",
@@ -1768,7 +1902,7 @@
             "sourceColumn": "predicted_cate",
             "summarizeBy": "sum",
             "lineageTag": "19e21e11-3b12-5136-9266-1c1b10fc32ee",
-            "formatString": "#,0.0000"
+            "formatString": "$0.00"
           },
           {
             "name": "observed_uplift",
@@ -1776,7 +1910,7 @@
             "sourceColumn": "observed_uplift",
             "summarizeBy": "sum",
             "lineageTag": "5fdeebb7-67ee-5cc7-be16-e2e883dbd24a",
-            "formatString": "#,0.0000"
+            "formatString": "$0.00"
           },
           {
             "name": "share_35_plus",
@@ -2012,6 +2146,22 @@
             "summarizeBy": "sum",
             "lineageTag": "5e18424b-c313-54a2-b58e-d56ed1365ee6",
             "formatString": "#,0.0000"
+          },
+          {
+            "name": "Negative share",
+            "dataType": "double",
+            "sourceColumn": "Negative share",
+            "summarizeBy": "sum",
+            "lineageTag": "8aa2644c-2322-541e-9032-9652fa9c84a4",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Topic diversity",
+            "dataType": "double",
+            "sourceColumn": "Topic diversity",
+            "summarizeBy": "sum",
+            "lineageTag": "c988d566-8cf8-53da-9799-0409b12a37e9",
+            "formatString": "0.00"
           }
         ],
         "partitions": [
@@ -2025,7 +2175,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"content_exposure_summary.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_entropy\", type number}, {\"top_topic_share\", type number}, {\"distinct_topics\", type number}, {\"negative_share\", type number}, {\"expected_engagements\", type number}, {\"topic_entropy_rel_change\", type number}, {\"topic_entropy_p\", type number}, {\"top_topic_share_rel_change\", type number}, {\"top_topic_share_p\", type number}, {\"distinct_topics_rel_change\", type number}, {\"distinct_topics_p\", type number}, {\"negative_share_rel_change\", type number}, {\"negative_share_p\", type number}, {\"expected_engagements_rel_change\", type number}, {\"expected_engagements_p\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_entropy\", type number}, {\"top_topic_share\", type number}, {\"distinct_topics\", type number}, {\"negative_share\", type number}, {\"expected_engagements\", type number}, {\"topic_entropy_rel_change\", type number}, {\"topic_entropy_p\", type number}, {\"top_topic_share_rel_change\", type number}, {\"top_topic_share_p\", type number}, {\"distinct_topics_rel_change\", type number}, {\"distinct_topics_p\", type number}, {\"negative_share_rel_change\", type number}, {\"negative_share_p\", type number}, {\"expected_engagements_rel_change\", type number}, {\"expected_engagements_p\", type number}, {\"Negative share\", type number}, {\"Topic diversity\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2083,6 +2233,37 @@
             "summarizeBy": "sum",
             "lineageTag": "92cf7228-9908-5c81-b347-e2252aa83163",
             "formatString": "#,0.0000"
+          },
+          {
+            "name": "Model name",
+            "dataType": "string",
+            "sourceColumn": "Model name",
+            "summarizeBy": "none",
+            "lineageTag": "539a3f2a-2851-5bca-9c9b-4e557ff0e67a"
+          },
+          {
+            "name": "Macro recall",
+            "dataType": "double",
+            "sourceColumn": "Macro recall",
+            "summarizeBy": "sum",
+            "lineageTag": "945ea1e0-b4cc-5423-9c98-b08062e0e05d",
+            "formatString": "0.000"
+          },
+          {
+            "name": "Macro F1",
+            "dataType": "double",
+            "sourceColumn": "Macro F1",
+            "summarizeBy": "sum",
+            "lineageTag": "8745fb59-ede5-58b0-b020-45dd9043cced",
+            "formatString": "0.000"
+          },
+          {
+            "name": "Accuracy %",
+            "dataType": "double",
+            "sourceColumn": "Accuracy %",
+            "summarizeBy": "sum",
+            "lineageTag": "48b4934a-566a-5d3d-bf7b-e502440adb22",
+            "formatString": "0.0%"
           }
         ],
         "partitions": [
@@ -2096,7 +2277,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"sentiment_model_metrics.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"macro_recall\", type number}, {\"macro_f1\", type number}, {\"accuracy\", type number}, {\"f1_negative\", type number}, {\"f1_positive\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"macro_recall\", type number}, {\"macro_f1\", type number}, {\"accuracy\", type number}, {\"f1_negative\", type number}, {\"f1_positive\", type number}, {\"Model name\", type text}, {\"Macro recall\", type number}, {\"Macro F1\", type number}, {\"Accuracy %\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2144,6 +2325,28 @@
             "summarizeBy": "sum",
             "lineageTag": "83e342b7-e074-5765-b7b4-9fda718a7493",
             "formatString": "0.0%"
+          },
+          {
+            "name": "Playbook view",
+            "dataType": "string",
+            "sourceColumn": "Playbook view",
+            "summarizeBy": "none",
+            "lineageTag": "7cd5c0ed-05f7-5f0b-b9a2-cdbd6cf5452d"
+          },
+          {
+            "name": "Level name",
+            "dataType": "string",
+            "sourceColumn": "Level name",
+            "summarizeBy": "none",
+            "lineageTag": "2d9cd0b1-6103-54c5-8c76-c6ddcefc92bc"
+          },
+          {
+            "name": "Viral rate",
+            "dataType": "double",
+            "sourceColumn": "Viral rate",
+            "summarizeBy": "sum",
+            "lineageTag": "fa09b7bb-9c5d-5745-a731-a64238f56fa2",
+            "formatString": "0%"
           }
         ],
         "partitions": [
@@ -2157,7 +2360,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"virality_playbook.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"level\", type text}, {\"articles\", Int64.Type}, {\"median_shares\", type number}, {\"viral_rate\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"dimension\", type text}, {\"level\", type text}, {\"articles\", Int64.Type}, {\"median_shares\", type number}, {\"viral_rate\", type number}, {\"Playbook view\", type text}, {\"Level name\", type text}, {\"Viral rate\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2182,7 +2385,14 @@
             "sourceColumn": "mean_abs_shap",
             "summarizeBy": "sum",
             "lineageTag": "53c4a3f0-60f3-544c-a2cc-fe2eab009d79",
-            "formatString": "#,0.0000"
+            "formatString": "0.000"
+          },
+          {
+            "name": "Feature name",
+            "dataType": "string",
+            "sourceColumn": "Feature name",
+            "summarizeBy": "none",
+            "lineageTag": "b56d9c20-1262-52aa-836b-ab785b909316"
           }
         ],
         "partitions": [
@@ -2196,7 +2406,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"virality_shap_importance.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"feature\", type text}, {\"mean_abs_shap\", type number}, {\"Feature name\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2214,7 +2424,7 @@
             "sourceColumn": "week",
             "summarizeBy": "none",
             "lineageTag": "1695cb8c-e9bb-5e47-877b-c4934d09039f",
-            "formatString": "yyyy-mm-dd"
+            "formatString": "d mmm"
           },
           {
             "name": "median_shares",
@@ -2291,7 +2501,7 @@
             "sourceColumn": "p50",
             "summarizeBy": "sum",
             "lineageTag": "94f795f9-112d-511c-a317-92dbf526c0c7",
-            "formatString": "#,0.0000"
+            "formatString": "$#,0"
           },
           {
             "name": "p95",
@@ -2338,7 +2548,7 @@
             "sourceColumn": "bin_mid_musd",
             "summarizeBy": "sum",
             "lineageTag": "d73eb466-b107-5b93-904e-2edd4e6cb1df",
-            "formatString": "#,0.0000"
+            "formatString": "$#,0"
           },
           {
             "name": "share_of_draws",
@@ -2418,6 +2628,45 @@
             "summarizeBy": "sum",
             "lineageTag": "afcca657-9748-52ae-b97b-6314d7073b4e",
             "formatString": "0.0%"
+          },
+          {
+            "name": "Scenario",
+            "dataType": "string",
+            "sourceColumn": "Scenario",
+            "summarizeBy": "none",
+            "lineageTag": "df3bd8c1-d0c5-524c-939e-22fc39f0dcbc"
+          },
+          {
+            "name": "P5 ($M)",
+            "dataType": "double",
+            "sourceColumn": "P5 ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "e75e4565-3a3e-56f9-a562-b8ddbe3064ce",
+            "formatString": "$#,0"
+          },
+          {
+            "name": "Median ($M)",
+            "dataType": "double",
+            "sourceColumn": "Median ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "ba1085f3-ad04-5c41-b78d-2c57dcb5b7f7",
+            "formatString": "$#,0"
+          },
+          {
+            "name": "P95 ($M)",
+            "dataType": "double",
+            "sourceColumn": "P95 ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "2d26fafd-d3cf-56ff-b559-206d5d06aae9",
+            "formatString": "$#,0"
+          },
+          {
+            "name": "P(> 0)",
+            "dataType": "double",
+            "sourceColumn": "P(> 0)",
+            "summarizeBy": "sum",
+            "lineageTag": "ff1b6fdd-31ba-5771-9132-f7c803785080",
+            "formatString": "0.00%"
           }
         ],
         "partitions": [
@@ -2431,7 +2680,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_monte_carlo.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"comparison\", type text}, {\"p05_musd\", type number}, {\"p50_musd\", type number}, {\"p95_musd\", type number}, {\"mean_musd\", type number}, {\"prob_positive\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"comparison\", type text}, {\"p05_musd\", type number}, {\"p50_musd\", type number}, {\"p95_musd\", type number}, {\"mean_musd\", type number}, {\"prob_positive\", type number}, {\"Scenario\", type text}, {\"P5 ($M)\", type number}, {\"Median ($M)\", type number}, {\"P95 ($M)\", type number}, {\"P(> 0)\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2481,6 +2730,29 @@
             "summarizeBy": "sum",
             "lineageTag": "72a30cb0-4511-5813-808e-712c78eb9db4",
             "formatString": "#,0.0000"
+          },
+          {
+            "name": "Driver",
+            "dataType": "string",
+            "sourceColumn": "Driver",
+            "summarizeBy": "none",
+            "lineageTag": "a09e79b5-c73c-54f9-92cb-242601425bd7"
+          },
+          {
+            "name": "Low case ($M)",
+            "dataType": "double",
+            "sourceColumn": "Low case ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "ed8e5f07-600e-5414-ab76-d61a0dc256af",
+            "formatString": "$#,0"
+          },
+          {
+            "name": "High case ($M)",
+            "dataType": "double",
+            "sourceColumn": "High case ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "9232b7c4-bc11-52f7-96f8-ec52b6d1dc95",
+            "formatString": "$#,0"
           }
         ],
         "partitions": [
@@ -2494,7 +2766,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_sensitivity.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"assumption\", type text}, {\"low_musd\", type number}, {\"high_musd\", type number}, {\"central_musd\", type number}, {\"swing\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"assumption\", type text}, {\"low_musd\", type number}, {\"high_musd\", type number}, {\"central_musd\", type number}, {\"swing\", type number}, {\"Driver\", type text}, {\"Low case ($M)\", type number}, {\"High case ($M)\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2534,6 +2806,21 @@
             "sourceColumn": "label",
             "summarizeBy": "none",
             "lineageTag": "1075c40e-f516-5eb3-8b76-5937a95d3361"
+          },
+          {
+            "name": "Topic",
+            "dataType": "string",
+            "sourceColumn": "Topic",
+            "summarizeBy": "none",
+            "lineageTag": "10e2e833-164a-5233-9173-92ed1f25b50a"
+          },
+          {
+            "name": "Impression share",
+            "dataType": "double",
+            "sourceColumn": "Impression share",
+            "summarizeBy": "sum",
+            "lineageTag": "82b262c4-d8fb-5a4c-a5a2-54445fdad5b0",
+            "formatString": "0.0%"
           }
         ],
         "partitions": [
@@ -2547,7 +2834,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"topic_exposure_by_arm.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_id\", Int64.Type}, {\"share\", type number}, {\"label\", type text}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"topic_id\", Int64.Type}, {\"share\", type number}, {\"label\", type text}, {\"Topic\", type text}, {\"Impression share\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]

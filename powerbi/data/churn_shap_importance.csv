@@ -1,29 +1,29 @@
-feature,mean_abs_shap
-recency_days,0.8036385450798124
-minutes_w0,0.2107817096855405
-active_days_w1,0.1782558093117267
-minutes_w1,0.1578151046995154
-minutes_w-2,0.1510773850267957
-log_followers,0.1213979292217459
-like_rate,0.1211602413414953
-minutes_w-1,0.1128074337654262
-minutes_per_session,0.1042904260839253
-tenure_days,0.0962679545328647
-arm,0.0901322749205471
-following_count,0.0890843092450272
-ctr,0.0882396482072795
-posts_total,0.0846584399877788
-active_days_w-2,0.0845067082818443
-engagement_trend,0.0842726319878651
-activity_drop,0.0795978336763166
-friend_interactions_rate,0.0772914351994717
-active_days_w0,0.0763145488286942
-neg_feedback_rate,0.0757387208643536
-friend_count,0.0727079198085016
-age_group,0.0505364248984057
-account_type,0.0374658361967757
-device,0.0328349795952386
-region,0.0265838661676986
-acquisition_channel,0.0249777199241277
-active_days_w-1,0.0231070177334498
-is_new_user,0.0072987557252597
+feature,mean_abs_shap,Feature name
+recency_days,0.8036385450798124,Days since last active
+minutes_w0,0.2107817096855405,"Minutes, exp. week 1"
+active_days_w1,0.1782558093117267,"Active days, exp. week 2"
+minutes_w1,0.1578151046995154,"Minutes, exp. week 2"
+minutes_w-2,0.1510773850267957,"Minutes, pre week 1"
+log_followers,0.1213979292217459,Followers (log)
+like_rate,0.1211602413414953,Likes per minute
+minutes_w-1,0.1128074337654262,"Minutes, pre week 2"
+minutes_per_session,0.1042904260839253,Minutes per session
+tenure_days,0.0962679545328647,Account tenure
+arm,0.0901322749205471,Experiment arm
+following_count,0.0890843092450272,Following count
+ctr,0.0882396482072795,Ad CTR
+posts_total,0.0846584399877788,Posts created
+active_days_w-2,0.0845067082818443,"Active days, pre week 1"
+engagement_trend,0.0842726319878651,Engagement trend
+activity_drop,0.0795978336763166,Activity drop
+friend_interactions_rate,0.0772914351994717,Friend interaction rate
+active_days_w0,0.0763145488286942,"Active days, exp. week 1"
+neg_feedback_rate,0.0757387208643536,Negative feedback rate
+friend_count,0.0727079198085016,Friend count
+age_group,0.0505364248984057,Age group
+account_type,0.0374658361967757,Account type
+device,0.0328349795952386,Device
+region,0.0265838661676986,Region
+acquisition_channel,0.0249777199241277,Acquisition channel
+active_days_w-1,0.0231070177334498,"Active days, pre week 2"
+is_new_user,0.0072987557252597,New user

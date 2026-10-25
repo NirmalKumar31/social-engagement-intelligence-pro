@@ -1,0 +1,96 @@
+{
+  "project": "social-engagement-intelligence-pro",
+  "audited_revision": "241c040b1baf2c27ed2c8fcb55ca218f159a7d51",
+  "checked_at_utc": "2026-10-25T22:31:58.901183+00:00",
+  "tests": {
+    "passed": 13,
+    "seconds": 29.04
+  },
+  "streamlit_pages_initial_execution_passed": 9,
+  "sql_examples_passed": 14,
+  "pipeline": {
+    "isolated_path": "/var/folders/zz/82b9t79d1y966pkzhkhg6fhc0000gn/T/sei-full-audit-qsaqsfs6",
+    "skip_nlp_pipeline_exit": 0,
+    "nlp_rerun_exit": 0,
+    "all_six_summary_jsons_byte_identical": true,
+    "executive_memo_byte_identical": true,
+    "raw_simulation_parquets_byte_identical": true,
+    "external_data_redownloaded": false
+  },
+  "friend_boost_negative_feedback": {
+    "relative_lift": 0.081325,
+    "adjusted_p_value": 7.74734e-15,
+    "saved_verdict": "harm"
+  },
+  "scoring_cohort": {
+    "n": 57297,
+    "future_inactivity_positive": 1501,
+    "already_latently_departed_by_day13": 1013,
+    "departed_day14_through27": 419,
+    "no_latent_departure": 69,
+    "oof_top10pct_positives": 1021,
+    "oof_top10pct_already_departed_positives": 833
+  },
+  "survival": {
+    "observed_final_window_churn": 5355,
+    "latent_28_day_departures": 5652,
+    "observed_churn_no_latent_departure": 612,
+    "latent_departures_not_counted_as_events": 909,
+    "last_constructed_event_day": 21,
+    "administrative_censor_day": 28
+  },
+  "adverse_campaign_scenario": {
+    "cost_usd": 3,
+    "assumed_save_fraction": 0.05,
+    "saved_user_ltv_usd": 5,
+    "all_candidate_values_negative": true,
+    "recommended_fraction": 0.01,
+    "recommended_value_musd": -1.0888318789994185,
+    "no_send_value": 0
+  },
+  "audit_paired_personalization_diagnostic": {
+    "point_vs_blanket_friend_boost_usd_per_user": 0.13870476366341222,
+    "approximate_95_interval": [
+      -0.73155084,
+      1.20257753
+    ],
+    "bootstrap_positive_fraction": 0.64,
+    "n_boot": 400,
+    "seed": 0,
+    "source": "reuse of saved held-out predictions; no fitting or policy selection"
+  },
+  "joint_sensitivity": {
+    "central_friend_boost_minus_ai_musd": 46.3419566249907,
+    "joint_adverse_marginal_bound_scenario_musd": -26.937992578947068,
+    "note": "stress scenario; not a joint confidence region or assigned probability"
+  },
+  "null_monitoring_audit": {
+    "n_random_splits": 500,
+    "seed": 812,
+    "population": "existing control users, repeated daily outcomes",
+    "naive_any_look_rejection": 0.136,
+    "mixture_any_look_rejection": 0.014,
+    "fixed_horizon_rejection": 0.05,
+    "note": "limited conditional diagnostic, not proof of an always-valid guarantee"
+  },
+  "virality": {
+    "full_data_target_cutoff": 2800,
+    "train_only_target_cutoff": 2900,
+    "train_last_date": "2014-07-27",
+    "test_first_date": "2014-07-27",
+    "boundary_date_articles": 29
+  },
+  "powerbi": {
+    "pages": 9,
+    "visuals": 67,
+    "missing_visual_field_references": 0,
+    "live_dax_engine_executed": false,
+    "pandas_3_1_dtype_probe_error": "TypeError: Cannot interpret '<StringDtype(na_value=nan)>' as a data type"
+  },
+  "not_executed": [
+    "live Fabric report inspection",
+    "Fabric deployment notebook",
+    "optional Anthropic API",
+    "fresh installation of all dependency combinations"
+  ]
+}

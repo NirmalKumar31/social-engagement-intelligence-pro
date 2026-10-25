@@ -1,59 +1,59 @@
-feature,mean_abs_shap
-kw_avg_avg,0.3370094130572119
-self_reference_min_shares,0.1454817092721259
-kw_max_avg,0.1132739726634057
-self_reference_avg_sharess,0.1107303180292713
-kw_min_avg,0.0969167635892351
-is_weekend,0.09437284181914
-kw_avg_max,0.0915966098141095
-global_subjectivity,0.0842643482960257
-kw_min_max,0.081459500031426
-data_channel_is_entertainment,0.0758095516537101
-num_videos,0.0750415276799065
-data_channel_is_tech,0.070964443302436
-n_unique_tokens,0.0701440597968022
-LDA_02,0.0567277019665452
-n_non_stop_words,0.0527956693755033
-num_hrefs,0.0513957193846424
-average_token_length,0.0501632002227898
-num_imgs,0.0495245051759291
-kw_max_max,0.0406638426861508
-LDA_00,0.0396331401311567
-n_tokens_content,0.03522559802077
-min_positive_polarity,0.035195366889654
-kw_max_min,0.0346972206640474
-global_rate_positive_words,0.0335841502630542
-title_sentiment_polarity,0.0335301200725987
-LDA_03,0.0326334881933933
-LDA_01,0.0291112359672173
-title_subjectivity,0.0272712501898807
-self_reference_max_shares,0.0268522221069808
-num_self_hrefs,0.0266233121542355
-global_rate_negative_words,0.0265962792482985
-LDA_04,0.0257744071044823
-kw_avg_min,0.0240124501277849
-avg_positive_polarity,0.0229550949404727
-n_tokens_title,0.022835492975949
-avg_negative_polarity,0.0221444088920375
-n_non_stop_unique_tokens,0.0218639882962626
-weekday_is_tuesday,0.0214230349540489
-data_channel_is_socmed,0.0199636518993907
-global_sentiment_polarity,0.018564170688534
-min_negative_polarity,0.0156627130536231
-abs_title_sentiment_polarity,0.0145185750531008
-rate_positive_words,0.0133982453581184
-abs_title_subjectivity,0.01259553973577
-max_negative_polarity,0.0125375122818719
-weekday_is_wednesday,0.0121021386391554
-weekday_is_friday,0.0119559654323433
-rate_negative_words,0.0116709641112823
-weekday_is_monday,0.0115850327703475
-kw_min_min,0.0109729189239342
-max_positive_polarity,0.009100136653361
-data_channel_is_bus,0.0083191196738086
-weekday_is_saturday,0.0075681065550014
-weekday_is_thursday,0.0071455137321038
-num_keywords,0.0053527185493207
-weekday_is_sunday,0.0047717385016975
-data_channel_is_world,0.004699011614293
-data_channel_is_lifestyle,0.0040306716025989
+feature,mean_abs_shap,Feature name
+kw_avg_avg,0.3370094130572119,Keyword avg shares
+self_reference_min_shares,0.1454817092721259,Linked-article min shares
+kw_max_avg,0.1132739726634057,Keyword max-avg shares
+self_reference_avg_sharess,0.1107303180292713,Linked-article avg shares
+kw_min_avg,0.0969167635892351,Keyword min-avg shares
+is_weekend,0.09437284181914,Published on weekend
+kw_avg_max,0.0915966098141095,Keyword avg-max shares
+global_subjectivity,0.0842643482960257,Text subjectivity
+kw_min_max,0.081459500031426,kw min max
+data_channel_is_entertainment,0.0758095516537101,Channel: entertainment
+num_videos,0.0750415276799065,Number of videos
+data_channel_is_tech,0.070964443302436,Channel: tech
+n_unique_tokens,0.0701440597968022,Unique-word ratio
+LDA_02,0.0567277019665452,Topic LDA 2
+n_non_stop_words,0.0527956693755033,n non stop words
+num_hrefs,0.0513957193846424,Number of links
+average_token_length,0.0501632002227898,Avg word length
+num_imgs,0.0495245051759291,Number of images
+kw_max_max,0.0406638426861508,Keyword max shares
+LDA_00,0.0396331401311567,Topic LDA 0
+n_tokens_content,0.03522559802077,Article length
+min_positive_polarity,0.035195366889654,min positive polarity
+kw_max_min,0.0346972206640474,kw max min
+global_rate_positive_words,0.0335841502630542,Positive-word rate
+title_sentiment_polarity,0.0335301200725987,title sentiment polarity
+LDA_03,0.0326334881933933,Topic LDA 3
+LDA_01,0.0291112359672173,Topic LDA 1
+title_subjectivity,0.0272712501898807,title subjectivity
+self_reference_max_shares,0.0268522221069808,Linked-article max shares
+num_self_hrefs,0.0266233121542355,num self hrefs
+global_rate_negative_words,0.0265962792482985,global rate negative words
+LDA_04,0.0257744071044823,Topic LDA 4
+kw_avg_min,0.0240124501277849,Keyword avg-min shares
+avg_positive_polarity,0.0229550949404727,avg positive polarity
+n_tokens_title,0.022835492975949,Title length
+avg_negative_polarity,0.0221444088920375,avg negative polarity
+n_non_stop_unique_tokens,0.0218639882962626,Unique non-stop words
+weekday_is_tuesday,0.0214230349540489,weekday is tuesday
+data_channel_is_socmed,0.0199636518993907,Channel: social media
+global_sentiment_polarity,0.018564170688534,global sentiment polarity
+min_negative_polarity,0.0156627130536231,min negative polarity
+abs_title_sentiment_polarity,0.0145185750531008,abs title sentiment polarity
+rate_positive_words,0.0133982453581184,rate positive words
+abs_title_subjectivity,0.01259553973577,abs title subjectivity
+max_negative_polarity,0.0125375122818719,max negative polarity
+weekday_is_wednesday,0.0121021386391554,weekday is wednesday
+weekday_is_friday,0.0119559654323433,weekday is friday
+rate_negative_words,0.0116709641112823,rate negative words
+weekday_is_monday,0.0115850327703475,weekday is monday
+kw_min_min,0.0109729189239342,kw min min
+max_positive_polarity,0.009100136653361,max positive polarity
+data_channel_is_bus,0.0083191196738086,data channel is bus
+weekday_is_saturday,0.0075681065550014,weekday is saturday
+weekday_is_thursday,0.0071455137321038,weekday is thursday
+num_keywords,0.0053527185493207,num keywords
+weekday_is_sunday,0.0047717385016975,weekday is sunday
+data_channel_is_world,0.004699011614293,Channel: world
+data_channel_is_lifestyle,0.0040306716025989,data channel is lifestyle

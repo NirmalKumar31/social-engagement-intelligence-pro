@@ -1,31 +1,31 @@
-arm,topic_id,share,label
-ai_feed,0,0.0986088888888888,good / love / happy
-ai_feed,1,0.1018933333333333,friday / black / kendrick
-ai_feed,2,0.0924066666666666,time / watching / watch
-ai_feed,3,0.1021333333333333,game / sox / vs
-ai_feed,4,0.1041577777777777,sunday / ice / national
-ai_feed,5,0.1015955555555555,saturday / live / come
-ai_feed,6,0.0992577777777777,trump / donald / melania
-ai_feed,7,0.1025577777777777,new / album / york
-ai_feed,8,0.0995844444444444,monday / raw / frank
-ai_feed,9,0.0978044444444444,want / know / really
-ai_feed_social,0,0.0973666666666666,good / love / happy
-ai_feed_social,1,0.1029044444444444,friday / black / kendrick
-ai_feed_social,2,0.0983288888888889,time / watching / watch
-ai_feed_social,3,0.1031911111111111,game / sox / vs
-ai_feed_social,4,0.0990866666666666,sunday / ice / national
-ai_feed_social,5,0.0978822222222222,saturday / live / come
-ai_feed_social,6,0.0992044444444444,trump / donald / melania
-ai_feed_social,7,0.0957266666666666,new / album / york
-ai_feed_social,8,0.1048044444444444,monday / raw / frank
-ai_feed_social,9,0.1015044444444444,want / know / really
-control,0,0.1000688888888888,good / love / happy
-control,1,0.1014977777777777,friday / black / kendrick
-control,2,0.1036133333333333,time / watching / watch
-control,3,0.0960422222222222,game / sox / vs
-control,4,0.10204,sunday / ice / national
-control,5,0.0996533333333333,saturday / live / come
-control,6,0.1005711111111111,trump / donald / melania
-control,7,0.0978866666666666,new / album / york
-control,8,0.1007711111111111,monday / raw / frank
-control,9,0.0978555555555555,want / know / really
+arm,topic_id,share,label,Topic,Impression share
+ai_feed,0,0.0986088888888888,good / love / happy,Good / Love / Happy,0.0986088888888888
+ai_feed,1,0.1018933333333333,friday / black / kendrick,Friday / Black / Kendrick,0.1018933333333333
+ai_feed,2,0.0924066666666666,time / watching / watch,Time / Watching / Watch,0.0924066666666666
+ai_feed,3,0.1021333333333333,game / sox / vs,Game / Sox / Vs,0.1021333333333333
+ai_feed,4,0.1041577777777777,sunday / ice / national,Sunday / Ice / National,0.1041577777777777
+ai_feed,5,0.1015955555555555,saturday / live / come,Saturday / Live / Come,0.1015955555555555
+ai_feed,6,0.0992577777777777,trump / donald / melania,Trump / Donald / Melania,0.0992577777777777
+ai_feed,7,0.1025577777777777,new / album / york,New / Album / York,0.1025577777777777
+ai_feed,8,0.0995844444444444,monday / raw / frank,Monday / Raw / Frank,0.0995844444444444
+ai_feed,9,0.0978044444444444,want / know / really,Want / Know / Really,0.0978044444444444
+ai_feed_social,0,0.0973666666666666,good / love / happy,Good / Love / Happy,0.0973666666666666
+ai_feed_social,1,0.1029044444444444,friday / black / kendrick,Friday / Black / Kendrick,0.1029044444444444
+ai_feed_social,2,0.0983288888888889,time / watching / watch,Time / Watching / Watch,0.0983288888888889
+ai_feed_social,3,0.1031911111111111,game / sox / vs,Game / Sox / Vs,0.1031911111111111
+ai_feed_social,4,0.0990866666666666,sunday / ice / national,Sunday / Ice / National,0.0990866666666666
+ai_feed_social,5,0.0978822222222222,saturday / live / come,Saturday / Live / Come,0.0978822222222222
+ai_feed_social,6,0.0992044444444444,trump / donald / melania,Trump / Donald / Melania,0.0992044444444444
+ai_feed_social,7,0.0957266666666666,new / album / york,New / Album / York,0.0957266666666666
+ai_feed_social,8,0.1048044444444444,monday / raw / frank,Monday / Raw / Frank,0.1048044444444444
+ai_feed_social,9,0.1015044444444444,want / know / really,Want / Know / Really,0.1015044444444444
+control,0,0.1000688888888888,good / love / happy,Good / Love / Happy,0.1000688888888888
+control,1,0.1014977777777777,friday / black / kendrick,Friday / Black / Kendrick,0.1014977777777777
+control,2,0.1036133333333333,time / watching / watch,Time / Watching / Watch,0.1036133333333333
+control,3,0.0960422222222222,game / sox / vs,Game / Sox / Vs,0.0960422222222222
+control,4,0.10204,sunday / ice / national,Sunday / Ice / National,0.10204
+control,5,0.0996533333333333,saturday / live / come,Saturday / Live / Come,0.0996533333333333
+control,6,0.1005711111111111,trump / donald / melania,Trump / Donald / Melania,0.1005711111111111
+control,7,0.0978866666666666,new / album / york,New / Album / York,0.0978866666666666
+control,8,0.1007711111111111,monday / raw / frank,Monday / Raw / Frank,0.1007711111111111
+control,9,0.0978555555555555,want / know / really,Want / Know / Really,0.0978555555555555

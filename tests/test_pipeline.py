@@ -48,3 +48,11 @@ def test_pbip_is_fabric_git_ready():
         assert meta["metadata"]["type"] == kind
     bim = json.loads((C.POWERBI / "SEI_Dashboard.SemanticModel" / "model.bim").read_text())
     assert bim["model"]["expressions"][0]["name"] == "DataPath"
+
+
+def test_powerbi_columns_unique_case_insensitive():
+    import json
+    bim = json.loads((C.POWERBI / "SEI_Dashboard.SemanticModel" / "model.bim").read_text())
+    for t in bim["model"]["tables"]:
+        names = [c["name"].lower() for c in t["columns"]]
+        assert len(names) == len(set(names)), t["name"]
