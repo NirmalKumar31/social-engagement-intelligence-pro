@@ -1,8 +1,12 @@
 """What makes content spread? A real-data model on UCI Online News Popularity (39,644 Mashable articles).
 
-* Time-based split (train on older articles, test on the newest 25%) to mimic production scoring
-* LightGBM classifier for "viral" (top-quartile shares) and a log-shares regressor
-* SHAP drivers + creator-facing playbook tables (best channel / weekday / media mix)
+An ORDERED RETROSPECTIVE BENCHMARK, not a verified point-in-time production evaluation:
+* split on whole publication dates (oldest ~75% of dates train, newest test; no date in both)
+* the "viral" threshold (top quartile of shares) is computed on TRAINING articles only
+* keyword-share (kw_*) and linked-article-share (self_reference_*) features have no verified
+  publication-time availability (UCI collected all shares on one date, 2015-01-08), so an ablation
+  without them is reported alongside the full model
+* SHAP drivers + a DESCRIPTIVE playbook (unadjusted associations, not causal publishing advice)
 """
 from __future__ import annotations
 
@@ -41,23 +45,32 @@ def load() -> pd.DataFrame:
 
 def main():
     df = load()
-    viral_cut = df.shares.quantile(0.75)
-    df["viral"] = (df.shares >= viral_cut).astype(int)
-    feats = [c for c in df.columns if c not in {"url", "timedelta", "shares", "viral", "channel", "weekday", "publish_date"}]
-    df = df.sort_values("publish_date").reset_index(drop=True)
-    cut = int(len(df) * 0.75)
-    tr, te = df.iloc[:cut], df.iloc[cut:]
+    feats = [c for c in df.columns if c not in {"url", "timedelta", "shares", "channel", "weekday", "publish_date"}]
+    dates = np.sort(df.publish_date.unique())
+    cut_date = dates[int(len(dates) * 0.75)]
+    tr, te = df[df.publish_date < cut_date].copy(), df[df.publish_date >= cut_date].copy()
+    viral_cut = tr.shares.quantile(0.75)
+    for d in (tr, te, df):
+        d["viral"] = (d.shares >= viral_cut).astype(int)
+    unverified = [c for c in feats if c.startswith("kw_") or c.startswith("self_reference_")]
+    safe = [c for c in feats if c not in unverified]
     params = dict(n_estimators=600, learning_rate=0.03, num_leaves=31, min_child_samples=50, subsample=0.8,
                   subsample_freq=1, colsample_bytree=0.7, reg_lambda=1.0, verbose=-1)
     clf = lgb.LGBMClassifier(**params).fit(tr[feats], tr.viral)
+    clf_safe = lgb.LGBMClassifier(**params).fit(tr[safe], tr.viral)
     base = make_pipeline(StandardScaler(), LogisticRegression(max_iter=3000, C=0.3)).fit(tr[feats], tr.viral)
     reg = lgb.LGBMRegressor(**params).fit(tr[feats], np.log1p(tr.shares))
     p, pb = clf.predict_proba(te[feats])[:, 1], base.predict_proba(te[feats])[:, 1]
+    ps = clf_safe.predict_proba(te[safe])[:, 1]
     lp = reg.predict(te[feats])
     metrics = {
-        "n_articles": int(len(df)), "train_until": str(tr.publish_date.max().date()), "test_from": str(te.publish_date.min().date()),
-        "viral_threshold_shares": float(viral_cut),
+        "evaluation": "ordered retrospective benchmark (whole-date split); feature availability not verified",
+        "n_articles": int(len(df)), "n_train": int(len(tr)), "n_test": int(len(te)),
+        "train_until": str(pd.Timestamp(tr.publish_date.max()).date()), "test_from": str(pd.Timestamp(te.publish_date.min()).date()),
+        "viral_threshold_shares": float(viral_cut), "threshold_source": "training articles only",
         "auc_lightgbm": float(roc_auc_score(te.viral, p)), "auc_logistic": float(roc_auc_score(te.viral, pb)),
+        "auc_lightgbm_without_unverified_features": float(roc_auc_score(te.viral, ps)),
+        "unverified_features_excluded": len(unverified),
         "r2_log_shares": float(r2_score(np.log1p(te.shares), lp)),
         "mae_shares_median_abs": float(mean_absolute_error(te.shares, np.expm1(lp))),
         "precision_top10pct": float(te.viral[p >= np.quantile(p, 0.9)].mean()), "base_viral_rate_test": float(te.viral.mean()),
@@ -95,8 +108,9 @@ def main():
     for yv, v in enumerate(ch.viral_rate):
         axes[1].text(v * 100 + 0.5, yv, f"{v:.0%}", va="center", color=C.INK["secondary"])
     axes[1].set(title="Viral rate by content channel", xlabel="% of articles in top-quartile shares")
-    fig.suptitle(f"Real data: 39,644 articles · time-split AUC {metrics['auc_lightgbm']:.3f} (LightGBM) vs "
-                 f"{metrics['auc_logistic']:.3f} (logistic)", x=0.01, ha="left", color=C.INK["secondary"])
+    fig.suptitle(f"Real data, ordered retrospective benchmark · AUC {metrics['auc_lightgbm']:.3f} (LightGBM), "
+                 f"{metrics['auc_logistic']:.3f} (logistic), {metrics['auc_lightgbm_without_unverified_features']:.3f} without "
+                 f"share-history features · playbook is descriptive", x=0.01, ha="left", color=C.INK["secondary"], fontsize=9)
     fig.tight_layout()
     save(fig, "16_virality_drivers")
     metrics["top_drivers"] = imp.feature.head(8).tolist()

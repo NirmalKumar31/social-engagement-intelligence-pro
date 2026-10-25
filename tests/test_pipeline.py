@@ -20,8 +20,7 @@ def test_churn_features_do_not_peek_into_label_window():
     from sei.retention import SCORING_DAY, build_features
     users, daily = load_raw()
     f = build_features(users, daily)
-    # recency is measured as of the scoring day, so it can never be negative
-    assert (f.recency_days >= 0).all()
+    assert (f.active_days_last3 >= 0).all() and (f.active_days_last3 <= 3).all()
     assert "late_minutes" not in f.columns and not any(c.startswith("exp_") for c in f.columns)
     assert SCORING_DAY < C.EXP_DAYS - 1
 

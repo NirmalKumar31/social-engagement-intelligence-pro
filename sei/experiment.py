@@ -11,6 +11,8 @@ from scipy.optimize import curve_fit
 
 from . import config as C
 from . import stats as S
+from .decision import decide
+from .decision import headline as headline_text
 from .features import load_raw
 from .plotting import plt, save, setup
 
@@ -123,82 +125,135 @@ def metric_results(df: pd.DataFrame) -> pd.DataFrame:
     return res
 
 
-def daily_dynamics(users: pd.DataFrame, daily: pd.DataFrame) -> pd.DataFrame:
-    """Per-day lift on minutes/assigned user, with an exponential novelty-decay fit."""
-    n = users.arm.value_counts()
-    d = daily[daily.day >= 0].merge(users[["user_id", "arm"]], on="user_id")
-    # Per-user per-day matrix is large; compute means and variances from sums
-    g = d.groupby(["day", "arm"]).minutes.agg(["sum", lambda s: (s**2).sum()]).reset_index()
-    g.columns = ["day", "arm", "s1", "s2"]
-    g["n"] = g.arm.map(n)
-    g["mean"] = g.s1 / g.n
-    g["var"] = g.s2 / g.n - g["mean"] ** 2
+def user_day_matrix(users: pd.DataFrame, daily: pd.DataFrame, value: str = "minutes") -> np.ndarray:
+    """users x experiment-day matrix of `value`, zeros on inactive days (intent-to-treat)."""
+    m = np.zeros((len(users), C.EXP_DAYS))
+    pos = pd.Series(np.arange(len(users)), index=users.user_id.values)
+    e = daily[daily.day >= 0]
+    np.add.at(m, (pos.reindex(e.user_id.values).values, e.day.values), e[value].values)
+    return m
+
+
+def _decay(t, ss, nov, tau):
+    return ss + nov * np.exp(-t / tau)
+
+
+def _fit(day, lift):
+    try:
+        (ss, nov, tau), _ = curve_fit(_decay, day, lift, p0=[0.07, 0.08, 5], bounds=([-1, -1, 0.5], [1, 1, 60]))
+    except RuntimeError:
+        ss, nov, tau = float(np.mean(lift[-7:])), 0.0, np.nan
+    return ss, nov, tau
+
+
+def daily_dynamics(users: pd.DataFrame, daily: pd.DataFrame, n_boot: int = 200, seed: int = 3):
+    """Per-day lift on minutes/assigned user plus an exponential decay fit.
+
+    The fitted asymptote is an EXTRAPOLATION of 28 correlated daily ratios, not a measured steady state.
+    Uncertainty: users are resampled within arm (control resampled once per draw and shared by both
+    contrasts), daily lifts recomputed and the curve refitted, giving percentile intervals for the
+    asymptote, decay constant and the observed week-1 / week-4 lifts.
+    """
+    m = user_day_matrix(users, daily)
+    arm = users.arm.values
+    idx = {a: np.flatnonzero(arm == a) for a in C.ARMS}
+    day = np.arange(C.EXP_DAYS)
+
+    def lifts(sel):
+        means = {a: m[sel[a]].mean(axis=0) for a in C.ARMS}
+        return {a: means[a] / means["control"] - 1 for a in C.TREATMENTS}
+
+    point = lifts(idx)
     rows = []
-    for day, gd in g.groupby("day"):
-        c = gd[gd.arm == "control"].iloc[0]
-        for arm in C.TREATMENTS:
-            t = gd[gd.arm == arm].iloc[0]
-            lift = t["mean"] / c["mean"] - 1
-            se = np.sqrt(t["var"] / t.n / c["mean"] ** 2 + c["var"] / c.n * t["mean"] ** 2 / c["mean"] ** 4)
-            rows.append({"day": day, "date": pd.Timestamp(C.START_DATE) + pd.Timedelta(days=int(day)), "arm": arm,
-                         "mean_control": c["mean"], "mean_treatment": t["mean"], "rel_lift": lift,
-                         "ci_low": lift - S.Z * se, "ci_high": lift + S.Z * se})
+    for a in C.TREATMENTS:
+        t, c = m[idx[a]], m[idx["control"]]
+        mt, mc = t.mean(axis=0), c.mean(axis=0)
+        se = np.sqrt(t.var(axis=0, ddof=1) / len(t) / mc**2 + c.var(axis=0, ddof=1) / len(c) * mt**2 / mc**4)
+        for d in day:
+            rows.append({"day": int(d), "date": pd.Timestamp(C.START_DATE) + pd.Timedelta(days=int(d)), "arm": a,
+                         "mean_control": mc[d], "mean_treatment": mt[d], "rel_lift": point[a][d],
+                         "ci_low": point[a][d] - S.Z * se[d], "ci_high": point[a][d] + S.Z * se[d]})
     out = pd.DataFrame(rows)
+
+    rng = np.random.default_rng(seed)
+    boots = {a: [] for a in C.TREATMENTS}
+    for _ in range(n_boot):
+        sel = {a: rng.choice(ix, len(ix), replace=True) for a, ix in idx.items()}
+        bl = lifts(sel)
+        for a in C.TREATMENTS:
+            boots[a].append((*_fit(day, bl[a]), bl[a][:7].mean(), bl[a][21:].mean()))
     fits = {}
-    for arm in C.TREATMENTS:
-        a = out[out.arm == arm]
-        f = lambda t, ss, nov, tau: ss + nov * np.exp(-t / tau)
-        try:
-            (ss, nov, tau), _ = curve_fit(f, a.day, a.rel_lift, p0=[0.07, 0.08, 5], bounds=([-1, -1, 0.5], [1, 1, 60]))
-        except RuntimeError:
-            ss, nov, tau = a.rel_lift.tail(7).mean(), 0.0, np.nan
-        out.loc[out.arm == arm, "fitted"] = f(a.day.values, ss, nov, tau)
-        w1, w4 = a[a.day < 7].rel_lift.mean(), a[a.day >= 21].rel_lift.mean()
-        fits[arm] = {"steady_state_lift": float(ss), "novelty_boost": float(nov), "decay_days": float(tau),
-                     "week1_lift": float(w1), "week4_lift": float(w4)}
+    for a in C.TREATMENTS:
+        ss, nov, tau = _fit(day, point[a])
+        out.loc[out.arm == a, "fitted"] = _decay(day, ss, nov, tau)
+        b = np.array(boots[a])
+        q = lambda j: [float(np.nanquantile(b[:, j], 0.025)), float(np.nanquantile(b[:, j], 0.975))]
+        fits[a] = {"fitted_asymptote_lift": float(ss), "fitted_asymptote_ci": q(0),
+                   "novelty_boost": float(nov), "decay_days": float(tau), "decay_days_ci": q(2),
+                   "week1_lift": float(point[a][:7].mean()), "week1_ci": q(3),
+                   "week4_lift": float(point[a][21:].mean()), "week4_ci": q(4),
+                   "headline_lift_retained_share": None, "n_boot": n_boot}
     out.to_csv(C.TABLES / "daily_lift.csv", index=False)
     return out, fits
 
 
-def sequential(users: pd.DataFrame, daily: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    """Cumulative monitoring of the primary metric: naive peeking vs always-valid mSPRT."""
-    d = daily[daily.day >= 0][["user_id", "day", "minutes"]]
-    arms = users.set_index("user_id").arm
+def sequential(users: pd.DataFrame, daily: pd.DataFrame, n_splits: int = 400, seed: int = 812):
+    """Running monitoring of the primary metric with mixture-SPRT p-values (an approximation here).
+
+    * Mixing scale tau is fixed BEFORE the experiment from pre-period data: 5% of the pre-period
+      control mean (minutes/day), i.e. the effect size we would care to detect.
+    * The exact always-valid guarantee assumes i.i.d. normal increments; here the same users are
+      re-observed daily (cumulative per-user averages), so we do not claim it. Instead we run a null
+      diagnostic on the ACTUAL design: control users are randomly split into two pseudo-arms many
+      times and monitored daily exactly like the real comparison.
+    """
+    m = user_day_matrix(users, daily)
+    cum = m.cumsum(axis=1) / np.arange(1, C.EXP_DAYS + 1)
+    arm = users.arm.values
+    pre = users[["user_id"]].merge(
+        daily[(daily.day < 0)].groupby("user_id").minutes.sum().rename("pre"), on="user_id", how="left").fillna(0)
+    pre_ctrl_mean = pre.pre.values[arm == "control"].mean() / C.PRE_DAYS
+    tau2 = (0.05 * pre_ctrl_mean) ** 2
+
+    def monitor(a_mask, b_mask, data):
+        na, nb = a_mask.sum(), b_mask.sum()
+        ma, mb = data[a_mask].mean(axis=0), data[b_mask].mean(axis=0)
+        se = np.sqrt(data[a_mask].var(axis=0, ddof=1) / na + data[b_mask].var(axis=0, ddof=1) / nb)
+        diff = ma - mb
+        return diff, se, 2 * stats.norm.sf(np.abs(diff / se))
+
     rows = []
-    piv = d.pivot_table(index="user_id", columns="day", values="minutes", aggfunc="sum").reindex(users.user_id).fillna(0)
-    cum = piv.cumsum(axis=1).div(np.arange(1, C.EXP_DAYS + 1), axis=1)
-    a_arr = arms.reindex(cum.index).values
-    for arm in C.TREATMENTS:
-        tau2 = (0.05 * cum.values[a_arr == "control", -1].mean()) ** 2
-        diffs, ses, naive = [], [], []
-        for day in range(C.EXP_DAYS):
-            col = cum.iloc[:, day].values
-            r = S.welch(col[a_arr == arm], col[a_arr == "control"])
-            diffs.append(r["diff"]); ses.append(r["se"]); naive.append(r["p_value"])
-        av = S.msprt_pvalue(np.array(diffs), np.array(ses), tau2)
-        for day in range(C.EXP_DAYS):
-            rows.append({"arm": arm, "day": day, "diff": diffs[day], "se": ses[day],
-                         "p_naive": naive[day], "p_always_valid": av[day]})
+    for a in C.TREATMENTS:
+        diff, se, p_naive = monitor(arm == a, arm == "control", cum)
+        p_mix = S.msprt_pvalue(diff, se, tau2)
+        rows += [{"arm": a, "day": d, "diff": diff[d], "se": se[d], "p_naive": p_naive[d], "p_mixture": p_mix[d]}
+                 for d in range(C.EXP_DAYS)]
     seq = pd.DataFrame(rows)
     seq.to_csv(C.TABLES / "sequential_monitoring.csv", index=False)
 
-    # Why it matters: simulated A/A experiments with 28 daily peeks
-    rng = np.random.default_rng(7)
-    n_sims, n_per_day = 4000, 500
-    k = np.arange(1, C.EXP_DAYS + 1)
-    # Each day adds n_per_day unit-variance users per arm; track the running difference in means
-    bx = rng.normal(0, 1 / np.sqrt(n_per_day), (n_sims, C.EXP_DAYS))
-    by = rng.normal(0, 1 / np.sqrt(n_per_day), (n_sims, C.EXP_DAYS))
-    diff = (bx.cumsum(axis=1) - by.cumsum(axis=1)) / k
-    se = np.sqrt(2.0 / (k * n_per_day))
+    # Null diagnostic on the real design (vectorised over splits)
+    rng = np.random.default_rng(seed)
+    ctrl = cum[arm == "control"]
+    n = len(ctrl)
+    masks = rng.random((n_splits, n)) < 0.5
+    na = masks.sum(axis=1, keepdims=True); nb = n - na
+    s1, s2 = masks @ ctrl, masks @ ctrl**2
+    t1, t2 = ctrl.sum(axis=0) - s1, (ctrl**2).sum(axis=0) - s2
+    ma, mb = s1 / na, t1 / nb
+    va = (s2 - na * ma**2) / (na - 1); vb = (t2 - nb * mb**2) / (nb - 1)
+    se = np.sqrt(va / na + vb / nb)
+    diff = ma - mb
     p_naive = 2 * stats.norm.sf(np.abs(diff / se))
-    av = np.array([S.msprt_pvalue(diff[i], se, tau2=(2 * se[-1]) ** 2) for i in range(n_sims)])
-    sim = {"peeking_fpr_naive": float((p_naive.min(axis=1) < 0.05).mean()),
-           "peeking_fpr_msprt": float((av[:, -1] < 0.05).mean()),
-           "fixed_horizon_fpr": float((p_naive[:, -1] < 0.05).mean())}
-    for arm in C.TREATMENTS:
-        s = seq[(seq.arm == arm) & (seq.p_always_valid < 0.05)]
-        sim[f"first_day_always_valid_sig_{arm}"] = int(s.day.min()) if len(s) else None
+    p_mix = np.array([S.msprt_pvalue(diff[i], se[i], tau2) for i in range(n_splits)])
+    sim = {"null_design": "control users re-randomised into two pseudo-arms, same users re-observed daily",
+           "n_splits": n_splits, "tau": float(np.sqrt(tau2)), "tau_source": "5% of pre-period control mean",
+           "peeking_fpr_naive": float((p_naive.min(axis=1) < 0.05).mean()),
+           "peeking_fpr_msprt": float((p_mix[:, -1] < 0.05).mean()),
+           "fixed_horizon_fpr": float((p_naive[:, -1] < 0.05).mean()),
+           "guarantee": "approximation; diagnostic only covers the primary metric under this null"}
+    for a in C.TREATMENTS:
+        s_ = seq[(seq.arm == a) & (seq.p_mixture < 0.05)]
+        sim[f"first_day_mixture_sig_{a}"] = int(s_.day.min()) if len(s_) else None
     return seq, sim
 
 
@@ -311,7 +366,7 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
                     xytext=(6, 0), textcoords="offset points", va="center", color=C.INK["secondary"])
     ax.axhline(0, color=C.INK["axis"], lw=1)
     ax.set(xlabel="Experiment day", ylabel="Lift in minutes / user (%)",
-           title="Novelty effect: AI-feed lift decays toward its steady state")
+           title="Daily lift with exponential fit (asymptote is an extrapolation)")
     ax.legend(loc="upper right")
     save(fig, "02_novelty_decay")
 
@@ -319,12 +374,12 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     fig, ax = plt.subplots(figsize=(10, 4.2))
     for arm in C.TREATMENTS:
         a = seq[seq.arm == arm]
-        ax.plot(a.day, a.p_always_valid, color=C.ARM_COLORS[arm], lw=2.2, label=f"{lab[arm]} · always-valid")
+        ax.plot(a.day, a.p_mixture, color=C.ARM_COLORS[arm], lw=2.2, label=f"{lab[arm]} · mixture SPRT")
         ax.plot(a.day, a.p_naive, color=C.ARM_COLORS[arm], lw=1.2, alpha=0.5, label=f"{lab[arm]} · naive")
     ax.axhline(0.05, color=C.STATUS["critical"], lw=1)
     ax.text(27, 0.06, "α = 0.05", color=C.INK["secondary"], ha="right")
     ax.set_yscale("log"); ax.set_ylim(1e-12, 1.2)
-    ax.set(xlabel="Experiment day", ylabel="p-value (log scale)", title="Sequential monitoring with mSPRT always-valid p-values")
+    ax.set(xlabel="Experiment day", ylabel="p-value (log scale)", title="Sequential monitoring: naive vs mixture-SPRT p-values (approximation)")
     ax.legend(fontsize=8, loc="lower left")
     save(fig, "03_sequential_monitoring")
 
@@ -380,7 +435,13 @@ def main():
     bay = bayesian(res, df)
     seg = segments(df)
     q = quantile_effects(df)
+    for a in C.TREATMENTS:
+        headline = res[(res.arm == a) & (res.metric == "minutes")].rel_lift.iloc[0]
+        fits[a]["headline_lift"] = float(headline)
+        fits[a]["headline_lift_retained_share"] = fits[a]["fitted_asymptote_lift"] / headline
     summary.update({"novelty": fits, "sequential": seqsum, "interaction": seg.attrs["interaction"]})
+    summary["decision"] = decide(res)
+    summary["decision_headline"] = headline_text(summary["decision"])
     summary["metrics"] = res[["arm", "metric", "rel_lift", "rel_ci_low", "rel_ci_high", "diff", "p_adj_bh", "verdict",
                               "variance_reduction"]].to_dict(orient="records")
     summary["bayes"] = bay[["arm", "metric", "p_improves"]].to_dict(orient="records")

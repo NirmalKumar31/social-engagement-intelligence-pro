@@ -13,8 +13,15 @@ Z = stats.norm.ppf(0.975)
 
 
 def welch(y_t: np.ndarray, y_c: np.ndarray, alpha: float = 0.05) -> dict:
-    """Difference in means with Welch SE, plus a delta-method CI on the relative lift."""
+    """Difference in means: unpooled (Welch) standard error with a large-sample normal reference.
+
+    Normal critical values and tail probabilities are used instead of Welch-Satterthwaite degrees of
+    freedom; at the ~20K-per-arm sizes here the difference is negligible. Requires >=2 rows per arm.
+    Relative lift CI is a delta-method interval for (mean_t / mean_c - 1), independent groups.
+    """
     y_t, y_c = np.asarray(y_t, float), np.asarray(y_c, float)
+    if len(y_t) < 2 or len(y_c) < 2:
+        raise ValueError("welch() needs at least two observations per arm")
     mt, mc = y_t.mean(), y_c.mean()
     vt, vc = y_t.var(ddof=1) / len(y_t), y_c.var(ddof=1) / len(y_c)
     diff, se = mt - mc, np.sqrt(vt + vc)
@@ -37,9 +44,14 @@ def cuped_theta(y: np.ndarray, x: np.ndarray) -> float:
 def cuped(y_t, y_c, x_t, x_c, alpha: float = 0.05) -> dict:
     """CUPED (Deng et al. 2013): regress out a pre-period covariate with a pooled theta.
 
-    The adjustment keeps each arm's mean comparable (x is centred on the pooled mean) so the
-    relative lift is still expressed against the raw control mean.
+    Estimands
+      diff      = mean(adj_t) - mean(adj_c), the variance-reduced absolute effect
+      rel_lift  = diff / mean_control_raw, i.e. the absolute effect relative to the RAW control mean.
+                  Its delta-method SE accounts for the dependence between the adjusted difference and
+                  the raw control mean (both are computed from the same control users).
+    Raw and adjusted arm means are reported under separate names.
     """
+    y_t, y_c, x_t, x_c = (np.asarray(a, float) for a in (y_t, y_c, x_t, x_c))
     y = np.concatenate([y_t, y_c]); x = np.concatenate([x_t, x_c])
     theta = cuped_theta(y, x)
     mx = x.mean()
@@ -47,9 +59,20 @@ def cuped(y_t, y_c, x_t, x_c, alpha: float = 0.05) -> dict:
     adj_c = y_c - theta * (x_c - mx)
     out = welch(adj_t, adj_c, alpha)
     raw = welch(y_t, y_c, alpha)
-    out["theta"] = theta
-    out["variance_reduction"] = 1 - (out["se"] ** 2) / (raw["se"] ** 2)
-    out["mean_control"], out["mean_treatment"] = raw["mean_control"], raw["mean_treatment"]
+    z = stats.norm.ppf(1 - alpha / 2)
+    mc_raw = raw["mean_control"]
+    nc = len(y_c)
+    var_diff = out["se"] ** 2
+    var_mc = y_c.var(ddof=1) / nc
+    cov_diff_mc = -np.cov(adj_c, y_c, ddof=1)[0, 1] / nc     # Cov(mean_t_adj - mean_c_adj, mean_c_raw)
+    d = out["diff"]
+    rel = d / mc_raw
+    rel_var = var_diff / mc_raw**2 + d**2 * var_mc / mc_raw**4 - 2 * d * cov_diff_mc / mc_raw**3
+    rel_se = np.sqrt(max(rel_var, 0.0))
+    out.update({"theta": theta, "variance_reduction": 1 - var_diff / raw["se"] ** 2,
+                "mean_control_adj": out["mean_control"], "mean_treatment_adj": out["mean_treatment"],
+                "mean_control": mc_raw, "mean_treatment": raw["mean_treatment"],
+                "rel_lift": rel, "rel_ci_low": rel - z * rel_se, "rel_ci_high": rel + z * rel_se})
     return out
 
 
@@ -127,10 +150,13 @@ def mde(sd: float, n_per_arm: int, alpha: float = 0.05, power: float = 0.8,
 
 
 def msprt_pvalue(diffs: np.ndarray, ses: np.ndarray, tau2: float) -> np.ndarray:
-    """Always-valid p-values via the mixture SPRT with a normal mixing prior (Johari et al. 2017).
+    """Normal-mixture SPRT p-values (Johari et al. 2017) applied to running estimates.
 
-    diffs/ses are the running estimate and its SE at each look. Returns the running-minimum
-    always-valid p-value, which may be monitored continuously without inflating type-I error.
+    diffs/ses are the running estimate and its SE at each look; tau2 is the mixing-prior variance and
+    must be fixed in advance (not estimated from later looks). The exact always-valid guarantee holds
+    for i.i.d. normal increments with known variance. Applied to cumulative averages of the SAME users
+    over time (this experiment), it is an approximation; experiment.sequential() reports a
+    re-randomisation null diagnostic on the actual data rather than asserting a guarantee.
     """
     diffs, ses = np.asarray(diffs, float), np.asarray(ses, float)
     v = ses**2

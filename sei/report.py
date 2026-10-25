@@ -1,118 +1,149 @@
 """Executive decision memo.
 
-Always writes a deterministic memo built directly from the analysis outputs (so every number is
-traceable). With `--llm`, Claude rewrites it into a polished narrative; if no credentials are
+Always writes a deterministic memo built directly from the analysis outputs and the decision rule
+(so every number and the recommendation itself are traceable). With `--llm`, Claude rewrites it into a polished narrative; if no credentials are
 configured, or the call fails, the deterministic memo stands on its own.
 """
 from __future__ import annotations
 
 import argparse
-import json
 
 import pandas as pd
 
 from . import config as C
-
-
-def _load(name):
-    with open(C.REPORTS / name) as f:
-        return json.load(f)
-
-
-def _m(metrics, arm, metric):
-    return next(r for r in metrics if r["arm"] == arm and r["metric"] == metric)
+from .narrative import facts, musd
 
 
 def build_memo() -> tuple[str, dict]:
-    ex, hte, ret = _load("experiment_summary.json"), _load("hte_summary.json"), _load("retention_summary.json")
-    nlp, vir, imp = _load("nlp_summary.json"), _load("virality_summary.json"), _load("impact_summary.json")
-    M = ex["metrics"]
-    a_min, b_min = _m(M, "ai_feed", "minutes"), _m(M, "ai_feed_social", "minutes")
-    a_ch, b_ch = _m(M, "ai_feed", "churned"), _m(M, "ai_feed_social", "churned")
-    a_fi, b_fi = _m(M, "ai_feed", "friend_interactions"), _m(M, "ai_feed_social", "friend_interactions")
-    a_rev, b_rev = _m(M, "ai_feed", "ad_revenue"), _m(M, "ai_feed_social", "ad_revenue")
-    nov = ex["novelty"]
-    pol = pd.DataFrame(hte["policies"]).set_index("policy")
-    mc = pd.DataFrame(imp["results"]).set_index("comparison")
-    expo = pd.DataFrame(nlp["exposure"]).set_index("arm")
-    seg = pd.read_csv(C.TABLES / "segment_results.csv")
-    risk = seg[(seg.arm == "ai_feed") & (seg.status == "churn risk")]
-    sm = pd.DataFrame(nlp["sentiment"]["metrics"]).set_index("model")
-    cm = ret["churn_model"]["holdout"]["LightGBM + isotonic"]
+    F = facts()
+    ex, ret, imp, vir, hte = F["experiment"], F["survival"], F["impact"], F["virality"], F["hte"]
     d = ex["design"]
-    pb = pd.read_csv(C.TABLES / "virality_playbook.csv")
-    wd = pb[pb.dimension == "weekday"].set_index("level")
-    wk_lift = (wd.loc[["saturday", "sunday"], "viral_rate"] * wd.loc[["saturday", "sunday"], "articles"]).sum() / wd.loc[["saturday", "sunday"], "articles"].sum() / (
-        (wd.drop(["saturday", "sunday"]).viral_rate * wd.drop(["saturday", "sunday"]).articles).sum() / wd.drop(["saturday", "sunday"]).articles.sum())
-    ch = pb[pb.dimension == "channel"].set_index("level")
-    sm_lift = ch.loc["Social Media", "viral_rate"] / ((ch.viral_rate * ch.articles).sum() / ch.articles.sum())
+    cm = F["churn_model"]
+    sq = ex["sequential"]
+    L = F["lift"]
     pct = lambda x: f"{x * 100:+.1f}%"
+    dec = F["decision"]
+
+    def guard_rows():
+        rows = []
+        for arm, a in dec["arms"].items():
+            for m, g in a["guardrails"].items():
+                rows.append(f"| {C.ARM_LABELS[arm]} | {F['label'][m]} ({g['severity']}) | {pct(g['rel_change'])} | "
+                            f"{g['direction']} ≤ {g['margin']:.0%} | {g['status']} |")
+        return "\n".join(rows)
+
+    def lift_row(metric, name):
+        a, b = L[("ai_feed", metric)], L[("ai_feed_social", metric)]
+        return f"| {name} | {pct(a.rel_lift)} ({a.verdict}) | {pct(b.rel_lift)} ({b.verdict}) |"
+
+    rules = {r["rule"]: r for r in cm["campaign_rules"]}
+    chosen = rules["Depth chosen on training OOF"]
+    be = rules["Break-even rule (p > cost / (save x value))"]
+    scen = pd.DataFrame(imp["scenarios"])
+    scen_tbl = "\n".join(f"| {r.persistence} | {r.comparison} | {musd(r.p50_musd)} | {musd(r.p05_musd)} to {musd(r.p95_musd)} | {r.prob_positive:.0%} |"
+                          for r in scen.itertuples())
+    o_ai, o_fb = hte["ai_feed"]["oracle_dr"], hte["ai_feed_social"]["oracle_dr"]
+    dep = cm["holdout"][cm["deployed_model"]]
+    bench = cm["simulator_benchmark"]
+    arm_states = "\n".join(f"| {C.ARM_LABELS[k]} | **{v['state']}** | {'win' if v['primary_win'] else 'no win'} ({pct(v['primary_lift'])}) | "
+                            f"{', '.join(F['label'][m] for m in v['blocking']) or '-'} | "
+                            f"{', '.join(F['label'][m] for m in v['mitigations_required']) or '-'} |" for k, v in dec["arms"].items())
 
     memo = f"""# Feed Ranking Experiment: Launch Decision Memo
 
-**Recommendation: ship the AI feed + friend boost variant (`ai_feed_social`) to all eligible users, and do not
-ship the pure AI feed.** Then run a follow-up on model-targeted arm assignment, which adds
-${pol.loc['Model-targeted (DR-learner)', 'uplift_vs_control_usd'] - pol.loc['Ship AI + friend boost to all', 'uplift_vs_control_usd']:.2f}/user/yr on top
-(within noise today, so it needs a dedicated test before it becomes policy).
+> **{F['notice']}**
 
-## 1. Is the experiment trustworthy?
+**Decision ({F['state']}): {F['headline']}**
+
+## 1. Decision rule and result
+The recommendation is generated by `sei/decision.py` from pre-written states, not typed by hand.
+Guardrails use one-sided non-inferiority tests, Bonferroni-adjusted across {dec['n_guardrail_tests']} guardrail × arm comparisons
+(z = {dec['z_guardrail']:.2f}). PASS means a harm larger than the margin is ruled out; FAIL means it is shown; anything
+else is INCONCLUSIVE. Non-significance is never treated as safety. *Disclosure: the margins were written after the first
+analysis had been seen (prompted by an external audit). A real program fixes them before unblinding.*
+
+| Arm | State | Primary (minutes) | Blocking critical guardrails | Mitigation required |
+|---|---|---|---|---|
+{arm_states}
+
+| Arm | Guardrail | Change | Margin | Status |
+|---|---|---|---|---|
+{guard_rows()}
+
+## 2. Is the experiment trustworthy?
 | Check | Result |
 |---|---|
 | Sample-ratio mismatch | χ² p = {d['srm']['p_value']:.3f} (no SRM) |
 | Covariate balance | max \\|SMD\\| = {d['max_abs_smd']:.3f} (threshold 0.10) |
-| A/A false-positive rate | {ex['aa']['aa_false_positive_rate']:.1%} over {ex['aa']['n_sims']:,} re-randomisations (target 5%) |
-| Power | MDE {d['mde_rel_raw']:.1%} raw → **{d['mde_rel_cuped']:.1%} with CUPED** at {d['n_per_arm']:,} users/arm |
-| Peeking risk | naive daily peeking inflates false positives to {ex['sequential']['peeking_fpr_naive']:.0%}; the mSPRT always-valid monitor keeps it at {ex['sequential']['peeking_fpr_msprt']:.1%} |
+| A/A false-positive rate (raw-mean test) | {ex['aa']['aa_false_positive_rate']:.1%} over {ex['aa']['n_sims']:,} re-randomisations |
+| Power | MDE {d['mde_rel_raw']:.1%} raw → {d['mde_rel_cuped']:.1%} with CUPED at {d['n_per_arm']:,} users/arm |
+| Sequential monitoring (null re-randomisation of control users, {sq['n_splits']} splits) | naive daily peeking {sq['peeking_fpr_naive']:.1%}, mixture SPRT {sq['peeking_fpr_msprt']:.1%}, single final test {sq['fixed_horizon_fpr']:.1%}. The mixture monitor is an approximation for repeated-user data, not a proven always-valid guarantee. |
 
-## 2. What happened?
-| Metric (CUPED / delta-method, BH-adjusted) | AI feed | AI + friend boost |
+## 3. Effects (CUPED or delta method, Benjamini-Hochberg)
+| Metric | AI feed | AI + friend boost |
 |---|---|---|
-| Daily minutes / user (primary) | {pct(a_min['rel_lift'])} | {pct(b_min['rel_lift'])} |
-| Steady-state minutes lift (after novelty) | {pct(nov['ai_feed']['steady_state_lift'])} | {pct(nov['ai_feed_social']['steady_state_lift'])} |
-| Ad revenue / user | {pct(a_rev['rel_lift'])} | {pct(b_rev['rel_lift'])} |
-| 28-day churn (guardrail) | **{pct(a_ch['rel_lift'])}** ({a_ch['verdict']}) | **{pct(b_ch['rel_lift'])}** ({b_ch['verdict']}) |
-| Friend interactions (guardrail) | **{pct(a_fi['rel_lift'])}** ({a_fi['verdict']}) | {pct(b_fi['rel_lift'])} ({b_fi['verdict']}) |
-| Cox hazard ratio for churn | {ret['survival']['hr_ai_feed']:.2f} | {ret['survival']['hr_ai_feed_social']:.2f} |
+{lift_row('minutes', 'Daily minutes / user (primary)')}
+{lift_row('ad_revenue', 'Ad revenue / user')}
+{lift_row('churned', '28-day final-week inactivity (churn)')}
+{lift_row('friend_interactions', 'Friend interactions')}
+{lift_row('neg_feedback_rate', 'Negative feedback per 100 min')}
+{lift_row('ad_ctr', 'Ad CTR')}
 
-- **The AI feed's headline lift is inflated by novelty.** Week-1 lift was {nov['ai_feed']['week1_lift']:.1%} and week-4 lift was
-  {nov['ai_feed']['week4_lift']:.1%}; the fitted steady state is {nov['ai_feed']['steady_state_lift']:.1%}, with novelty decaying on a ~{nov['ai_feed']['decay_days']:.0f}-day time constant.
-  Once novelty is stripped out, the AI feed beats the friend-boost variant by only {(nov['ai_feed']['steady_state_lift'] - nov['ai_feed_social']['steady_state_lift']) * 100:.1f} pp of time spent.
-- **It buys that edge with retention.** Churn rises {a_ch['rel_lift']:.0%} on the AI feed, concentrated in
-  {', '.join(risk[risk.dimension == 'age_group'].segment.tolist()) or 'older'} age groups (age × treatment interaction p = {ex['interaction']['churn_age_interaction_p']:.4f}).
-  The friend boost *reduces* churn by {abs(b_ch['rel_lift']):.0%}.
+- **Novelty.** {F['novelty']} The asymptote is an extrapolation of four weeks of data, not a measured long-run effect.
+- **Segments.** {F['segments']}
 
-## 3. Content health (responsible-AI guardrails)
-On real posts, the engagement-optimised AI ranker cut feed topic diversity by {abs(expo.loc['ai_feed', 'topic_entropy_rel_change']):.0%} and raised
-the share of negative-sentiment posts served from {expo.loc['control', 'negative_share']:.1%} to {expo.loc['ai_feed', 'negative_share']:.1%}.
-The friend boost halves both harms ({expo.loc['ai_feed_social', 'negative_share']:.1%} negative share). Sentiment is scored by our TweetEval model
-(macro-recall {sm.loc['TF-IDF + LogReg (ours)', 'macro_recall']:.3f} vs VADER {sm.loc['VADER (lexicon baseline)', 'macro_recall']:.3f}).
+## 4. Retention
+- **Endpoint:** {ret['endpoint']}. Cox HR AI feed {ret['hr_ai_feed']:.2f} ({ret['hr_ci']['ai_feed'][0]:.2f}–{ret['hr_ci']['ai_feed'][1]:.2f}),
+  friend boost {ret['hr_ai_feed_social']:.2f} ({ret['hr_ci']['ai_feed_social'][0]:.2f}–{ret['hr_ci']['ai_feed_social'][1]:.2f});
+  proportional-hazards test p = {ret['ph_test_p']['ai_feed']:.2f} / {ret['ph_test_p']['ai_feed_social']:.2f}. Restricted mean lapse-free days
+  to day 21 differ by {ret['rmst_diff_vs_control']['ai_feed']:+.2f} / {ret['rmst_diff_vs_control']['ai_feed_social']:+.2f} days.
+  Simulator-only benchmark on true permanent-quit times: HR {ret['simulator_benchmark_hr_latent_quit']['ai_feed']:.2f} /
+  {ret['simulator_benchmark_hr_latent_quit']['ai_feed_social']:.2f}. The observable endpoint dilutes the true effect.
+- **Lapse early warning:** {cm['task']} ({cm['cohort_size']:,} users, base rate {cm['base_churn_rate']:.1%}). Of
+  {bench['positives']:,} positives, {bench['already_quit_at_scoring']} had already quit, {bench['permanent_quit_after_scoring']:,}
+  quit permanently later and {bench['temporary_lapse']:,} lapsed temporarily. Deployed model ({cm['deployed_model']}, chosen by
+  training CV): ROC-AUC {dep['roc_auc']:.3f}, PR-AUC {dep['pr_auc']:.3f}, top-decile lift {dep['top_decile_lift']:.1f}x.
+- **Nudge campaign** (assumed {cm['campaign_assumptions']['save_rate']:.0%} of lapsers saved at ${cm['campaign_assumptions']['cost']:.2f}/user,
+  value ${cm['campaign_assumptions']['value']:.0f}): depth frozen on training data targets {chosen['share_targeted']:.0%} and is worth
+  ${chosen['test_value_musd']:,.2f}M on the test set (95% CI {chosen['ci_low']:,.2f} to {chosen['ci_high']:,.2f}); the predefined
+  break-even rule gives ${be['test_value_musd']:,.2f}M. "Send to nobody" ($0) is always an option. The save rate must be measured
+  in a randomised nudge holdout before this is a business case.
 
-## 4. What is it worth?
-12-month Monte Carlo ({C.MC_DRAWS:,} draws, {C.MAU_POPULATION / 1e6:.0f}M eligible MAU, compounding churn):
-| Rollout | Median incremental revenue | 90% interval |
-|---|---|---|
-| AI feed | ${mc.loc['AI feed vs control', 'p50_musd']:,.0f}M | ${mc.loc['AI feed vs control', 'p05_musd']:,.0f}M – ${mc.loc['AI feed vs control', 'p95_musd']:,.0f}M |
-| AI + friend boost | **${mc.loc['AI + friend boost vs control', 'p50_musd']:,.0f}M** | ${mc.loc['AI + friend boost vs control', 'p05_musd']:,.0f}M – ${mc.loc['AI + friend boost vs control', 'p95_musd']:,.0f}M |
+## 5. Personalisation (causal ML)
+{F['personalisation']} Against simulator counterfactuals (16 common-seed re-simulations per user), DR-learner CATEs rank users
+weakly (Spearman {o_ai['spearman']:.2f} AI feed, {o_fb['spearman']:.2f} friend boost; decile calibration slope
+{o_ai['decile_calibration_slope']:.2f} / {o_fb['decile_calibration_slope']:.2f}). The utility score
+(365 × late-window, days 14–27, revenue − churn × ${C.LTV_PER_RETAINED_USER:.0f}) is an assumed decision score, not forecast dollars.
 
-P(friend boost beats AI feed over 12 months) = **{mc.loc['Friend boost minus AI feed', 'prob_positive']:.2%}**. No single assumption in the sensitivity
-analysis flips the decision.
+## 6. Content health (scenario)
+{F['content']}
 
-## 5. Personalisation and retention levers
-- DR-learner CATE model: model-targeted assignment is worth ${pol.loc['Model-targeted (DR-learner)', 'uplift_vs_control_usd']:.2f}/user/yr vs
-  ${pol.loc['Ship AI + friend boost to all', 'uplift_vs_control_usd']:.2f} for the blanket friend-boost launch (IPW, held-out users). Effects of the AI feed are strongly
-  heterogeneous; the friend boost's are nearly uniform, so blanket rollout is low-regret.
-- Churn early-warning model (leakage-free, scored at day 13): ROC-AUC {cm['roc_auc']:.3f}, top-decile lift {cm['top_decile_lift']:.1f}x.
-  Targeting the top {ret['churn_model']['campaign_optimal_fraction']:.0%} riskiest users with a retention nudge nets ≈${ret['churn_model']['campaign_optimal_profit_musd']:.1f}M at scale.
-- Creator playbook (real data, {vir['n_articles']:,} articles, time-split AUC {vir['auc_lightgbm']:.3f}): weekend posts go viral at
-  {wk_lift:.1f}x the weekday rate and Social Media-channel posts at {sm_lift:.1f}x the overall rate. Surface this in creator tooling.
+## 7. Revenue scenarios (12 months, {C.MAU_POPULATION / 1e6:.0f}M users, {C.MONTHLY_BASE_CHURN:.1%} assumed monthly base lapse rate)
+Revenue per not-lapsed user-day and the lapse rate ratio come from the same bootstrap resample of users ({imp['n_boot']:,} draws,
+shared control). "Share of draws > 0" is a fraction of simulations under these assumptions, not an empirical probability.
 
-## 6. Next steps
-1. Roll out `ai_feed_social` at 10% → 50% → 100% with the churn and friend-interaction guardrails on an always-valid monitor.
-2. Holdback 2% on control for 90 days to measure long-run retention directly (validates the Monte Carlo).
-3. A/B test the DR-learner arm-assignment policy against blanket friend boost.
-4. Add a negativity-exposure cap to the ranker objective; re-measure diversity.
+| Persistence | Comparison | Median | 90% of draws | Share of draws > 0 |
+|---|---|---|---|---|
+{scen_tbl}
+
+{F['revenue']} A joint adverse stress case (marginal 95% bounds, 2% base lapse rate) gives
+{musd(imp['joint_stress_fb_minus_ai_musd'])}. This is an illustration, not a probability.
+
+## 8. Real-data benchmarks
+- **Sentiment** (TweetEval official splits): macro-recall {F['nlp']['sentiment']['metrics'][1]['macro_recall']:.3f} vs VADER
+  {F['nlp']['sentiment']['metrics'][0]['macro_recall']:.3f}.
+- **Virality** (UCI news, {vir['evaluation']}): AUC {vir['auc_lightgbm']:.3f}; {vir['auc_lightgbm_without_unverified_features']:.3f}
+  without the {vir['unverified_features_excluded']} share-history features whose publication-time availability is unverified.
+  Threshold {vir['viral_threshold_shares']:,.0f} shares from training articles only. Playbook associations are descriptive, not causal.
+
+## 9. Next steps
+1. {"Ship " + C.ARM_LABELS[F['recommended_arm']] + " only behind a mitigation for " + ", ".join(F['label'][m] for m in dec['arms'][F['recommended_arm']]['mitigations_required']) + ", with a named owner and a guardrail monitor on a 10% → 50% → 100% ramp." if F['state'] == 'CONDITIONAL' else ("Ramp " + C.ARM_LABELS[F['recommended_arm']] + " 10% → 50% → 100% with guardrail monitoring." if F['recommended_arm'] else "Do not ship; iterate on the variants.")}
+2. Keep a long-running holdback (e.g. 2% control for 90 days) to measure persistence and permanent attrition directly; it
+   validates the revenue scenarios rather than confirming a known number.
+3. Pre-register guardrail margins, the monitoring rule and the economic endpoint before the next experiment.
+4. Test any personalised assignment policy in its own randomised experiment; this analysis does not show it helps.
 """
-    return memo, {"experiment": ex, "hte": hte, "retention": ret, "nlp": nlp, "virality": vir, "impact": imp}
+    return memo, F
 
 
 def llm_polish(memo: str) -> str | None:
@@ -130,8 +161,8 @@ def llm_polish(memo: str) -> str | None:
             output_config={"effort": "medium"},
             system=("You are a principal product data scientist writing for a VP of Product. Rewrite the memo you are "
                     "given into a crisp one-page executive brief in Markdown. Keep every number exactly as given, do "
-                    "not invent figures, keep the recommendation, and lead with the decision and the single most "
-                    "important reason."),
+                    "not invent figures, keep the decision state and its conditions, keep the synthetic-data notice "
+                    "at the top, keep every caveat about assumptions, and lead with the decision."),
             messages=[{"role": "user", "content": memo}],
         )
     except (anthropic.AuthenticationError, anthropic.PermissionDeniedError) as e:

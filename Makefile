@@ -1,9 +1,17 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup data all pipeline test dashboard powerbi sql examples clean
 
-setup:            ## create venv + install deps
+.PHONY: setup setup-latest fixture data all pipeline test dashboard powerbi sql examples clean
+
+setup:            ## create venv + install the pinned, tested versions (Python 3.12)
+	python3 -m venv .venv && .venv/bin/pip install -U pip && .venv/bin/pip install -r requirements-lock.txt
+
+setup-latest:     ## install the newest versions allowed by requirements.txt
 	python3 -m venv .venv && .venv/bin/pip install -U pip && .venv/bin/pip install -r requirements.txt
+
+fixture:          ## full pipeline on a 3,000-user fixture in a scratch directory (what CI runs)
+	SEI_WORKDIR=$${TMPDIR:-/tmp}/sei-fixture SEI_N_USERS=3000 $(PY) -m sei.pipeline && \
+	SEI_WORKDIR=$${TMPDIR:-/tmp}/sei-fixture SEI_N_USERS=3000 $(PY) -m pytest -q tests
 
 data:             ## download the public datasets (UCI news, TweetEval)
 	$(PY) -m sei.download

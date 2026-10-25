@@ -1,13 +1,15 @@
 """Heterogeneous treatment effects and personalised rollout policy.
 
-Outcome = annualised net user value (USD) = steady-state ad revenue/day * 365 - churned * LTV.
+Outcome = an ASSUMED utility score in USD-like units: late-window (days 14-27) ad revenue/day * 365 - churned * LTV.
+It is a decision score, not a forecast of incremental dollars (late revenue already reflects inactivity,
+so the LTV term partly overlaps it); impact.py holds the separate revenue scenario model.
 Revenue uses the post-novelty window (experiment days 14-27) so week-1 novelty is not annualised.
 It folds the engagement upside and the retention downside into one number a PM can act on.
 
 * T-learner and cross-fitted DR-learner (doubly robust pseudo-outcomes, known propensity)
 * Qini / uplift curves on a held-out fold
-* Validation against the simulator's ground-truth individual effects
-* Three-arm policy learning, valued off-policy with IPW on held-out data, plus an
+* Validation against simulator counterfactual outcomes (oracle.py: every user re-simulated under every arm)
+* Three-arm policy learning, valued with Horvitz-Thompson IPW (known design probability) on held-out data, plus an
   interpretable depth-3 "policy tree" that turns the model into rollout rules
 """
 from __future__ import annotations
@@ -22,6 +24,7 @@ from sklearn.model_selection import KFold, train_test_split
 from sklearn.tree import DecisionTreeRegressor, export_text
 
 from . import config as C
+from .oracle import outcome
 from .plotting import plt, save, setup
 
 PRE = ["minutes", "active_days", "sessions", "likes", "comments", "dms_sent", "shares", "posts_created",
@@ -37,10 +40,6 @@ def feature_matrix(df: pd.DataFrame) -> pd.DataFrame:
     X = pd.concat([X, pd.get_dummies(df[CATS], dtype=float)], axis=1)
     X.columns = [c.replace(" ", "_").replace("+", "plus").replace("-", "_") for c in X.columns]
     return X
-
-
-def outcome(df: pd.DataFrame) -> np.ndarray:
-    return (df.late_ad_revenue_per_day * C.ANNUAL_DAYS - df.churned * C.LTV_PER_RETAINED_USER).values
 
 
 def _reg():
@@ -65,44 +64,59 @@ def dr_learner(Xtr, ytr, ttr, Xte, e: float, seed: int = 0):
     return final.predict(Xte), final
 
 
-def qini_curve(tau_hat, y, t, n_points: int = 50) -> pd.DataFrame:
+def gain_curve(tau_hat, y, t, n_points: int = 50) -> pd.DataFrame:
+    """Cumulative uplift gain for a continuous outcome (starts at the origin).
+
+    gain(k) = (mean_t - mean_c among the top-k users by predicted effect) * k. This is an uplift *gain*
+    curve, not the normalised Qini coefficient; the reported area ratio vs the random line is our own
+    convention and is undefined when the overall gain is ~0.
+    """
     order = np.argsort(-tau_hat)
     y, t = y[order], t[order]
     n = len(y)
-    rows = []
+    rows = [{"fraction_targeted": 0.0, "cumulative_gain": 0.0}]
     for frac in np.linspace(0, 1, n_points + 1)[1:]:
         k = int(frac * n)
         yt, yc = y[:k][t[:k] == 1], y[:k][t[:k] == 0]
         uplift = (yt.mean() - yc.mean()) * k if len(yt) and len(yc) else 0.0
         rows.append({"fraction_targeted": frac, "cumulative_gain": uplift})
     out = pd.DataFrame(rows)
-    total = out.cumulative_gain.iloc[-1]
-    out["random"] = out.fraction_targeted * total
+    out["random"] = out.fraction_targeted * out.cumulative_gain.iloc[-1]
     return out
 
 
-def ipw_policy_value(policy: np.ndarray, arm: np.ndarray, y: np.ndarray, probs: dict, n_boot: int = 400, seed: int = 0):
-    """Self-normalised IPW value of a policy, with bootstrap draws (same seed => paired across policies)."""
-    w = np.array([1 / probs[a] for a in arm]) * (policy == arm)
-    vals = w * y
-    rng = np.random.default_rng(seed)
-    boots = np.array([vals[idx].sum() / w[idx].sum() for idx in (rng.integers(0, len(y), len(y)) for _ in range(n_boot))])
-    return vals.sum() / w.sum(), boots
+def ht_policy_value(policy: np.ndarray, arm: np.ndarray, y: np.ndarray, p_design: float, boot_idx) -> tuple[float, np.ndarray]:
+    """Horvitz-Thompson IPW value using the KNOWN randomisation probability; bootstrap draws share boot_idx."""
+    vals = (policy == arm) * y / p_design
+    return float(vals.mean()), np.array([vals[i].mean() for i in boot_idx])
+
+
+def oracle_metrics(pred: np.ndarray, oracle: np.ndarray, mc_se: np.ndarray) -> dict:
+    mse = np.mean((pred - oracle) ** 2)
+    noise = np.mean(mc_se ** 2)
+    dec = pd.qcut(pd.Series(pred).rank(method="first"), 10, labels=False)
+    cal = pd.DataFrame({"d": dec, "p": pred, "o": oracle}).groupby("d").mean()
+    slope = float(np.polyfit(cal.p, cal.o, 1)[0])
+    return {"spearman": float(spearmanr(pred, oracle).correlation), "rmse": float(np.sqrt(mse)),
+            "rmse_noise_corrected": float(np.sqrt(max(mse - noise, 0))), "bias": float(np.mean(pred - oracle)),
+            "decile_calibration_slope": slope}
 
 
 def main():
     df = pd.read_parquet(C.PROCESSED / "user_experiment.parquet")
-    truth = pd.read_parquet(C.RAW / "user_ground_truth.parquet")
-    df = df.merge(truth, on="user_id")
+    oracle = pd.read_parquet(C.PROCESSED / "oracle_outcomes.parquet")
+    df = df.merge(oracle, on="user_id")
     X = feature_matrix(df)
     y = outcome(df)
-    probs = (df.arm.value_counts() / len(df)).to_dict()
+    p_design = 1 / len(C.ARMS)
     idx_tr, idx_te = train_test_split(np.arange(len(df)), test_size=0.35, random_state=C.SEED, stratify=df.arm)
     te = df.iloc[idx_te].reset_index(drop=True)
     X_te = X.iloc[idx_te].reset_index(drop=True)
+    X_trall = X.iloc[idx_tr].reset_index(drop=True)
+    tr_all = df.iloc[idx_tr].reset_index(drop=True)
     y_te = y[idx_te]
 
-    cate, qinis, summary = {}, [], {}
+    cate, cate_tr, gains, summary = {}, {}, [], {}
     for arm in C.TREATMENTS:
         mtr = df.arm.iloc[idx_tr].isin(["control", arm]).values
         tr_idx = idx_tr[mtr]
@@ -111,37 +125,45 @@ def main():
         e = ttr.mean()
         tau_t = t_learner(Xtr, ytr, ttr, X_te)
         tau_dr, final_model = dr_learner(Xtr, ytr, ttr, X_te, e)
-        cate[arm] = tau_dr
-        te[f"cate_{arm}"] = tau_dr
-        te[f"cate_t_{arm}"] = tau_t
+        cate[arm], cate_tr[arm] = tau_dr, final_model.predict(X_trall)
+        te[f"cate_{arm}"], te[f"cate_t_{arm}"] = tau_dr, tau_t
         mte = te.arm.isin(["control", arm]).values
         t_te = (te.arm[mte] == arm).astype(int).values
         for name, tau in [("DR-learner", tau_dr), ("T-learner", tau_t)]:
-            q = qini_curve(tau[mte], y_te[mte], t_te)
-            q["model"], q["arm"] = name, arm
-            qinis.append(q)
-        # Ground-truth check: does the model rank users like their true (latent) effects do?
-        # True annualised value effect ~ revenue lift (tau_minutes * baseline revenue) minus churn-hazard harm
-        true_val = (te[f"true_tau_minutes_{arm}"] * te.pre_ad_revenue_per_day * C.ANNUAL_DAYS
-                    - (te[f"true_hazard_mult_{arm}"] - 1) * C.LTV_PER_RETAINED_USER * 0.08)
-        summary[arm] = {
-            "mean_cate_usd": float(tau_dr.mean()),
-            "share_positive": float((tau_dr > 0).mean()),
-            "spearman_vs_truth_dr": float(spearmanr(tau_dr, true_val).correlation),
-            "spearman_vs_truth_t": float(spearmanr(tau_t, true_val).correlation),
-        }
+            g = gain_curve(tau[mte], y_te[mte], t_te)
+            g["model"], g["arm"] = name, arm
+            gains.append(g)
+        orc, se = te[f"oracle_cate_{arm}"].values, te[f"oracle_cate_{arm}_mc_se"].values
+        summary[arm] = {"mean_cate": float(tau_dr.mean()), "mean_oracle_cate": float(orc.mean()),
+                        "share_positive": float((tau_dr > 0).mean()), "share_positive_oracle": float((orc > 0).mean()),
+                        "oracle_dr": oracle_metrics(tau_dr, orc, se), "oracle_t": oracle_metrics(tau_t, orc, se),
+                        "oracle_note": "oracle = mean over 16 common-seed re-simulations per user; per-user MC error reported"}
         imp = pd.Series(final_model.feature_importances_, index=X.columns).sort_values(ascending=False)
         imp.head(15).rename("importance").to_frame().assign(arm=arm).to_csv(C.TABLES / f"hte_drivers_{arm}.csv")
 
-    qini = pd.concat(qinis)
-    qini.to_csv(C.TABLES / "qini_curves.csv", index=False)
+    gain = pd.concat(gains)
+    gain.to_csv(C.TABLES / "qini_curves.csv", index=False)
     for arm in C.TREATMENTS:
         for model in ["DR-learner", "T-learner"]:
-            q = qini[(qini.arm == arm) & (qini.model == model)]
-            summary[arm][f"qini_auc_ratio_{model}"] = float(np.trapezoid(q.cumulative_gain, q.fraction_targeted)
-                                                            / np.trapezoid(q.random, q.fraction_targeted))
+            g = gain[(gain.arm == arm) & (gain.model == model)]
+            rnd = np.trapezoid(g.random, g.fraction_targeted)
+            summary[arm][f"gain_area_ratio_{model}"] = (float(np.trapezoid(g.cumulative_gain, g.fraction_targeted) / rnd)
+                                                        if abs(rnd) > 1e-9 else None)
 
-    # Policy learning: choose the arm with the highest predicted net value per user
+    # Interpretable surrogate policy: depth-3 tree trained on TRAINING-user predictions, evaluated on test
+    def readable(frame):
+        r = frame[["tenure_days", "friend_count", "pre_minutes_per_day", "pre_friend_interactions_per_day", "is_new_user"]].copy()
+        r["age_35_plus"] = (~frame.age_group.isin(["18-24", "25-34"])).astype(int)
+        r["is_creator"] = (frame.account_type == "creator").astype(int)
+        return r
+    adv_tr = cate_tr["ai_feed"] - cate_tr["ai_feed_social"]
+    tree = DecisionTreeRegressor(max_depth=3, min_samples_leaf=800, random_state=0).fit(readable(tr_all), adv_tr)
+    rules = export_text(tree, feature_names=list(readable(tr_all).columns), decimals=2)
+    (C.REPORTS / "policy_tree_rules.txt").write_text(
+        "Surrogate policy tree trained on TRAINING-user DR-learner predictions of the annual utility advantage\n"
+        "of AI feed over AI+friend boost (positive = AI feed). Its own value is evaluated on held-out users.\n\n" + rules)
+    tree_policy = np.where(tree.predict(readable(te)) > 0, "ai_feed", "ai_feed_social")
+
     pred = np.column_stack([np.zeros(len(te)), cate["ai_feed"], cate["ai_feed_social"]])
     best = np.array(C.ARMS)[pred.argmax(axis=1)]
     under35 = te.age_group.isin(["18-24", "25-34"]).values
@@ -150,33 +172,32 @@ def main():
         "Ship AI feed to all": np.full(len(te), "ai_feed"),
         "Ship AI + friend boost to all": np.full(len(te), "ai_feed_social"),
         "Rule: AI feed <35, friend boost 35+": np.where(under35, "ai_feed", "ai_feed_social"),
+        "Policy tree (trained on train)": tree_policy,
         "Model-targeted (DR-learner)": best,
     }
+    rng = np.random.default_rng(0)
+    boot_idx = [rng.integers(0, len(te), len(te)) for _ in range(1000)]
+    vals = {n: ht_policy_value(p, te.arm.values, y_te, p_design, boot_idx) for n, p in policies.items()}
+    oracle_y = te[[f"y_{a}" for a in C.ARMS]].values
+    oracle_best = oracle_y.max(axis=1).mean()
     rows = []
-    _, ctrl_boots = ipw_policy_value(policies["Ship nothing (control)"], te.arm.values, y_te, probs)
-    for name, pol in policies.items():
-        v, boots = ipw_policy_value(pol, te.arm.values, y_te, probs)
-        diff = boots - ctrl_boots  # paired bootstrap: CI on the uplift itself
-        rows.append({"policy": name, "value_per_user_usd": v, "uplift_ci_low": np.quantile(diff, 0.025),
-                     "uplift_ci_high": np.quantile(diff, 0.975),
-                     "share_ai_feed": (pol == "ai_feed").mean(), "share_ai_feed_social": (pol == "ai_feed_social").mean(),
-                     "share_control": (pol == "control").mean()})
+    for n, p in policies.items():
+        v, b = vals[n]
+        d_ctrl = b - vals["Ship nothing (control)"][1]
+        d_fb = b - vals["Ship AI + friend boost to all"][1]
+        chosen = oracle_y[np.arange(len(te)), [C.ARMS.index(a) for a in p]]
+        rows.append({"policy": n, "value_per_user_usd": v,
+                     "uplift_vs_control_usd": v - vals["Ship nothing (control)"][0],
+                     "uplift_ci_low": float(np.quantile(d_ctrl, 0.025)), "uplift_ci_high": float(np.quantile(d_ctrl, 0.975)),
+                     "diff_vs_friend_boost_usd": v - vals["Ship AI + friend boost to all"][0],
+                     "diff_vs_fb_ci_low": float(np.quantile(d_fb, 0.025)), "diff_vs_fb_ci_high": float(np.quantile(d_fb, 0.975)),
+                     "share_draws_beating_fb": float((d_fb > 0).mean()),
+                     "oracle_value_per_user": float(chosen.mean()), "oracle_regret_per_user": float(oracle_best - chosen.mean()),
+                     "share_ai_feed": (p == "ai_feed").mean(), "share_ai_feed_social": (p == "ai_feed_social").mean(),
+                     "share_control": (p == "control").mean()})
     pol = pd.DataFrame(rows)
-    base = pol.loc[0, "value_per_user_usd"]
-    pol["uplift_vs_control_usd"] = pol.value_per_user_usd - base
     pol["annual_value_at_scale_musd"] = pol.uplift_vs_control_usd * C.MAU_POPULATION / 1e6
     pol.to_csv(C.TABLES / "policy_values.csv", index=False)
-
-    # Interpretable rules: depth-3 tree on the AI-feed-minus-friend-boost advantage
-    adv = cate["ai_feed"] - cate["ai_feed_social"]
-    readable = te[["tenure_days", "friend_count", "pre_minutes_per_day", "pre_friend_interactions_per_day", "is_new_user"]].copy()
-    readable["age_35_plus"] = (~under35).astype(int)
-    readable["is_creator"] = (te.account_type == "creator").astype(int)
-    tree = DecisionTreeRegressor(max_depth=3, min_samples_leaf=800, random_state=0).fit(readable, adv)
-    rules = export_text(tree, feature_names=list(readable.columns), decimals=2)
-    (C.REPORTS / "policy_tree_rules.txt").write_text(
-        "Predicted annual value advantage (USD/user) of AI feed over AI+friend boost\n"
-        "(positive = AI feed better for this leaf)\n\n" + rules)
 
     te["policy_arm"] = best
     te["cate_best_usd"] = pred.max(axis=1)
@@ -190,40 +211,43 @@ def main():
             yy = outcome(g2)
             obs = yy[(g2.arm == arm).values].mean() - yy[(g2.arm == "control").values].mean()
             deciles.append({"arm": arm, "decile": int(d), "predicted_cate": g[f"cate_{arm}"].mean(), "observed_uplift": obs,
+                            "oracle_cate": g[f"oracle_cate_{arm}"].mean(),
                             "share_35_plus": (~g.age_group.isin(["18-24", "25-34"])).mean()})
     pd.DataFrame(deciles).to_csv(C.TABLES / "cate_deciles.csv", index=False)
 
     summary["policies"] = pol.to_dict(orient="records")
+    summary["oracle_best_value_per_user"] = float(oracle_best)
     with open(C.REPORTS / "hte_summary.json", "w") as f:
         json.dump(summary, f, indent=2, default=float)
 
-    # Figures
     setup()
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=False)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
     for ax, arm in zip(axes, C.TREATMENTS):
-        for model, ls in [("DR-learner", "-"), ("T-learner", "-")]:
-            q = qini[(qini.arm == arm) & (qini.model == model)]
-            ax.plot(q.fraction_targeted * 100, q.cumulative_gain / 1e3, lw=2.2 if model == "DR-learner" else 1.4,
+        for model in ["DR-learner", "T-learner"]:
+            g = gain[(gain.arm == arm) & (gain.model == model)]
+            ax.plot(g.fraction_targeted * 100, g.cumulative_gain / 1e3, lw=2.2 if model == "DR-learner" else 1.4,
                     color=C.ARM_COLORS[arm] if model == "DR-learner" else C.INK["secondary"], label=model)
-        ax.plot(q.fraction_targeted * 100, q.random / 1e3, color=C.INK["muted"], lw=1.2, label="Random targeting")
-        ax.set(title=f"Qini curve · {C.ARM_LABELS[arm]}", xlabel="% of users targeted (highest predicted effect first)",
-               ylabel="Cumulative net value gain ($K)")
+        ax.plot(g.fraction_targeted * 100, g.random / 1e3, color=C.INK["muted"], lw=1.2, label="Random targeting")
+        ax.set(title=f"Cumulative uplift gain · {C.ARM_LABELS[arm]}", xlabel="% of users targeted (highest predicted effect first)",
+               ylabel="Cumulative utility gain (thousands)")
         ax.legend(fontsize=8)
     save(fig, "07_qini_curves")
 
-    fig, ax = plt.subplots(figsize=(10, 4.2))
+    fig, ax = plt.subplots(figsize=(10, 4.4))
     p = pol.sort_values("value_per_user_usd")
     colors = [C.SEQ_BLUE[5] if "Model" in n else C.SEQ_BLUE[2] for n in p.policy]
     ax.barh(p.policy, p.uplift_vs_control_usd, color=colors, height=0.55,
             xerr=[p.uplift_vs_control_usd - p.uplift_ci_low, p.uplift_ci_high - p.uplift_vs_control_usd],
             ecolor=C.INK["secondary"])
     ax.axvline(0, color=C.INK["axis"], lw=1)
-    for yv, (v, s) in enumerate(zip(p.uplift_vs_control_usd, p.annual_value_at_scale_musd)):
-        ax.text(max(v, 0) + 0.15, yv + 0.22, f"${s:,.0f}M / yr at {C.MAU_POPULATION/1e6:.0f}M MAU", color=C.INK["secondary"], fontsize=8)
-    ax.set(xlabel="Net annual value per user vs control (USD, IPW on held-out users, paired-bootstrap 95% CI)",
-           title="Model-targeted rollout leads, but overlaps the blanket friend-boost launch")
+    m = pol.set_index("policy").loc["Model-targeted (DR-learner)"]
+    ax.set(xlabel="Utility score per user vs control (Horvitz-Thompson IPW on held-out users, paired 95% CI)",
+           title=f"Policy values · model minus blanket friend boost: {m.diff_vs_friend_boost_usd:+.2f} "
+                 f"[{m.diff_vs_fb_ci_low:+.2f}, {m.diff_vs_fb_ci_high:+.2f}]")
     save(fig, "08_policy_values")
-    print(json.dumps(summary, indent=1, default=float))
+    print(json.dumps({k: v for k, v in summary.items() if k != "policies"}, indent=1, default=float))
+    print(pol[["policy", "uplift_vs_control_usd", "diff_vs_friend_boost_usd", "diff_vs_fb_ci_low", "diff_vs_fb_ci_high",
+               "share_draws_beating_fb", "oracle_regret_per_user"]].round(3).to_string(index=False))
     print(rules)
 
 

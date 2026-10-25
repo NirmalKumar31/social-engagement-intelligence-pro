@@ -48,7 +48,8 @@ def test_srm_detects_imbalance():
     assert S.srm_check({"a": 10_500, "b": 9_500})["srm_detected"]
 
 
-def test_msprt_controls_type_one_error_under_peeking():
+def test_msprt_controls_type_one_error_iid_textbook_case():
+    """Exact guarantee holds only for i.i.d. normal increments; the real-design check lives in experiment.sequential()."""
     rng = np.random.default_rng(4)
     k = np.arange(1, 29)
     se = np.sqrt(2 / (k * 300))

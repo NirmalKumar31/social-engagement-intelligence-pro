@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-lock.txt
+      - name: Install pinned dependencies
+        run: pip install -r requirements-lock.txt
+      - name: Unit tests (no generated data needed)
+        run: pytest -q tests
+      - name: Download public datasets
+        run: python -m sei.download
+      - name: Full pipeline on a 3,000-user fixture
+        env:
+          SEI_WORKDIR: ${{ runner.temp }}/sei-fixture
+          SEI_N_USERS: "3000"
+        run: |
+          python -m sei.pipeline
+          pytest -q tests

@@ -21,10 +21,14 @@ from . import config as C
 _CON: duckdb.DuckDBPyConnection | None = None
 
 
-def connect() -> duckdb.DuckDBPyConnection:
-    """In-memory DuckDB with one view per project file (event logs, user tables, result tables, Power BI tables)."""
+def connect(refresh: bool = False) -> duckdb.DuckDBPyConnection:
+    """In-memory DuckDB with one view per project file (event logs, user tables, result tables, Power BI tables).
+
+    Views read the files lazily, so rebuilt data is picked up automatically; pass refresh=True to also pick up
+    files that did not exist when the connection was first created.
+    """
     global _CON
-    if _CON is not None:
+    if _CON is not None and not refresh:
         return _CON
     con = duckdb.connect()
     sources = [(p.stem, f"read_parquet('{p}')") for d in (C.RAW, C.PROCESSED) for p in sorted(d.glob("*.parquet"))]
@@ -36,8 +40,8 @@ def connect() -> duckdb.DuckDBPyConnection:
     return con
 
 
-def q(sql: str) -> pd.DataFrame:
-    return connect().execute(sql).df()
+def q(sql: str, refresh: bool = False) -> pd.DataFrame:
+    return connect(refresh).execute(sql).df()
 
 
 def tables() -> pd.DataFrame:

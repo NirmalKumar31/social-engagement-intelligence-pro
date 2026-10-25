@@ -1,23 +1,27 @@
 """Central configuration: paths, simulation parameters, and business assumptions."""
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
+# SEI_WORKDIR redirects every generated artefact (data, reports, Power BI export) so fixture / CI runs never
+# overwrite the real outputs. Downloaded public datasets stay shared under ROOT/data/external.
+WORK = Path(os.environ.get("SEI_WORKDIR", ROOT)).resolve()
+DATA = WORK / "data"
 RAW = DATA / "raw"
 PROCESSED = DATA / "processed"
-EXTERNAL = DATA / "external"
-REPORTS = ROOT / "reports"
+EXTERNAL = ROOT / "data" / "external"
+REPORTS = WORK / "reports"
 FIGURES = REPORTS / "figures"
 TABLES = REPORTS / "tables"
-POWERBI = ROOT / "powerbi"
+POWERBI = WORK / "powerbi"
 
-for _p in (RAW, PROCESSED, FIGURES, TABLES):
+for _p in (RAW, PROCESSED, FIGURES, TABLES, POWERBI):
     _p.mkdir(parents=True, exist_ok=True)
 
 SEED = 20261024
 
 # Experiment design
-N_USERS = 60_000
+N_USERS = int(os.environ.get("SEI_N_USERS", 60_000))
 PRE_DAYS = 14            # days -14..-1: pre-period (used for CUPED + balance checks)
 EXP_DAYS = 28            # days 0..27: experiment
 START_DATE = "2026-08-03"  # day 0 (a Monday)
@@ -49,3 +53,19 @@ MC_DRAWS = 20_000
 
 # Power BI reads its CSVs from here (raw.githubusercontent.com/<this path><table>.csv)
 GITHUB_DATA_PATH = "NirmalKumar31/social-engagement-intelligence-pro/main/powerbi/data/"
+
+# ---------------------------------------------------------------- launch decision rule (see sei/decision.py)
+# Non-inferiority margins on the RELATIVE change of each guardrail, in its harmful direction.
+# Disclosure: these margins were written on 2026-10-25, AFTER the first analysis had been seen (prompted by
+# an external audit). A real experiment program must fix them before unblinding.
+PRIMARY_METRIC = "minutes"
+GUARDRAILS = {
+    # metric: (harmful direction, relative margin, severity)
+    "churned": ("increase", 0.03, "critical"),
+    "friend_interactions": ("decrease", 0.03, "standard"),
+    "neg_feedback_rate": ("increase", 0.05, "standard"),
+    "ad_ctr": ("decrease", 0.03, "standard"),
+}
+GUARDRAIL_FAMILY_ALPHA = 0.05   # Bonferroni across all guardrail x arm comparisons, one-sided
+SYNTHETIC_NOTICE = ("SYNTHETIC DATA: the experiment is simulated (sei/simulate.py); only the NLP and virality "
+                    "modules use real public data. Numbers illustrate methods, not a real product.")

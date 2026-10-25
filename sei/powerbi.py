@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 from . import config as C
+from .narrative import facts
 from .pbi_report import build_report
 
 OUT = C.POWERBI
@@ -98,7 +99,7 @@ def export_data() -> dict[str, pd.DataFrame]:
     tables["virality_weekly"]["week"] = pd.to_datetime(tables["virality_weekly"]["week"])
     for t in ["metric_results", "segment_results"]:
         for c in tables[t].columns:
-            if tables[t][c].dtype == bool:
+            if pd.api.types.is_bool_dtype(tables[t][c]):
                 tables[t][c] = tables[t][c].astype(int)
     tables["metric_results"]["metric_label"] = tables["metric_results"]["label"]
     add_display_columns(tables)
@@ -109,7 +110,7 @@ def export_data() -> dict[str, pd.DataFrame]:
     for t, df in tables.items():
         out = df.copy()
         for c in out.columns:
-            if np.issubdtype(out[c].dtype, np.datetime64):
+            if pd.api.types.is_datetime64_any_dtype(out[c]):
                 out[c] = out[c].dt.strftime("%Y-%m-%d")
         out.to_csv(DATA / f"{t}.csv", index=False)
     return tables
@@ -219,11 +220,15 @@ PCT_COLS = {"rel_lift", "rel_ci_low", "rel_ci_high", "minutes_lift", "minutes_ci
 
 
 def _dtype(s: pd.Series) -> tuple[str, str]:
-    if np.issubdtype(s.dtype, np.datetime64):
+    """Model + Power Query type. Uses pandas predicates so extension dtypes (pandas 3 strings) work."""
+    t = pd.api.types
+    if t.is_datetime64_any_dtype(s):
         return "dateTime", "type date"
-    if np.issubdtype(s.dtype, np.integer):
+    if t.is_bool_dtype(s):
         return "int64", "Int64.Type"
-    if np.issubdtype(s.dtype, np.floating):
+    if t.is_integer_dtype(s):
+        return "int64", "Int64.Type"
+    if t.is_float_dtype(s):
         return "double", "type number"
     return "string", "type text"
 
@@ -256,12 +261,12 @@ MEASURES = [
     ("Revenue per User-Day", "DIVIDE(SUM(fact_daily[ad_revenue]), [User-Days])", "$0.0000", "Monetisation"),
     ("Ad CTR", "DIVIDE(SUM(fact_daily[ad_clicks]), SUM(fact_daily[ad_impressions]))", "0.00%", "Monetisation"),
     ("Negative Feedback per 100 Min", "DIVIDE(SUM(fact_daily[negative_feedback]), SUM(fact_daily[minutes])) * 100", "0.000", "Guardrails"),
-    ("Minutes per User-Day (Control)", 'CALCULATE([Minutes per User-Day], dim_arm[arm] = "control")', "0.00", "Lift vs Control"),
+    ("Minutes per User-Day (Control)", 'CALCULATE([Minutes per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")', "0.00", "Lift vs Control"),
     ("Minutes Lift vs Control", "DIVIDE([Minutes per User-Day], [Minutes per User-Day (Control)]) - 1", "+0.0%;-0.0%;0.0%", "Lift vs Control"),
-    ("Revenue Lift vs Control", 'DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], dim_arm[arm] = "control")) - 1', "+0.0%;-0.0%;0.0%", "Lift vs Control"),
-    ("Friend Interactions Lift vs Control", 'DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], dim_arm[arm] = "control")) - 1', "+0.0%;-0.0%;0.0%", "Lift vs Control"),
+    ("Revenue Lift vs Control", 'DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")) - 1', "+0.0%;-0.0%;0.0%", "Lift vs Control"),
+    ("Friend Interactions Lift vs Control", 'DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")) - 1', "+0.0%;-0.0%;0.0%", "Lift vs Control"),
     ("Churn Rate", "AVERAGE(fact_user[churned])", "0.00%", "Retention"),
-    ("Churn Rate (Control)", 'CALCULATE([Churn Rate], dim_arm[arm] = "control")', "0.00%", "Retention"),
+    ("Churn Rate (Control)", 'CALCULATE([Churn Rate], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")', "0.00%", "Retention"),
     ("Churn Change vs Control (pp)", "([Churn Rate] - [Churn Rate (Control)]) * 100", "+0.00;-0.00;0.00", "Retention"),
     ("Avg Churn Risk", "AVERAGE(fact_user[churn_probability])", "0.0%", "Retention"),
     ("High-Risk Users", 'CALCULATE(COUNTROWS(fact_user), fact_user[risk_tier] IN {"High", "Critical"})', "#,0", "Retention"),
@@ -271,11 +276,11 @@ MEASURES = [
     ("Friend Boost Churn Change", 'CALCULATE(MAX(metric_results[rel_lift]), metric_results[arm] = "ai_feed_social", metric_results[metric] = "churned")', "+0.0%;-0.0%", "Headline KPIs"),
     ("Friend Boost 12M Value ($M)", 'CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = "AI + friend boost vs control")', "$#,0\"M\"", "Headline KPIs"),
     ("AI Feed 12M Value ($M)", 'CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = "AI feed vs control")', "$#,0\"M\"", "Headline KPIs"),
-    ("P(Friend Boost Beats AI Feed)", 'CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = "Friend boost minus AI feed")', "0.0%", "Headline KPIs"),
+    ("Share of Draws FB Beats AI", 'CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = "Friend boost minus AI feed")', "0.0%", "Headline KPIs"),
     ("Significant Wins", 'CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = "win")', "0", "Headline KPIs"),
     ("Significant Harms", 'CALCULATE(COUNTROWS(metric_results), metric_results[verdict] = "harm")', "0", "Headline KPIs"),
     ("Best Policy Uplift ($/user/yr)", "MAX(policy_values[uplift_vs_control_usd])", "$0.00", "Headline KPIs"),
-    ("Churn Model AUC", 'CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[model] = "LightGBM + isotonic")', "0.000", "Headline KPIs"),
+    ("Churn Model AUC", 'CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[deployed] = 1)', "0.000", "Headline KPIs"),
 ]
 
 RELATIONSHIPS = [
@@ -285,6 +290,7 @@ RELATIONSHIPS = [
     ("km_survival", "arm", "dim_arm", "arm"), ("impact_fan", "arm", "dim_arm", "arm"),
     ("topic_exposure_by_arm", "arm", "dim_arm", "arm"), ("content_exposure_summary", "arm", "dim_arm", "arm"),
     ("sequential_monitoring", "arm", "dim_arm", "arm"), ("impact_distribution", "arm", "dim_arm", "arm"),
+    ("qini_curves", "arm", "dim_arm", "arm"), ("cate_deciles", "arm", "dim_arm", "arm"),
 ]
 
 
@@ -374,7 +380,7 @@ def write_pbip(tables, data_path: str, source: str):
     (report_dir / ".platform").write_text(platform("Report"))
     (report_dir / "definition.pbir").write_text(json.dumps(
         {"version": "1.0", "datasetReference": {"byPath": {"path": f"../{NAME}.SemanticModel"}, "byConnection": None}}, indent=2))
-    (report_dir / "report.json").write_text(json.dumps(build_report(), indent=2))
+    (report_dir / "report.json").write_text(json.dumps(build_report(facts()), indent=2))
     (OUT / "SEI_Theme.json").write_text(json.dumps(theme(), indent=2))
     (OUT / ".gitignore").write_text("**/.pbi/localSettings.json\n**/.pbi/cache.abf\n")
     dax = ["// DAX measures for the SEI semantic model (table: _Measures)\n"]

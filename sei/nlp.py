@@ -3,9 +3,10 @@
 1. Sentiment model: TF-IDF word+char n-grams + logistic regression, tuned on the official
    validation split, scored on the official test split, benchmarked against VADER.
 2. Topic discovery: NMF on TF-IDF over the full corpus.
-3. Feed-exposure simulation: each arm's ranker serves real posts to sampled experiment users,
-   so we can measure what the AI feed does to topic diversity and negativity exposure.
-   These are responsible-AI guardrails a launch review would ask about.
+3. Feed-exposure SCENARIO: each arm's ASSUMED ranker (topic concentration + a hand-set preference for
+   high-arousal posts) serves real held-out posts to sampled users. The harms it shows are built into those
+   assumed weights, not learned from real engagement data, so results are reported with a weight
+   sensitivity sweep. "Negative sentiment" is not the same as toxicity or polarisation.
 """
 from __future__ import annotations
 
@@ -103,17 +104,22 @@ def topics(corpus: pd.DataFrame) -> pd.DataFrame:
     return info
 
 
-def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impressions: int = 150) -> dict:
-    """Serve real posts to sampled users under each arm's ranking objective."""
+RANKERS = {"control": (0.6, 0.0), "ai_feed": (2.2, 2.2), "ai_feed_social": (1.4, 0.8)}   # (concentration, engagement weight)
+
+
+def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impressions: int = 150,
+                        rankers: dict | None = None, save_outputs: bool = True) -> pd.DataFrame:
+    """Serve real held-out posts to sampled users under each arm's ASSUMED ranking objective."""
     rng = np.random.default_rng(C.SEED)
+    rankers = rankers or RANKERS
     users = pd.read_parquet(C.RAW / "users.parquet")
-    sample = users.groupby("arm", group_keys=False).apply(lambda g: g.sample(n_users_per_arm, random_state=0))
-    items = corpus[corpus.topic_strength > 0].reset_index(drop=True)
+    users = users[users.arm.isin(list(rankers))]
+    sample = users.groupby("arm", group_keys=False).apply(lambda g: g.sample(min(n_users_per_arm, len(g)), random_state=0))
+    # Only posts from the TweetEval test split: the sentiment model never trained on them
+    items = corpus[(corpus.topic_strength > 0) & (corpus.split == "test")].reset_index(drop=True)
     topic_items = [np.flatnonzero(items.topic_id.values == k) for k in range(N_TOPICS)]
-    # Predicted engagement: engagement-optimised rankers learn that high-arousal (negative) posts get reactions
+    # ASSUMED engagement score: the scenario posits that high-arousal (negative) posts draw more reactions
     eng_score = 0.9 * items.p_negative.values + 0.3 * items.p_positive.values
-    # Rankers: exponent on affinity (concentration) and weight on predicted engagement
-    rankers = {"control": (0.6, 0.0), "ai_feed": (2.2, 2.2), "ai_feed_social": (1.4, 0.8)}
     rows, topic_rows = [], []
     for _, u in sample.iterrows():
         aff = rng.dirichlet(np.full(N_TOPICS, 0.7))
@@ -141,12 +147,14 @@ def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impre
         for k in range(N_TOPICS):
             topic_rows.append((u.arm, k, share[k]))
     ux = pd.DataFrame(rows)
+    if not save_outputs:
+        return ux
     ux.to_parquet(C.PROCESSED / "content_exposure_users.parquet", index=False)
     tx = pd.DataFrame(topic_rows, columns=["arm", "topic_id", "share"]).groupby(["arm", "topic_id"]).share.mean().reset_index()
     tx.to_csv(C.TABLES / "topic_exposure_by_arm.csv", index=False)
     summ = []
     ctrl = ux[ux.arm == "control"]
-    for arm in C.ARMS:
+    for arm in [a for a in C.ARMS if a in set(ux.arm)]:
         g = ux[ux.arm == arm]
         r = {"arm": arm}
         for m in ["topic_entropy", "top_topic_share", "distinct_topics", "negative_share", "expected_engagements"]:
@@ -158,6 +166,19 @@ def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impre
     summ = pd.DataFrame(summ)
     summ.to_csv(C.TABLES / "content_exposure_summary.csv", index=False)
     return summ
+
+
+def exposure_sensitivity(corpus: pd.DataFrame) -> pd.DataFrame:
+    """How much of the AI-feed exposure result is driven by the assumed weights?"""
+    rows = []
+    for conc in (0.6, 1.4, 2.2):
+        for w in (0.0, 0.8, 1.5, 2.2, 3.0):
+            ux = exposure_simulation(corpus, n_users_per_arm=600, rankers={"ai_feed": (conc, w)}, save_outputs=False)
+            rows.append({"concentration": conc, "engagement_weight": w, "negative_share": ux.negative_share.mean(),
+                         "topic_entropy": ux.topic_entropy.mean()})
+    out = pd.DataFrame(rows)
+    out.to_csv(C.TABLES / "exposure_sensitivity.csv", index=False)
+    return out
 
 
 def figures(metrics, info, tx, summ):
@@ -198,7 +219,8 @@ def figures(metrics, info, tx, summ):
             ax.text(i, v * 1.01, f"{v:.2f}" if m != "negative_share" else f"{v:.1%}", ha="center", color=C.INK["secondary"])
         ax.set_xticks(range(3), ["Control", "AI feed", "AI + friends"])
         ax.set_title(t, fontsize=10)
-    fig.suptitle("Engagement-optimised ranking narrows feeds and amplifies negativity", x=0.01, ha="left", fontweight="bold")
+    fig.suptitle("Scenario: under ASSUMED ranker weights, engagement-optimised ranking narrows feeds and raises negative-post share",
+                 x=0.01, ha="left", fontweight="bold", fontsize=10)
     fig.tight_layout()
     save(fig, "15_responsible_ai_guardrails")
 
@@ -208,11 +230,13 @@ def main():
     sent, corpus = sentiment_model(d)
     info = topics(corpus)
     summ = exposure_simulation(corpus)
+    sens = exposure_sensitivity(corpus)
     tx = pd.read_csv(C.TABLES / "topic_exposure_by_arm.csv")
     figures(sent["metrics"], info, tx, summ)
     corpus[["split", "label", "pred_sentiment", "p_negative", "topic_id"]].to_parquet(C.PROCESSED / "tweet_corpus_scored.parquet", index=False)
     out = {"sentiment": sent, "topics": info[["topic_id", "label", "n_posts", "share_negative_pred"]].to_dict(orient="records"),
-           "exposure": summ.to_dict(orient="records")}
+           "exposure": summ.to_dict(orient="records"), "exposure_sensitivity": sens.to_dict(orient="records"),
+           "exposure_note": "scenario under assumed ranker weights on held-out posts; not learned from real engagement"}
     with open(C.REPORTS / "nlp_summary.json", "w") as f:
         json.dump(out, f, indent=2, default=float)
     print(json.dumps(out, indent=1, default=float))

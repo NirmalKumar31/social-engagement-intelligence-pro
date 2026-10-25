@@ -7,7 +7,7 @@
 --   users              one row per user: arm, age_group, region, device, account_type, ...
 --   daily_activity     one row per ACTIVE user-day: day (-14..27), minutes, likes, comments, ad_revenue, ...
 --   user_experiment    one row per user: pre_* / exp_* / late_* metrics, churned
---   churn_scores       churn probability + risk tier for users active at day 13
+--   churn_scores       7-day-lapse probability + risk tier for users active ON day 13 (scoring day)
 --   user_cate          per-user predicted treatment effects (held-out users)
 --   metric_results, segment_results, daily_lift, ...   analysis outputs (reports/tables)
 -- ============================================================================
@@ -63,11 +63,11 @@ FROM user_experiment GROUP BY region ORDER BY annual_revenue_per_user DESC;
 SELECT account_type, arm, ROUND(AVG(exp_posts_created_per_day), 3) AS posts_per_day
 FROM user_experiment GROUP BY account_type, arm ORDER BY account_type, arm;
 
--- 9. Top 10 riskiest users right now (churn early-warning model)
-SELECT user_id, arm, age_group, region, ROUND(churn_probability, 3) AS churn_probability, risk_tier, recency_days
+-- 9. Top 10 users most at risk of a 7-day lapse (early-warning model, out-of-fold scores)
+SELECT user_id, arm, age_group, region, ROUND(churn_probability, 3) AS lapse_probability, risk_tier
 FROM churn_scores ORDER BY churn_probability DESC LIMIT 10;
 
--- 10. Does the risk model work? Actual churn by predicted risk decile
+-- 10. Is the risk model calibrated? Actual lapse rate by predicted risk decile
 SELECT risk_decile, COUNT(*) AS users, ROUND(100 * AVG(churn_probability), 1) AS predicted_pct,
        ROUND(100 * AVG(actual_churn_next_14d), 1) AS actual_pct
 FROM churn_scores GROUP BY risk_decile ORDER BY risk_decile DESC;
@@ -77,6 +77,7 @@ SELECT age_group, policy_arm, COUNT(*) AS users
 FROM user_cate GROUP BY age_group, policy_arm ORDER BY age_group, users DESC;
 
 -- 12. Official experiment results (CUPED + Benjamini-Hochberg) for guardrail metrics
+-- (the launch decision itself uses non-inferiority margins: see experiment_summary.json -> decision)
 SELECT arm, label, ROUND(100 * rel_lift, 1) AS lift_pct, p_adj_bh, verdict
 FROM metric_results WHERE tier = 'guardrail' ORDER BY arm, label;
 
