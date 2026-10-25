@@ -2,7 +2,7 @@
   "version": "1.0",
   "datasetReference": {
     "byPath": {
-      "path": "../SEI_Dashboard.SemanticModel"
+      "path": "../Feed_Ranking_Launch_Review.SemanticModel"
     },
     "byConnection": null
   }

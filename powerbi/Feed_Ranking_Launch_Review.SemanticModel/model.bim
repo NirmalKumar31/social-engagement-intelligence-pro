@@ -1,5 +1,5 @@
 {
-  "name": "SEI_Dashboard",
+  "name": "Feed_Ranking_Launch_Review",
   "compatibilityLevel": 1567,
   "model": {
     "culture": "en-US",
@@ -2922,6 +2922,211 @@
         ]
       },
       {
+        "name": "decision_guardrails",
+        "lineageTag": "6bcb1f3b-6bee-54a1-a0f6-7b6a8847adce",
+        "columns": [
+          {
+            "name": "arm",
+            "dataType": "string",
+            "sourceColumn": "arm",
+            "summarizeBy": "none",
+            "lineageTag": "a2654726-dfdc-59f6-a5c1-fe1101a65502"
+          },
+          {
+            "name": "Arm name",
+            "dataType": "string",
+            "sourceColumn": "Arm name",
+            "summarizeBy": "none",
+            "lineageTag": "a0f2dd59-d77f-5643-8405-c6b2ef48600b"
+          },
+          {
+            "name": "Guardrail",
+            "dataType": "string",
+            "sourceColumn": "Guardrail",
+            "summarizeBy": "none",
+            "lineageTag": "9ad85a27-6c79-5628-9ba4-6c9114ccd202"
+          },
+          {
+            "name": "Observed change",
+            "dataType": "double",
+            "sourceColumn": "Observed change",
+            "summarizeBy": "sum",
+            "lineageTag": "a8f0fd0e-9a14-5369-86c3-e18fac9d958d",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "Harm bound",
+            "dataType": "double",
+            "sourceColumn": "Harm bound",
+            "summarizeBy": "sum",
+            "lineageTag": "997fb026-6b5a-563f-8758-d0ff345e3e5f",
+            "formatString": "+0.0%;-0.0%;0.0%"
+          },
+          {
+            "name": "margin",
+            "dataType": "double",
+            "sourceColumn": "margin",
+            "summarizeBy": "sum",
+            "lineageTag": "b2560b03-1e5a-55b4-ac2a-32b1226611cb",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "Allowed harm",
+            "dataType": "string",
+            "sourceColumn": "Allowed harm",
+            "summarizeBy": "none",
+            "lineageTag": "53251c03-95ef-56e9-b4a4-b66b47520aa4"
+          },
+          {
+            "name": "Status",
+            "dataType": "string",
+            "sourceColumn": "Status",
+            "summarizeBy": "none",
+            "lineageTag": "3d03ba47-621c-5c8b-903c-41731d6c9439"
+          },
+          {
+            "name": "Arm decision",
+            "dataType": "string",
+            "sourceColumn": "Arm decision",
+            "summarizeBy": "none",
+            "lineageTag": "0fa1bf23-f66b-5e0c-9827-6321b6678fb1"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "decision_guardrails",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"decision_guardrails.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"Arm name\", type text}, {\"Guardrail\", type text}, {\"Observed change\", type number}, {\"Harm bound\", type number}, {\"margin\", type number}, {\"Allowed harm\", type text}, {\"Status\", type text}, {\"Arm decision\", type text}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "impact_scenarios",
+        "lineageTag": "9f4e2952-af41-5b54-9160-b2c67ab550ee",
+        "columns": [
+          {
+            "name": "persistence",
+            "dataType": "string",
+            "sourceColumn": "persistence",
+            "summarizeBy": "none",
+            "lineageTag": "dede8a2d-67e2-51a1-a59f-2ddce6992a5f"
+          },
+          {
+            "name": "comparison",
+            "dataType": "string",
+            "sourceColumn": "comparison",
+            "summarizeBy": "none",
+            "lineageTag": "9b3cad91-828e-5b35-9e1e-db6555db7a14"
+          },
+          {
+            "name": "p05_musd",
+            "dataType": "double",
+            "sourceColumn": "p05_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "66ce8272-24ee-5e66-9ccf-d4cb60bcf7da",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p50_musd",
+            "dataType": "double",
+            "sourceColumn": "p50_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "31d2dba0-93e0-58ad-afdc-7849109b7244",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "p95_musd",
+            "dataType": "double",
+            "sourceColumn": "p95_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "8376c217-5dcd-5a1d-924b-ab5a1e0f92f3",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "mean_musd",
+            "dataType": "double",
+            "sourceColumn": "mean_musd",
+            "summarizeBy": "sum",
+            "lineageTag": "224bff8e-3f36-571b-a94b-1903ccc1cc11",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "prob_positive",
+            "dataType": "double",
+            "sourceColumn": "prob_positive",
+            "summarizeBy": "sum",
+            "lineageTag": "fe26ce52-eaa5-511f-9177-1552f763e3de",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Effect persistence",
+            "dataType": "string",
+            "sourceColumn": "Effect persistence",
+            "summarizeBy": "none",
+            "lineageTag": "033c06a7-6ac9-516c-a885-dc6cff4f8edf"
+          },
+          {
+            "name": "Scenario",
+            "dataType": "string",
+            "sourceColumn": "Scenario",
+            "summarizeBy": "none",
+            "lineageTag": "4456fa7c-8c60-516d-b79e-36e5218eb2b5"
+          },
+          {
+            "name": "Median ($M)",
+            "dataType": "double",
+            "sourceColumn": "Median ($M)",
+            "summarizeBy": "sum",
+            "lineageTag": "cf614d28-da77-56ce-b6ab-016917b298a2",
+            "formatString": "$#,0"
+          },
+          {
+            "name": "90% range",
+            "dataType": "string",
+            "sourceColumn": "90% range",
+            "summarizeBy": "none",
+            "lineageTag": "ed97961e-e3cd-5abd-8e74-2bcc1df2d1f6"
+          },
+          {
+            "name": "Share of draws > 0",
+            "dataType": "double",
+            "sourceColumn": "Share of draws > 0",
+            "summarizeBy": "sum",
+            "lineageTag": "1760d2cc-030b-5cf1-bb64-a57c594e8a68",
+            "formatString": "0%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "impact_scenarios",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"impact_scenarios.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"persistence\", type text}, {\"comparison\", type text}, {\"p05_musd\", type number}, {\"p50_musd\", type number}, {\"p95_musd\", type number}, {\"mean_musd\", type number}, {\"prob_positive\", type number}, {\"Effect persistence\", type text}, {\"Scenario\", type text}, {\"Median ($M)\", type number}, {\"90% range\", type text}, {\"Share of draws > 0\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
         "name": "_Measures",
         "lineageTag": "b582f3ce-9fd6-5634-b599-dc61df992f28",
         "columns": [
@@ -3261,6 +3466,13 @@
         "fromColumn": "arm",
         "toTable": "dim_arm",
         "toColumn": "arm"
+      },
+      {
+        "name": "cc2b6f41-ad2d-508f-9d60-f0efa2e4053c",
+        "fromTable": "decision_guardrails",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
       }
     ],
     "expressions": [
@@ -3274,7 +3486,7 @@
     "annotations": [
       {
         "name": "PBI_QueryOrder",
-        "value": "[\"DataPath\", \"dim_date\", \"dim_arm\", \"fact_daily\", \"fact_user\", \"metric_results\", \"segment_results\", \"daily_lift\", \"sequential_monitoring\", \"power_mde\", \"balance_smd\", \"bayesian_results\", \"km_survival\", \"cox_hazard_ratios\", \"churn_model_metrics\", \"churn_shap_importance\", \"retention_profit_curve\", \"policy_values\", \"qini_curves\", \"cate_deciles\", \"topic_info\", \"content_exposure_summary\", \"sentiment_model_metrics\", \"virality_playbook\", \"virality_shap_importance\", \"virality_weekly\", \"impact_fan\", \"impact_distribution\", \"impact_monte_carlo\", \"impact_sensitivity\", \"topic_exposure_by_arm\", \"_Measures\"]"
+        "value": "[\"DataPath\", \"dim_date\", \"dim_arm\", \"fact_daily\", \"fact_user\", \"metric_results\", \"segment_results\", \"daily_lift\", \"sequential_monitoring\", \"power_mde\", \"balance_smd\", \"bayesian_results\", \"km_survival\", \"cox_hazard_ratios\", \"churn_model_metrics\", \"churn_shap_importance\", \"retention_profit_curve\", \"policy_values\", \"qini_curves\", \"cate_deciles\", \"topic_info\", \"content_exposure_summary\", \"sentiment_model_metrics\", \"virality_playbook\", \"virality_shap_importance\", \"virality_weekly\", \"impact_fan\", \"impact_distribution\", \"impact_monte_carlo\", \"impact_sensitivity\", \"topic_exposure_by_arm\", \"decision_guardrails\", \"impact_scenarios\", \"_Measures\"]"
       },
       {
         "name": "__PBI_TimeIntelligenceEnabled",

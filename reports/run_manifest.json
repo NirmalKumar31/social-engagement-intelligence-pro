@@ -1,7 +1,7 @@
 {
-  "started_utc": "2026-10-25T23:35:50+00:00",
-  "finished_utc": "2026-10-25T23:41:09+00:00",
-  "git_commit": "57b92b1ecbeb5e293f92bb47872bf95e518577ed",
+  "started_utc": "2026-10-25T23:50:21+00:00",
+  "finished_utc": "2026-10-25T23:55:48+00:00",
+  "git_commit": "89aca994dd6210ca6e604a49fec8f4bfaa43d435",
   "git_source_dirty": false,
   "python": "3.12.3",
   "packages": {
@@ -50,52 +50,52 @@
     {
       "stage": "simulate",
       "status": "ran",
-      "seconds": 2.2
+      "seconds": 2.3
     },
     {
       "stage": "features",
       "status": "ran",
-      "seconds": 0.8
+      "seconds": 0.9
     },
     {
       "stage": "experiment",
       "status": "ran",
-      "seconds": 8.5
+      "seconds": 8.6
     },
     {
       "stage": "oracle",
       "status": "ran",
-      "seconds": 78.6
+      "seconds": 78.9
     },
     {
       "stage": "hte",
       "status": "ran",
-      "seconds": 26.4
+      "seconds": 28.7
     },
     {
       "stage": "retention",
       "status": "ran",
-      "seconds": 37.2
+      "seconds": 39.0
     },
     {
       "stage": "nlp",
       "status": "ran",
-      "seconds": 118.1
+      "seconds": 120.4
     },
     {
       "stage": "virality",
       "status": "ran",
-      "seconds": 13.7
+      "seconds": 14.7
     },
     {
       "stage": "impact",
       "status": "ran",
-      "seconds": 2.4
+      "seconds": 2.3
     },
     {
       "stage": "powerbi",
       "status": "ran",
-      "seconds": 31.2
+      "seconds": 30.6
     },
     {
       "stage": "report",
@@ -165,6 +165,7 @@
     "powerbi/data/content_exposure_summary.csv": "99394abef5746a9e",
     "powerbi/data/cox_hazard_ratios.csv": "c64889293783f03a",
     "powerbi/data/daily_lift.csv": "32c3f8e2ffd5e684",
+    "powerbi/data/decision_guardrails.csv": "218ba7da8d21163b",
     "powerbi/data/dim_arm.csv": "57ffbf295d7953e0",
     "powerbi/data/dim_date.csv": "6bec1a66914a443d",
     "powerbi/data/fact_daily.csv": "9a4c97c8f7f11daf",
@@ -172,6 +173,7 @@
     "powerbi/data/impact_distribution.csv": "c0b1981ce8debe63",
     "powerbi/data/impact_fan.csv": "365b84727794c30e",
     "powerbi/data/impact_monte_carlo.csv": "064ab5889a1ad7e5",
+    "powerbi/data/impact_scenarios.csv": "a0fd35277bd1d30b",
     "powerbi/data/impact_sensitivity.csv": "daab82983799e60d",
     "powerbi/data/km_survival.csv": "6e5860fa8895d672",
     "powerbi/data/metric_results.csv": "fb6971d3574b2eb5",

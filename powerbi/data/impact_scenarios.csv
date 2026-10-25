@@ -1,0 +1,10 @@
+persistence,comparison,p05_musd,p50_musd,p95_musd,mean_musd,prob_positive,Effect persistence,Scenario,Median ($M),90% range,Share of draws > 0
+persist,AI feed vs control,70.19723254468214,92.52722516404091,117.11509617794675,93.07468059910232,1.0,Persist,AI feed vs control,92.52722516404091,$70M to $117M,1.0
+persist,AI + friend boost vs control,60.491146912732304,84.32072657622302,108.99193208568562,84.52109210725472,1.0,Persist,AI + friend boost vs control,84.32072657622302,$60M to $109M,1.0
+persist,Friend boost minus AI feed,-32.094083390675394,-8.634072907040238,14.4920346098112,-8.553588491847586,0.272,Persist,Friend boost minus AI feed,-8.634072907040238,-$32M to $14M,0.272
+half-decay by month 12,AI feed vs control,52.8140064121834,70.0369568915528,89.4370902698021,70.50860698375173,1.0,Half-decay by month 12,AI feed vs control,70.0369568915528,$53M to $89M,1.0
+half-decay by month 12,AI + friend boost vs control,47.72806722044882,65.93901872853314,85.24799908824349,66.16668165280684,1.0,Half-decay by month 12,AI + friend boost vs control,65.93901872853314,$48M to $85M,1.0
+half-decay by month 12,Friend boost minus AI feed,-22.792643429400073,-4.4829607880681746,13.651618033657394,-4.3419253309448775,0.36,Half-decay by month 12,Friend boost minus AI feed,-4.4829607880681746,-$23M to $14M,0.36
+fade to zero by month 12,AI feed vs control,34.85081194233078,47.42673847737074,61.47391888837179,47.77977928453336,1.0,Fade to zero by month 12,AI feed vs control,47.42673847737074,$35M to $61M,1.0
+fade to zero by month 12,AI + friend boost vs control,34.50813043083445,47.788772480672,61.65793711691388,47.93484106870293,1.0,Fade to zero by month 12,AI + friend boost vs control,47.788772480672,$35M to $62M,1.0
+fade to zero by month 12,Friend boost minus AI feed,-13.251353916856122,0.2064885303832292,13.508513400058364,0.1550617841695728,0.507,Fade to zero by month 12,Friend boost minus AI feed,0.2064885303832292,-$13M to $14M,0.507

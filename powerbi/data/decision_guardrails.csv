@@ -1,0 +1,9 @@
+arm,Arm name,Guardrail,Observed change,Harm bound,margin,Allowed harm,Status,Arm decision
+ai_feed,AI 'For You' feed,Churn (28-day) ★,0.1696123099541681,0.2602045183782462,0.03,↑ ≤ 3%,✖ FAIL,DO NOT LAUNCH
+ai_feed,AI 'For You' feed,Friend interactions,-0.08946951714154737,0.10112717586018448,0.03,↓ ≤ 3%,✖ FAIL,DO NOT LAUNCH
+ai_feed,AI 'For You' feed,Negative feedback,0.19105050182896582,0.22072772345889285,0.05,↑ ≤ 5%,✖ FAIL,DO NOT LAUNCH
+ai_feed,AI 'For You' feed,Ad CTR,0.034007772562504715,-0.01993469695019754,0.03,↓ ≤ 3%,✔ PASS,DO NOT LAUNCH
+ai_feed_social,AI feed + friend boost,Churn (28-day) ★,-0.11140574060630108,-0.037601698380886006,0.03,↑ ≤ 3%,✔ PASS,CONDITIONAL
+ai_feed_social,AI feed + friend boost,Friend interactions,0.10582671200344766,-0.09222848332438176,0.03,↓ ≤ 3%,✔ PASS,CONDITIONAL
+ai_feed_social,AI feed + friend boost,Negative feedback,0.08132529359744377,0.10828193002026903,0.05,↑ ≤ 5%,✖ FAIL,CONDITIONAL
+ai_feed_social,AI feed + friend boost,Ad CTR,0.02715258532373357,-0.013213660397986472,0.03,↓ ≤ 3%,✔ PASS,CONDITIONAL

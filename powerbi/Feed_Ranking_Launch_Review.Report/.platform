@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "SemanticModel",
-    "displayName": "SEI_Dashboard"
+    "type": "Report",
+    "displayName": "Feed Ranking Launch Review"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "8863da67-b40a-56fd-acef-d2510e820189"
+    "logicalId": "f45e2a10-0b45-5482-8ebc-92ef6fcb471d"
   }
 }
