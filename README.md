@@ -71,6 +71,19 @@ GitHub repo, so it refreshes anywhere. On a Mac, sync the `powerbi/` folder into
 integration to get the full 9-page report in the browser, or upload `powerbi/SEI_Dashboard_data.xlsx`. On Windows,
 open `powerbi/SEI_Dashboard.pbip` in Power BI Desktop.
 
+## Explore the data yourself
+
+| Way | Command / file | Best for |
+|---|---|---|
+| **SQL prompt** | `make sql` → type queries ending in `;` (`.tables` lists all 72 tables) | quick questions |
+| **Example queries** | `make examples` runs [`queries/examples.sql`](queries/examples.sql) (14 annotated queries) | learning the schema |
+| **Notebook** | [`notebooks/explore.ipynb`](notebooks/explore.ipynb): SQL + pandas + Plotly + a one-line CUPED `ab_test()` on any metric/segment | your own analysis |
+| **One-off** | `.venv/bin/python -m sei.sql "SELECT arm, AVG(churned) FROM user_experiment GROUP BY arm"` | scripting |
+| **Power BI** | Fabric report, or *Explore* / *DAX query view* on the semantic model | business users |
+
+Key tables: `users`, `daily_activity` (event log), `user_experiment` (one row per user, pre/exp/late metrics),
+`churn_scores`, `user_cate`, plus every result table in `reports/tables/`.
+
 ## Project layout
 
 ```

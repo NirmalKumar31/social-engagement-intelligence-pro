@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup data all pipeline test dashboard powerbi clean
+.PHONY: setup data all pipeline test dashboard powerbi sql examples clean
 
 setup:            ## create venv + install deps
 	python3 -m venv .venv && .venv/bin/pip install -U pip && .venv/bin/pip install -r requirements.txt
@@ -15,6 +15,12 @@ pipeline:
 
 test:
 	$(PY) -m pytest -q tests
+
+sql:              ## interactive SQL prompt over every dataset
+	$(PY) -m sei.sql
+
+examples:         ## run the 14 example queries
+	$(PY) -m sei.sql --file queries/examples.sql
 
 dashboard:
 	.venv/bin/streamlit run dashboard/app.py
