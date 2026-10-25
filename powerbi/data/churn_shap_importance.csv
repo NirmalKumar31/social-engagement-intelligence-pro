@@ -1,29 +1,29 @@
 feature,mean_abs_shap,Feature name
-recency_days,0.8036385450798124,Days since last active
-minutes_w0,0.2107817096855405,"Minutes, exp. week 1"
-active_days_w1,0.1782558093117267,"Active days, exp. week 2"
-minutes_w1,0.1578151046995154,"Minutes, exp. week 2"
-minutes_w-2,0.1510773850267957,"Minutes, pre week 1"
-log_followers,0.1213979292217459,Followers (log)
-like_rate,0.1211602413414953,Likes per minute
-minutes_w-1,0.1128074337654262,"Minutes, pre week 2"
-minutes_per_session,0.1042904260839253,Minutes per session
-tenure_days,0.0962679545328647,Account tenure
-arm,0.0901322749205471,Experiment arm
-following_count,0.0890843092450272,Following count
-ctr,0.0882396482072795,Ad CTR
-posts_total,0.0846584399877788,Posts created
-active_days_w-2,0.0845067082818443,"Active days, pre week 1"
-engagement_trend,0.0842726319878651,Engagement trend
-activity_drop,0.0795978336763166,Activity drop
-friend_interactions_rate,0.0772914351994717,Friend interaction rate
-active_days_w0,0.0763145488286942,"Active days, exp. week 1"
-neg_feedback_rate,0.0757387208643536,Negative feedback rate
-friend_count,0.0727079198085016,Friend count
-age_group,0.0505364248984057,Age group
-account_type,0.0374658361967757,Account type
-device,0.0328349795952386,Device
-region,0.0265838661676986,Region
-acquisition_channel,0.0249777199241277,Acquisition channel
-active_days_w-1,0.0231070177334498,"Active days, pre week 2"
-is_new_user,0.0072987557252597,New user
+minutes_w0,0.2695181320647981,"Minutes, exp. week 1"
+minutes_w-1,0.2340157768268196,"Minutes, pre week 2"
+minutes_w-2,0.2248228239822334,"Minutes, pre week 1"
+minutes_w1,0.1932360050165978,"Minutes, exp. week 2"
+active_days_w0,0.136700805602388,"Active days, exp. week 1"
+arm,0.103860815848436,Experiment arm
+friend_interactions_rate,0.0985126919233291,Friend interaction rate
+minutes_per_session,0.0914136888560603,Minutes per session
+posts_total,0.088997592476976,Posts created
+friend_count,0.0871504881463098,Friend count
+tenure_days,0.0869898860210124,Account tenure
+log_followers,0.086942745884399,Followers (log)
+ctr,0.0791727011020855,Ad CTR
+like_rate,0.0753167398062732,Likes per minute
+engagement_trend,0.0737257607007945,Engagement trend
+active_days_w1,0.0718034231252311,"Active days, exp. week 2"
+acquisition_channel,0.0650586378947349,Acquisition channel
+neg_feedback_rate,0.0647408109626448,Negative feedback rate
+following_count,0.0636812073506897,Following count
+active_days_w-1,0.0487140220420274,"Active days, pre week 2"
+active_days_w-2,0.0359747145497724,"Active days, pre week 1"
+age_group,0.0340332897725539,Age group
+activity_drop,0.0241883079761223,Activity drop
+device,0.0207401429099628,Device
+region,0.0207158294067441,Region
+account_type,0.0196590157161514,Account type
+active_days_last3,0.0090055771416801,active days last3
+is_new_user,0.0036485289904861,New user

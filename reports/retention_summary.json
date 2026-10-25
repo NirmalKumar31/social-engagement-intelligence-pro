@@ -1,58 +1,164 @@
 {
   "survival": {
-    "logrank_p": 2.7852274365527774e-17,
-    "hr_ai_feed": 1.1885338866525026,
-    "hr_ai_feed_social": 0.8784334922756778,
-    "cox_concordance": 0.7279104779976965
+    "endpoint": "time to first 7-day lapse (start day), censored at day 21",
+    "events": {
+      "control": 2752,
+      "ai_feed": 2901,
+      "ai_feed_social": 2562
+    },
+    "logrank_p": 7.375513664038845e-08,
+    "hr_ai_feed": 1.076692907218417,
+    "hr_ai_feed_social": 0.9089193214114902,
+    "hr_ci": {
+      "ai_feed": [
+        1.022272556040467,
+        1.134010308312098
+      ],
+      "ai_feed_social": [
+        0.861587502397274,
+        0.958851341896783
+      ]
+    },
+    "ph_test_p": {
+      "ai_feed": 0.4458324364011431,
+      "ai_feed_social": 0.81833486895033
+    },
+    "cox_concordance": 0.7945657232396673,
+    "rmst_days": {
+      "control": 19.293830602997545,
+      "ai_feed": 19.183513869204305,
+      "ai_feed_social": 19.424458112196813
+    },
+    "rmst_diff_vs_control": {
+      "ai_feed": -0.11031673379324047,
+      "ai_feed_social": 0.13062750919926813
+    },
+    "rate_ratio": {
+      "ai_feed": {
+        "rate_ratio": 1.0777528271553944,
+        "ci": [
+          1.0229831068426785,
+          1.1354548757177836
+        ]
+      },
+      "ai_feed_social": {
+        "rate_ratio": 0.921121169681338,
+        "ci": [
+          0.8728666720188719,
+          0.9720433102030178
+        ]
+      }
+    },
+    "simulator_benchmark_hr_latent_quit": {
+      "ai_feed": 1.1678298846520123,
+      "ai_feed_social": 0.864640078786073
+    }
   },
   "churn_model": {
-    "cohort_size": 57297,
-    "base_churn_rate": 0.026196834040176625,
+    "task": "predict a 7-day lapse starting days 14-21 among users active on day 13",
+    "deployed_model": "Logistic regression",
+    "deployed_selected_by": "training cross-validated AUC",
+    "cohort_size": 42548,
+    "base_churn_rate": 0.03671147880041365,
+    "simulator_benchmark": {
+      "positives": 1562,
+      "already_quit_at_scoring": 0,
+      "permanent_quit_after_scoring": 1000,
+      "temporary_lapse": 562
+    },
     "cv_auc": {
-      "logistic": 0.8874178227481601,
-      "lightgbm": 0.8853206608403615
+      "logistic": 0.7923387429814941,
+      "lightgbm": 0.7784102835082531
     },
     "holdout": {
       "Logistic regression": {
-        "roc_auc": 0.8922354971458916,
-        "pr_auc": 0.24030159663571665,
-        "brier": 0.12027486901513447,
-        "log_loss": 0.4227398417803084,
-        "top_decile_lift": 6.555555555555555,
-        "top_decile_precision": 0.17161140197789412,
-        "cv_auc": 0.8874178227481601
+        "roc_auc": 0.7914684061799008,
+        "pr_auc": 0.18147731030445996,
+        "brier": 0.03262298156600123,
+        "log_loss": 0.13395067444523953,
+        "top_decile_lift": 4.475858764127678,
+        "top_decile_precision": 0.1644479248238058,
+        "cv_auc": 0.7923387429814941,
+        "deployed": 1
+      },
+      "Logistic (class-weighted)": {
+        "roc_auc": 0.7918528465581749,
+        "pr_auc": 0.1805243520440224,
+        "brier": 0.18265698960563811,
+        "log_loss": 0.5469724107660083,
+        "top_decile_lift": 4.475858764127678,
+        "top_decile_precision": 0.1644479248238058,
+        "cv_auc": 0.7923387429814941,
+        "deployed": 0
       },
       "LightGBM (raw)": {
-        "roc_auc": 0.895514005044471,
-        "pr_auc": 0.3605171921508597,
-        "brier": 0.02032184132767813,
-        "log_loss": 0.08309799950170633,
-        "top_decile_lift": 6.888888888888889,
-        "top_decile_precision": 0.18033740546829552,
-        "cv_auc": 0.8853206608403615
+        "roc_auc": 0.7716550739193706,
+        "pr_auc": 0.1694743760313429,
+        "brier": 0.03309082128546142,
+        "log_loss": 0.13812400487785284,
+        "top_decile_lift": 4.326663471990089,
+        "top_decile_precision": 0.15896632732967894,
+        "cv_auc": 0.7784102835082531,
+        "deployed": 0
       },
       "LightGBM + isotonic": {
-        "roc_auc": 0.8959763042612505,
-        "pr_auc": 0.3590046291006604,
-        "brier": 0.02029216008354762,
-        "log_loss": 0.08295619739506416,
-        "top_decile_lift": 6.925276002324231,
-        "top_decile_precision": 0.1812899477048228,
-        "cv_auc": 0.8853206608403615
+        "roc_auc": 0.7742435004085437,
+        "pr_auc": 0.17322307067823267,
+        "brier": 0.03288909358381914,
+        "log_loss": 0.13602632808868093,
+        "top_decile_lift": 4.49717237729019,
+        "top_decile_precision": 0.16523101018010963,
+        "cv_auc": 0.7784102835082531,
+        "deployed": 0
       }
     },
     "top_drivers": [
-      "recency_days",
       "minutes_w0",
-      "active_days_w1",
-      "minutes_w1",
+      "minutes_w-1",
       "minutes_w-2",
-      "log_followers",
-      "like_rate",
-      "minutes_w-1"
+      "minutes_w1",
+      "active_days_w0",
+      "arm",
+      "friend_interactions_rate",
+      "minutes_per_session"
     ],
-    "campaign_optimal_fraction": 0.09,
-    "campaign_optimal_profit_musd": 2.5276009912739967,
-    "campaign_recall_at_optimum": 0.6711111111111111
+    "campaign_rules": [
+      {
+        "rule": "Depth chosen on training OOF",
+        "threshold": 0.10411138761737905,
+        "share_targeted": 0.08491970231100666,
+        "test_value_musd": 1.5033959984332157,
+        "ci_low": 1.1241871567567565,
+        "ci_high": 1.8940976332158241
+      },
+      {
+        "rule": "Break-even rule (p > cost / (save x value))",
+        "threshold": 0.08771929824561403,
+        "share_targeted": 0.10716803760282022,
+        "test_value_musd": 1.565526411280846,
+        "ci_low": 1.1348066575793183,
+        "ci_high": 1.9723406220133175
+      },
+      {
+        "rule": "Send to nobody",
+        "threshold": null,
+        "share_targeted": 0.0,
+        "test_value_musd": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0
+      }
+    ],
+    "campaign_optimal_fraction": 0.08491970231100666,
+    "campaign_optimal_profit_musd": 1.5033959984332157,
+    "campaign_value_ci_musd": [
+      1.1241871567567565,
+      1.8940976332158241
+    ],
+    "campaign_assumptions": {
+      "cost": 0.6,
+      "save_rate": 0.18,
+      "value": 38.0,
+      "note": "save_rate is assumed, not measured; needs a randomised nudge holdout"
+    }
   }
 }

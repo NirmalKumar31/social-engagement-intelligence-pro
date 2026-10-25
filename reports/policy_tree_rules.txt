@@ -1,25 +1,25 @@
-Predicted annual value advantage (USD/user) of AI feed over AI+friend boost
-(positive = AI feed better for this leaf)
+Surrogate policy tree trained on TRAINING-user DR-learner predictions of the annual utility advantage
+of AI feed over AI+friend boost (positive = AI feed). Its own value is evaluated on held-out users.
 
-|--- friend_count <= 120.50
-|   |--- pre_minutes_per_day <= 7.78
-|   |   |--- tenure_days <= 302.00
-|   |   |   |--- value: [-0.03]
-|   |   |--- tenure_days >  302.00
-|   |   |   |--- value: [-2.44]
-|   |--- pre_minutes_per_day >  7.78
-|   |   |--- tenure_days <= 345.50
-|   |   |   |--- value: [0.47]
-|   |   |--- tenure_days >  345.50
-|   |   |   |--- value: [1.67]
-|--- friend_count >  120.50
-|   |--- pre_minutes_per_day <= 26.27
+|--- friend_count <= 119.50
+|   |--- pre_minutes_per_day <= 7.74
+|   |   |--- tenure_days <= 304.50
+|   |   |   |--- value: [-0.09]
+|   |   |--- tenure_days >  304.50
+|   |   |   |--- value: [-2.39]
+|   |--- pre_minutes_per_day >  7.74
 |   |   |--- is_creator <= 0.50
-|   |   |   |--- value: [-3.10]
+|   |   |   |--- value: [0.87]
 |   |   |--- is_creator >  0.50
-|   |   |   |--- value: [-1.25]
-|   |--- pre_minutes_per_day >  26.27
-|   |   |--- tenure_days <= 532.50
-|   |   |   |--- value: [-0.78]
-|   |   |--- tenure_days >  532.50
-|   |   |   |--- value: [2.07]
+|   |   |   |--- value: [2.36]
+|--- friend_count >  119.50
+|   |--- pre_minutes_per_day <= 27.12
+|   |   |--- is_creator <= 0.50
+|   |   |   |--- value: [-2.99]
+|   |   |--- is_creator >  0.50
+|   |   |   |--- value: [-1.02]
+|   |--- pre_minutes_per_day >  27.12
+|   |   |--- tenure_days <= 823.50
+|   |   |   |--- value: [0.03]
+|   |   |--- tenure_days >  823.50
+|   |   |   |--- value: [3.34]

@@ -1,0 +1,191 @@
+{
+  "started_utc": "2026-10-25T23:35:50+00:00",
+  "finished_utc": "2026-10-25T23:41:09+00:00",
+  "git_commit": "57b92b1ecbeb5e293f92bb47872bf95e518577ed",
+  "git_source_dirty": false,
+  "python": "3.12.3",
+  "packages": {
+    "pandas": "2.3.3",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "statsmodels": "0.15.0",
+    "lightgbm": "4.7.0",
+    "shap": "0.54.1",
+    "lifelines": "0.30.3",
+    "pyarrow": "26.0.0"
+  },
+  "config": {
+    "seed": 20261024,
+    "n_users": 60000,
+    "pre_days": 14,
+    "exp_days": 28,
+    "guardrails": {
+      "churned": [
+        "increase",
+        0.03,
+        "critical"
+      ],
+      "friend_interactions": [
+        "decrease",
+        0.03,
+        "standard"
+      ],
+      "neg_feedback_rate": [
+        "increase",
+        0.05,
+        "standard"
+      ],
+      "ad_ctr": [
+        "decrease",
+        0.03,
+        "standard"
+      ]
+    },
+    "monthly_base_churn": 0.035,
+    "mau": 40000000
+  },
+  "workdir": "/Users/nirmalkumar/Projects/social-engagement-intelligence-pro",
+  "stages": [
+    {
+      "stage": "simulate",
+      "status": "ran",
+      "seconds": 2.2
+    },
+    {
+      "stage": "features",
+      "status": "ran",
+      "seconds": 0.8
+    },
+    {
+      "stage": "experiment",
+      "status": "ran",
+      "seconds": 8.5
+    },
+    {
+      "stage": "oracle",
+      "status": "ran",
+      "seconds": 78.6
+    },
+    {
+      "stage": "hte",
+      "status": "ran",
+      "seconds": 26.4
+    },
+    {
+      "stage": "retention",
+      "status": "ran",
+      "seconds": 37.2
+    },
+    {
+      "stage": "nlp",
+      "status": "ran",
+      "seconds": 118.1
+    },
+    {
+      "stage": "virality",
+      "status": "ran",
+      "seconds": 13.7
+    },
+    {
+      "stage": "impact",
+      "status": "ran",
+      "seconds": 2.4
+    },
+    {
+      "stage": "powerbi",
+      "status": "ran",
+      "seconds": 31.2
+    },
+    {
+      "stage": "report",
+      "status": "ran",
+      "seconds": 0.0
+    }
+  ],
+  "inputs_sha256_16": {
+    "data/external/tweet_eval/test.parquet": "f73aea52d4387922",
+    "data/external/tweet_eval/train.parquet": "884ed7990ba4058a",
+    "data/external/tweet_eval/validation.parquet": "ba8e7513047d4991",
+    "data/external/uci_news/OnlineNewsPopularity/OnlineNewsPopularity.csv": "b66d9088632308cc",
+    "data/external/uci_news/OnlineNewsPopularity/OnlineNewsPopularity.names": "7a50337dec4e4539"
+  },
+  "outputs_sha256_16": {
+    "reports/EXECUTIVE_MEMO.md": "7dfd5042151b5238",
+    "reports/experiment_summary.json": "7951e20ab3b3d18c",
+    "reports/hte_summary.json": "2cae75268aa55f82",
+    "reports/impact_summary.json": "ff126ed398217395",
+    "reports/nlp_summary.json": "a07164a4cc48cbee",
+    "reports/policy_tree_rules.txt": "7d8803642303df98",
+    "reports/retention_summary.json": "a6b42e2acd9b6723",
+    "reports/tables/aa_pvalues.csv": "810fb78502b31122",
+    "reports/tables/balance_smd.csv": "416218412028a14e",
+    "reports/tables/bayesian_results.csv": "36214f8d36115fc7",
+    "reports/tables/cate_deciles.csv": "6ccff55de1c6e23a",
+    "reports/tables/churn_calibration.csv": "bfd117ac4fcf4390",
+    "reports/tables/churn_model_metrics.csv": "9ec4b78eea82223d",
+    "reports/tables/churn_roc.csv": "ad370298bb27b851",
+    "reports/tables/churn_shap_importance.csv": "b86fc7a9d0a5f8f4",
+    "reports/tables/content_exposure_summary.csv": "65e0c9fd309e3e57",
+    "reports/tables/cox_hazard_ratios.csv": "aa1369df96311f37",
+    "reports/tables/daily_lift.csv": "603415236226e89b",
+    "reports/tables/exposure_sensitivity.csv": "ffb9c97fce2b646a",
+    "reports/tables/hte_drivers_ai_feed.csv": "9877790df7242597",
+    "reports/tables/hte_drivers_ai_feed_social.csv": "530abc30b037ae30",
+    "reports/tables/impact_distribution.csv": "b1f7f24b37d9277a",
+    "reports/tables/impact_fan.csv": "8d4d57a8a719ca54",
+    "reports/tables/impact_monte_carlo.csv": "5258c44a0a4192c7",
+    "reports/tables/impact_param_draws.csv": "6f3268ebb9c87748",
+    "reports/tables/impact_scenarios.csv": "bd4fecc61144ab9c",
+    "reports/tables/impact_sensitivity.csv": "c3f403a76f29f9f1",
+    "reports/tables/km_survival.csv": "cb1d386f4556d418",
+    "reports/tables/metric_results.csv": "7c87a929a1cec347",
+    "reports/tables/policy_values.csv": "87e60159a4857f1c",
+    "reports/tables/power_mde.csv": "5b9d65a84e34d16c",
+    "reports/tables/qini_curves.csv": "823bf03eca6e6a60",
+    "reports/tables/quantile_effects.csv": "6808605261814f5f",
+    "reports/tables/retention_campaign_rules.csv": "c9db56799c859bd0",
+    "reports/tables/retention_profit_curve.csv": "6e2695587dac5478",
+    "reports/tables/segment_results.csv": "3ddb8308e1734f07",
+    "reports/tables/sentiment_confusion_matrix.csv": "a041999e9e5294de",
+    "reports/tables/sentiment_model_metrics.csv": "42dfeac63ddf982a",
+    "reports/tables/sequential_monitoring.csv": "7c4755229654773d",
+    "reports/tables/srm.csv": "37b28a541a43ccab",
+    "reports/tables/topic_exposure_by_arm.csv": "6461fbc1d14cb075",
+    "reports/tables/topic_info.csv": "855380aa943b98db",
+    "reports/tables/virality_playbook.csv": "695aa87f54711b22",
+    "reports/tables/virality_shap_importance.csv": "40ebc96b86a0a273",
+    "reports/tables/virality_weekly.csv": "300a640abd21c6d0",
+    "reports/virality_summary.json": "7ba05496c52f5a89",
+    "powerbi/data/balance_smd.csv": "922cee66806e4a63",
+    "powerbi/data/bayesian_results.csv": "a57a3c7183bd6cbf",
+    "powerbi/data/cate_deciles.csv": "0ce5fa5e55c09942",
+    "powerbi/data/churn_model_metrics.csv": "5e4873830d9f6961",
+    "powerbi/data/churn_shap_importance.csv": "72e2e5b6e03bdbb1",
+    "powerbi/data/content_exposure_summary.csv": "99394abef5746a9e",
+    "powerbi/data/cox_hazard_ratios.csv": "c64889293783f03a",
+    "powerbi/data/daily_lift.csv": "32c3f8e2ffd5e684",
+    "powerbi/data/dim_arm.csv": "57ffbf295d7953e0",
+    "powerbi/data/dim_date.csv": "6bec1a66914a443d",
+    "powerbi/data/fact_daily.csv": "9a4c97c8f7f11daf",
+    "powerbi/data/fact_user.csv": "192bfb4dc04a3e5f",
+    "powerbi/data/impact_distribution.csv": "c0b1981ce8debe63",
+    "powerbi/data/impact_fan.csv": "365b84727794c30e",
+    "powerbi/data/impact_monte_carlo.csv": "064ab5889a1ad7e5",
+    "powerbi/data/impact_sensitivity.csv": "daab82983799e60d",
+    "powerbi/data/km_survival.csv": "6e5860fa8895d672",
+    "powerbi/data/metric_results.csv": "fb6971d3574b2eb5",
+    "powerbi/data/policy_values.csv": "b999f11af14cb7ee",
+    "powerbi/data/power_mde.csv": "a35661ddeaa788bf",
+    "powerbi/data/qini_curves.csv": "58718298bf15cdb0",
+    "powerbi/data/retention_profit_curve.csv": "508baeff0f8130f3",
+    "powerbi/data/segment_results.csv": "187ea190c6cc1e06",
+    "powerbi/data/sentiment_model_metrics.csv": "bb9558c01e07c0f9",
+    "powerbi/data/sequential_monitoring.csv": "5e7d02c5fefd5a9e",
+    "powerbi/data/topic_exposure_by_arm.csv": "e95dd7a28c122df5",
+    "powerbi/data/topic_info.csv": "7b7ceb47c9bef7e1",
+    "powerbi/data/virality_playbook.csv": "caf0e9d5119d2bfc",
+    "powerbi/data/virality_shap_importance.csv": "ad9d21e808057d10",
+    "powerbi/data/virality_weekly.csv": "f70152ff3d84c7da"
+  }
+}

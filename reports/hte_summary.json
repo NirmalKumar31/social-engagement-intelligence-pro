@@ -1,75 +1,153 @@
 {
   "ai_feed": {
-    "mean_cate_usd": 2.155394748790901,
+    "mean_cate": 2.155394748790901,
+    "mean_oracle_cate": 2.4550864419417313,
     "share_positive": 0.6068571428571429,
-    "spearman_vs_truth_dr": 0.3905546509963987,
-    "spearman_vs_truth_t": 0.36037085930372403,
-    "qini_auc_ratio_DR-learner": 1.2079514859541367,
-    "qini_auc_ratio_T-learner": 1.2703494063990943
+    "share_positive_oracle": 0.6213333333333333,
+    "oracle_dr": {
+      "spearman": 0.1917652318523189,
+      "rmse": 9.569592583844994,
+      "rmse_noise_corrected": 6.232733584587589,
+      "bias": -0.2996916931508302,
+      "decile_calibration_slope": 0.3025430936313191
+    },
+    "oracle_t": {
+      "spearman": 0.16650277208703246,
+      "rmse": 10.261016898525254,
+      "rmse_noise_corrected": 7.249712649994191,
+      "bias": -0.2174063133880905,
+      "decile_calibration_slope": 0.232052586756672
+    },
+    "oracle_note": "oracle = mean over 16 common-seed re-simulations per user; per-user MC error reported",
+    "gain_area_ratio_DR-learner": 1.2096688389843293,
+    "gain_area_ratio_T-learner": 1.2717236034009967
   },
   "ai_feed_social": {
-    "mean_cate_usd": 2.743672448945401,
+    "mean_cate": 2.743672448945401,
+    "mean_oracle_cate": 2.720936219640137,
     "share_positive": 0.7015238095238095,
-    "spearman_vs_truth_dr": 0.26023440474299997,
-    "spearman_vs_truth_t": 0.22888961996573612,
-    "qini_auc_ratio_DR-learner": 1.0032734250130388,
-    "qini_auc_ratio_T-learner": 0.9207256807724815
+    "share_positive_oracle": 0.6556190476190477,
+    "oracle_dr": {
+      "spearman": 0.07557039477546967,
+      "rmse": 8.64134399193993,
+      "rmse_noise_corrected": 5.157060566604038,
+      "bias": 0.02273622930526411,
+      "decile_calibration_slope": 0.13113081589867248
+    },
+    "oracle_t": {
+      "spearman": 0.0751093769046263,
+      "rmse": 9.295932271130285,
+      "rmse_noise_corrected": 6.191672188514788,
+      "bias": 0.03925241557538754,
+      "decile_calibration_slope": 0.10627390890470033
+    },
+    "oracle_note": "oracle = mean over 16 common-seed re-simulations per user; per-user MC error reported",
+    "gain_area_ratio_DR-learner": 1.0031330832777614,
+    "gain_area_ratio_T-learner": 0.9203522815222209
   },
   "policies": [
     {
       "policy": "Ship nothing (control)",
-      "value_per_user_usd": 26.918727169828543,
+      "value_per_user_usd": 27.03024761096069,
+      "uplift_vs_control_usd": 0.0,
       "uplift_ci_low": 0.0,
       "uplift_ci_high": 0.0,
+      "diff_vs_friend_boost_usd": -2.1705133371345156,
+      "diff_vs_fb_ci_low": -3.87590652090498,
+      "diff_vs_fb_ci_high": -0.604605178760511,
+      "share_draws_beating_fb": 0.005,
+      "oracle_value_per_user": 26.394657475252767,
+      "oracle_regret_per_user": 6.075192120625882,
       "share_ai_feed": 0.0,
       "share_ai_feed_social": 0.0,
       "share_control": 1.0,
-      "uplift_vs_control_usd": 0.0,
       "annual_value_at_scale_musd": 0.0
     },
     {
       "policy": "Ship AI feed to all",
-      "value_per_user_usd": 28.652250445041258,
-      "uplift_ci_low": 0.615933464076473,
-      "uplift_ci_high": 3.0970342311780663,
+      "value_per_user_usd": 28.304330261065758,
+      "uplift_vs_control_usd": 1.2740826501050684,
+      "uplift_ci_low": -0.2353317562498538,
+      "uplift_ci_high": 2.841960314490012,
+      "diff_vs_friend_boost_usd": -0.8964306870294472,
+      "diff_vs_fb_ci_low": -2.5292608810092245,
+      "diff_vs_fb_ci_high": 0.6604743860094868,
+      "share_draws_beating_fb": 0.127,
+      "oracle_value_per_user": 28.8497439171945,
+      "oracle_regret_per_user": 3.6201056786841512,
       "share_ai_feed": 1.0,
       "share_ai_feed_social": 0.0,
       "share_control": 0.0,
-      "uplift_vs_control_usd": 1.7335232752127148,
-      "annual_value_at_scale_musd": 69.34093100850859
+      "annual_value_at_scale_musd": 50.963306004202735
     },
     {
       "policy": "Ship AI + friend boost to all",
-      "value_per_user_usd": 28.96900887707858,
-      "uplift_ci_low": 0.8722674120865497,
-      "uplift_ci_high": 3.4268405064912564,
+      "value_per_user_usd": 29.200760948095205,
+      "uplift_vs_control_usd": 2.1705133371345156,
+      "uplift_ci_low": 0.604605178760511,
+      "uplift_ci_high": 3.8759065209049797,
+      "diff_vs_friend_boost_usd": 0.0,
+      "diff_vs_fb_ci_low": 0.0,
+      "diff_vs_fb_ci_high": 0.0,
+      "share_draws_beating_fb": 0.0,
+      "oracle_value_per_user": 29.115593694892905,
+      "oracle_regret_per_user": 3.354255900985745,
       "share_ai_feed": 0.0,
       "share_ai_feed_social": 1.0,
       "share_control": 0.0,
-      "uplift_vs_control_usd": 2.0502817072500363,
-      "annual_value_at_scale_musd": 82.01126829000145
+      "annual_value_at_scale_musd": 86.82053348538062
     },
     {
       "policy": "Rule: AI feed <35, friend boost 35+",
-      "value_per_user_usd": 28.838651748990078,
-      "uplift_ci_low": 0.782192575767972,
-      "uplift_ci_high": 3.2437797121849847,
+      "value_per_user_usd": 29.209815125737872,
+      "uplift_vs_control_usd": 2.179567514777183,
+      "uplift_ci_low": 0.6329706674641781,
+      "uplift_ci_high": 3.856387396830825,
+      "diff_vs_friend_boost_usd": 0.009054177642667582,
+      "diff_vs_fb_ci_low": -1.2667025818318751,
+      "diff_vs_fb_ci_high": 1.302895838353438,
+      "share_draws_beating_fb": 0.51,
+      "oracle_value_per_user": 29.31079637520662,
+      "oracle_regret_per_user": 3.1590532206720283,
       "share_ai_feed": 0.6021904761904762,
       "share_ai_feed_social": 0.39780952380952384,
       "share_control": 0.0,
-      "uplift_vs_control_usd": 1.9199245791615347,
-      "annual_value_at_scale_musd": 76.79698316646139
+      "annual_value_at_scale_musd": 87.18270059108733
+    },
+    {
+      "policy": "Policy tree (trained on train)",
+      "value_per_user_usd": 29.164804113706573,
+      "uplift_vs_control_usd": 2.134556502745884,
+      "uplift_ci_low": 0.6296549808325644,
+      "uplift_ci_high": 3.7239588383711144,
+      "diff_vs_friend_boost_usd": -0.03595683438863162,
+      "diff_vs_fb_ci_low": -1.5597982099712953,
+      "diff_vs_fb_ci_high": 1.3164921043984583,
+      "share_draws_beating_fb": 0.487,
+      "oracle_value_per_user": 29.569045407623307,
+      "oracle_regret_per_user": 2.900804188255343,
+      "share_ai_feed": 0.515095238095238,
+      "share_ai_feed_social": 0.4849047619047619,
+      "share_control": 0.0,
+      "annual_value_at_scale_musd": 85.38226010983536
     },
     {
       "policy": "Model-targeted (DR-learner)",
-      "value_per_user_usd": 29.10771364074199,
-      "uplift_ci_low": 1.135853964769707,
-      "uplift_ci_high": 3.380838499799441,
+      "value_per_user_usd": 28.9577502240818,
+      "uplift_vs_control_usd": 1.92750261312111,
+      "uplift_ci_low": 0.34477244991750783,
+      "uplift_ci_high": 3.4441777714918813,
+      "diff_vs_friend_boost_usd": -0.24301072401340562,
+      "diff_vs_fb_ci_low": -1.4593173288170507,
+      "diff_vs_fb_ci_high": 0.9090312797944731,
+      "share_draws_beating_fb": 0.352,
+      "oracle_value_per_user": 29.014486557532212,
+      "oracle_regret_per_user": 3.4553630383464373,
       "share_ai_feed": 0.36528571428571427,
       "share_ai_feed_social": 0.46195238095238095,
       "share_control": 0.17276190476190476,
-      "uplift_vs_control_usd": 2.1889864709134486,
-      "annual_value_at_scale_musd": 87.55945883653794
+      "annual_value_at_scale_musd": 77.1001045248444
     }
-  ]
+  ],
+  "oracle_best_value_per_user": 32.46984959587865
 }

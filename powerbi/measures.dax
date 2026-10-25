@@ -42,7 +42,7 @@ Negative Feedback per 100 Min =
 
 // [Lift vs Control]  format: 0.00
 Minutes per User-Day (Control) =
-    CALCULATE([Minutes per User-Day], dim_arm[arm] = "control")
+    CALCULATE([Minutes per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")
 
 // [Lift vs Control]  format: +0.0%;-0.0%;0.0%
 Minutes Lift vs Control =
@@ -50,11 +50,11 @@ Minutes Lift vs Control =
 
 // [Lift vs Control]  format: +0.0%;-0.0%;0.0%
 Revenue Lift vs Control =
-    DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], dim_arm[arm] = "control")) - 1
+    DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")) - 1
 
 // [Lift vs Control]  format: +0.0%;-0.0%;0.0%
 Friend Interactions Lift vs Control =
-    DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], dim_arm[arm] = "control")) - 1
+    DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")) - 1
 
 // [Retention]  format: 0.00%
 Churn Rate =
@@ -62,7 +62,7 @@ Churn Rate =
 
 // [Retention]  format: 0.00%
 Churn Rate (Control) =
-    CALCULATE([Churn Rate], dim_arm[arm] = "control")
+    CALCULATE([Churn Rate], REMOVEFILTERS(dim_arm), dim_arm[arm] = "control")
 
 // [Retention]  format: +0.00;-0.00;0.00
 Churn Change vs Control (pp) =
@@ -101,7 +101,7 @@ AI Feed 12M Value ($M) =
     CALCULATE(MAX(impact_monte_carlo[p50_musd]), impact_monte_carlo[comparison] = "AI feed vs control")
 
 // [Headline KPIs]  format: 0.0%
-P(Friend Boost Beats AI Feed) =
+Share of Draws FB Beats AI =
     CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = "Friend boost minus AI feed")
 
 // [Headline KPIs]  format: 0
@@ -118,4 +118,4 @@ Best Policy Uplift ($/user/yr) =
 
 // [Headline KPIs]  format: 0.000
 Churn Model AUC =
-    CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[model] = "LightGBM + isotonic")
+    CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[deployed] = 1)

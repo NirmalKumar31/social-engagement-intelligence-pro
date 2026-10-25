@@ -1,87 +1,204 @@
 {
-  "inputs": {
-    "rev_per_alive_user_month": 2.7352426052093506,
+  "method": "12-month revenue scenario model under explicit assumptions.\n\nDecomposition (one coherent endpoint, the 7-day lapse from retention.py):\n    monthly revenue of a cohort = users not yet lapsed (t)  x  revenue per not-lapsed user-month\n  * revenue rate   = ad revenue / person-days at risk, post-novelty window (days 14-27), counting only\n                     days before a user's first lapse. Treatment changes it by (1 + rev_lift).\n  * lapse hazard   = lapses / person-days at risk over days 0-21; treatment multiplies it by the rate ratio.\nBoth parameters come from the SAME bootstrap resample of users per draw, with the control arm resampled\nonce and shared by both contrasts, so their joint and shared-control dependence is kept.\n\nTransport assumptions (not identified by a 4-week test and shown as scenarios, not as uncertainty):\n  * a monthly base lapse rate for the full population (config.MONTHLY_BASE_CHURN),\n  * whether the 4-week effects persist, half-decay or fade by month 12.\n\"Share of draws > 0\" is a fraction of simulations under these assumptions, not an empirical probability.",
+  "point": {
+    "base_rate": 0.09357440629365026,
     "ai_feed": {
-      "rev_lift": 0.08860256632075014,
-      "rev_lift_se": 0.006670407522761733,
-      "log_hr": 0.17272051952986728,
-      "log_hr_se": 0.032311064233084705
+      "rev_lift": 0.09767640479581563,
+      "rate_ratio": 1.0777528271553944
     },
     "ai_feed_social": {
-      "rev_lift": 0.07106882715749399,
-      "rev_lift_se": 0.006377582472563402,
-      "log_hr": -0.129615080224611,
-      "log_hr_se": 0.03436854954657619
+      "rev_lift": 0.05944207545270652,
+      "rate_ratio": 0.921121169681338
     }
   },
+  "rev_per_at_risk_user_month": 2.8446619513269678,
+  "param_ci": {
+    "ai_feed": {
+      "rev_lift": [
+        0.07482781555325634,
+        0.12114094508983723
+      ],
+      "rate_ratio": [
+        1.0244012468233537,
+        1.1314346861984665
+      ]
+    },
+    "ai_feed_social": {
+      "rev_lift": [
+        0.03860956826289602,
+        0.08237349933841447
+      ],
+      "rate_ratio": [
+        0.8711732139466228,
+        0.9774512238577735
+      ]
+    }
+  },
+  "param_correlation_rev_vs_hazard": {
+    "ai_feed": -0.010455376765885885,
+    "ai_feed_social": -0.07280968209512097
+  },
+  "cross_arm_rev_lift_correlation": 0.5428136776224519,
   "results": [
     {
       "comparison": "AI feed vs control",
-      "p05_musd": 39.39525842475506,
-      "p50_musd": 56.81455878053999,
-      "p95_musd": 74.05981722084066,
-      "mean_musd": 56.809117554181626,
+      "p05_musd": 70.19723254468214,
+      "p50_musd": 92.52722516404091,
+      "p95_musd": 117.11509617794675,
+      "mean_musd": 93.07468059910231,
       "prob_positive": 1.0
     },
     {
       "comparison": "AI + friend boost vs control",
-      "p05_musd": 87.49348432379523,
-      "p50_musd": 103.26661960567893,
-      "p95_musd": 119.03957459240394,
-      "mean_musd": 103.26744418078361,
+      "p05_musd": 60.491146912732304,
+      "p50_musd": 84.32072657622302,
+      "p95_musd": 108.99193208568562,
+      "mean_musd": 84.52109210725472,
       "prob_positive": 1.0
     },
     {
       "comparison": "Friend boost minus AI feed",
-      "p05_musd": 22.765701918943513,
-      "p50_musd": 46.44477515595425,
-      "p95_musd": 69.74233345654567,
-      "mean_musd": 46.45832662660199,
-      "prob_positive": 0.99965
+      "p05_musd": -32.094083390675394,
+      "p50_musd": -8.634072907040238,
+      "p95_musd": 14.492034609811201,
+      "mean_musd": -8.553588491847586,
+      "prob_positive": 0.272
+    }
+  ],
+  "scenarios": [
+    {
+      "persistence": "persist",
+      "comparison": "AI feed vs control",
+      "p05_musd": 70.19723254468214,
+      "p50_musd": 92.52722516404091,
+      "p95_musd": 117.11509617794675,
+      "mean_musd": 93.07468059910231,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "persist",
+      "comparison": "AI + friend boost vs control",
+      "p05_musd": 60.491146912732304,
+      "p50_musd": 84.32072657622302,
+      "p95_musd": 108.99193208568562,
+      "mean_musd": 84.52109210725472,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "persist",
+      "comparison": "Friend boost minus AI feed",
+      "p05_musd": -32.094083390675394,
+      "p50_musd": -8.634072907040238,
+      "p95_musd": 14.492034609811201,
+      "mean_musd": -8.553588491847586,
+      "prob_positive": 0.272
+    },
+    {
+      "persistence": "half-decay by month 12",
+      "comparison": "AI feed vs control",
+      "p05_musd": 52.8140064121834,
+      "p50_musd": 70.0369568915528,
+      "p95_musd": 89.4370902698021,
+      "mean_musd": 70.50860698375173,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "half-decay by month 12",
+      "comparison": "AI + friend boost vs control",
+      "p05_musd": 47.72806722044882,
+      "p50_musd": 65.93901872853314,
+      "p95_musd": 85.24799908824349,
+      "mean_musd": 66.16668165280684,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "half-decay by month 12",
+      "comparison": "Friend boost minus AI feed",
+      "p05_musd": -22.792643429400073,
+      "p50_musd": -4.4829607880681746,
+      "p95_musd": 13.651618033657394,
+      "mean_musd": -4.3419253309448775,
+      "prob_positive": 0.36
+    },
+    {
+      "persistence": "fade to zero by month 12",
+      "comparison": "AI feed vs control",
+      "p05_musd": 34.85081194233078,
+      "p50_musd": 47.42673847737074,
+      "p95_musd": 61.47391888837179,
+      "mean_musd": 47.77977928453336,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "fade to zero by month 12",
+      "comparison": "AI + friend boost vs control",
+      "p05_musd": 34.50813043083445,
+      "p50_musd": 47.788772480672,
+      "p95_musd": 61.65793711691388,
+      "mean_musd": 47.93484106870293,
+      "prob_positive": 1.0
+    },
+    {
+      "persistence": "fade to zero by month 12",
+      "comparison": "Friend boost minus AI feed",
+      "p05_musd": -13.251353916856122,
+      "p50_musd": 0.20648853038322926,
+      "p95_musd": 13.508513400058364,
+      "mean_musd": 0.15506178416957286,
+      "prob_positive": 0.507
     }
   ],
   "sensitivity": [
     {
-      "assumption": "Friend-boost churn HR at 95% CI low / high",
-      "low_musd": 58.88567938552332,
-      "high_musd": 33.132977178903104,
-      "central_musd": 46.3419566249907,
-      "swing": 25.752702206620214
-    },
-    {
-      "assumption": "AI-feed revenue lift at 95% CI low / high",
-      "low_musd": 60.086278723722934,
-      "high_musd": 32.59763452625799,
-      "central_musd": 46.3419566249907,
-      "swing": 27.488644197464943
-    },
-    {
       "assumption": "Revenue per user -30% / +30%",
-      "low_musd": 32.43936842566848,
-      "high_musd": 60.24454078489614,
-      "central_musd": 46.3419566249907,
-      "swing": 27.80517235922766
-    },
-    {
-      "assumption": "AI-feed churn HR at 95% CI low / high",
-      "low_musd": 31.33740707140064,
-      "high_musd": 62.01525545871329,
-      "central_musd": 46.3419566249907,
-      "swing": 30.67784838731265
+      "low_musd": -6.081111102141619,
+      "high_musd": -11.293492046833991,
+      "central_musd": -8.687301574488163,
+      "swing": 5.212380944692373
     },
     {
       "assumption": "Eligible MAU 20M / 60M",
-      "low_musd": 23.17097831249535,
-      "high_musd": 69.51293493748545,
-      "central_musd": 46.3419566249907,
-      "swing": 46.341956624990104
+      "low_musd": -4.343650787244082,
+      "high_musd": -13.03095236173153,
+      "central_musd": -8.687301574488163,
+      "swing": 8.687301574487448
     },
     {
-      "assumption": "Monthly base churn 2% / 6%",
-      "low_musd": 21.11498535467696,
-      "high_musd": 76.50727436254024,
-      "central_musd": 46.3419566249907,
-      "swing": 55.39228900786328
+      "assumption": "Effects persist / fade by month 12",
+      "low_musd": -8.687301574488163,
+      "high_musd": 0.09437727806282044,
+      "central_musd": -8.687301574488163,
+      "swing": 8.781678852550984
+    },
+    {
+      "assumption": "Friend-boost lapse rate ratio 2.5% / 97.5%",
+      "low_musd": 2.438571313357115,
+      "high_musd": -21.05970029520631,
+      "central_musd": -8.687301574488163,
+      "swing": 23.498271608563424
+    },
+    {
+      "assumption": "AI-feed lapse rate ratio 2.5% / 97.5%",
+      "low_musd": -20.506793216607807,
+      "high_musd": 3.039156558155775,
+      "central_musd": -8.687301574488163,
+      "swing": 23.54594977476358
+    },
+    {
+      "assumption": "Monthly base lapse 2% / 6%",
+      "low_musd": -24.84661442331791,
+      "high_musd": 11.55145191317761,
+      "central_musd": -8.687301574488163,
+      "swing": 36.39806633649552
+    },
+    {
+      "assumption": "AI-feed revenue lift 2.5% / 97.5%",
+      "low_musd": 16.794089378479242,
+      "high_musd": -34.8556185071547,
+      "central_musd": -8.687301574488163,
+      "swing": 51.649707885633944
     }
-  ]
+  ],
+  "joint_stress_fb_minus_ai_musd": -94.4788681134274,
+  "n_boot": 1000
 }

@@ -1143,11 +1143,11 @@
             "formatString": "#,0.0000"
           },
           {
-            "name": "p_always_valid",
+            "name": "p_mixture",
             "dataType": "double",
-            "sourceColumn": "p_always_valid",
+            "sourceColumn": "p_mixture",
             "summarizeBy": "sum",
-            "lineageTag": "18a7bbe1-298f-5327-9757-769b4758279b",
+            "lineageTag": "503d37b6-5590-5d31-869c-5db0cfd08f2c",
             "formatString": "#,0.0000"
           }
         ],
@@ -1162,7 +1162,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"sequential_monitoring.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"day\", Int64.Type}, {\"diff\", type number}, {\"se\", type number}, {\"p_naive\", type number}, {\"p_always_valid\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"day\", Int64.Type}, {\"diff\", type number}, {\"se\", type number}, {\"p_naive\", type number}, {\"p_mixture\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1267,9 +1267,9 @@
           },
           {
             "name": "balanced",
-            "dataType": "string",
+            "dataType": "int64",
             "sourceColumn": "balanced",
-            "summarizeBy": "none",
+            "summarizeBy": "sum",
             "lineageTag": "eb22891b-a000-5722-8273-0d332f4d2e28"
           }
         ],
@@ -1284,7 +1284,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"balance_smd.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"covariate\", type text}, {\"smd\", type number}, {\"balanced\", type text}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"covariate\", type text}, {\"smd\", type number}, {\"balanced\", Int64.Type}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1569,6 +1569,13 @@
             "summarizeBy": "sum",
             "lineageTag": "8302ede4-abdb-55cd-a1b4-fcd8ac29012e",
             "formatString": "#,0.0000"
+          },
+          {
+            "name": "deployed",
+            "dataType": "int64",
+            "sourceColumn": "deployed",
+            "summarizeBy": "sum",
+            "lineageTag": "97e068bd-7bbb-5be3-a0ca-df2c91c1a891"
           }
         ],
         "partitions": [
@@ -1582,7 +1589,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"churn_model_metrics.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"roc_auc\", type number}, {\"pr_auc\", type number}, {\"brier\", type number}, {\"log_loss\", type number}, {\"top_decile_lift\", type number}, {\"top_decile_precision\", type number}, {\"cv_auc\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"model\", type text}, {\"roc_auc\", type number}, {\"pr_auc\", type number}, {\"brier\", type number}, {\"log_loss\", type number}, {\"top_decile_lift\", type number}, {\"top_decile_precision\", type number}, {\"cv_auc\", type number}, {\"deployed\", Int64.Type}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1679,11 +1686,19 @@
             "formatString": "0.0%"
           },
           {
-            "name": "profit_test_usd",
+            "name": "threshold",
             "dataType": "double",
-            "sourceColumn": "profit_test_usd",
+            "sourceColumn": "threshold",
             "summarizeBy": "sum",
-            "lineageTag": "7980f0ce-2cf7-5585-a190-09ec1bcdbcaa",
+            "lineageTag": "7c60e969-4552-53f3-9d4f-c62bf564cbe7",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "profit_usd",
+            "dataType": "double",
+            "sourceColumn": "profit_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "9042682e-2c52-5670-96db-098e4de46b37",
             "formatString": "#,0.0000"
           },
           {
@@ -1693,6 +1708,14 @@
             "summarizeBy": "sum",
             "lineageTag": "e1046a34-887e-5241-8436-fcc0febffcca",
             "formatString": "$#,0.0"
+          },
+          {
+            "name": "profit_test_usd",
+            "dataType": "double",
+            "sourceColumn": "profit_test_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "7980f0ce-2cf7-5585-a190-09ec1bcdbcaa",
+            "formatString": "#,0.0000"
           }
         ],
         "partitions": [
@@ -1706,7 +1729,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"retention_profit_curve.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"users_targeted\", Int64.Type}, {\"churners_caught\", Int64.Type}, {\"recall\", type number}, {\"precision\", type number}, {\"profit_test_usd\", type number}, {\"profit_at_scale_musd\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"fraction_targeted\", type number}, {\"users_targeted\", Int64.Type}, {\"churners_caught\", Int64.Type}, {\"recall\", type number}, {\"precision\", type number}, {\"threshold\", type number}, {\"profit_usd\", type number}, {\"profit_at_scale_musd\", type number}, {\"profit_test_usd\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1734,6 +1757,14 @@
             "formatString": "#,0.0000"
           },
           {
+            "name": "uplift_vs_control_usd",
+            "dataType": "double",
+            "sourceColumn": "uplift_vs_control_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "247898ca-3387-5230-abbb-35548982b219",
+            "formatString": "$0.00"
+          },
+          {
             "name": "uplift_ci_low",
             "dataType": "double",
             "sourceColumn": "uplift_ci_low",
@@ -1747,6 +1778,54 @@
             "sourceColumn": "uplift_ci_high",
             "summarizeBy": "sum",
             "lineageTag": "9ff0ed59-7176-5c20-b3e4-98357d93cd80",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "diff_vs_friend_boost_usd",
+            "dataType": "double",
+            "sourceColumn": "diff_vs_friend_boost_usd",
+            "summarizeBy": "sum",
+            "lineageTag": "e0a4b22f-cfc5-5f4d-8907-d158001e6bc1",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "diff_vs_fb_ci_low",
+            "dataType": "double",
+            "sourceColumn": "diff_vs_fb_ci_low",
+            "summarizeBy": "sum",
+            "lineageTag": "4867989f-98b0-534d-a9a5-29631e9f44e6",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "diff_vs_fb_ci_high",
+            "dataType": "double",
+            "sourceColumn": "diff_vs_fb_ci_high",
+            "summarizeBy": "sum",
+            "lineageTag": "96d66bab-ed1c-5036-9fdd-9ba898b9c330",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "share_draws_beating_fb",
+            "dataType": "double",
+            "sourceColumn": "share_draws_beating_fb",
+            "summarizeBy": "sum",
+            "lineageTag": "303bede6-8a90-532d-8ffd-5ea27a1ca259",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "oracle_value_per_user",
+            "dataType": "double",
+            "sourceColumn": "oracle_value_per_user",
+            "summarizeBy": "sum",
+            "lineageTag": "fa53881c-562a-5480-9040-825541e49786",
+            "formatString": "#,0.0000"
+          },
+          {
+            "name": "oracle_regret_per_user",
+            "dataType": "double",
+            "sourceColumn": "oracle_regret_per_user",
+            "summarizeBy": "sum",
+            "lineageTag": "d84cf0c1-7079-5c2b-8bc8-ab5eb1664458",
             "formatString": "#,0.0000"
           },
           {
@@ -1772,14 +1851,6 @@
             "summarizeBy": "sum",
             "lineageTag": "0bcdabef-f76b-5447-9904-6c205c1dafde",
             "formatString": "0.0%"
-          },
-          {
-            "name": "uplift_vs_control_usd",
-            "dataType": "double",
-            "sourceColumn": "uplift_vs_control_usd",
-            "summarizeBy": "sum",
-            "lineageTag": "247898ca-3387-5230-abbb-35548982b219",
-            "formatString": "$0.00"
           },
           {
             "name": "annual_value_at_scale_musd",
@@ -1808,7 +1879,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"policy_values.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"uplift_vs_control_usd\", type number}, {\"annual_value_at_scale_musd\", type number}, {\"Policy name\", type text}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"policy\", type text}, {\"value_per_user_usd\", type number}, {\"uplift_vs_control_usd\", type number}, {\"uplift_ci_low\", type number}, {\"uplift_ci_high\", type number}, {\"diff_vs_friend_boost_usd\", type number}, {\"diff_vs_fb_ci_low\", type number}, {\"diff_vs_fb_ci_high\", type number}, {\"share_draws_beating_fb\", type number}, {\"oracle_value_per_user\", type number}, {\"oracle_regret_per_user\", type number}, {\"share_ai_feed\", type number}, {\"share_ai_feed_social\", type number}, {\"share_control\", type number}, {\"annual_value_at_scale_musd\", type number}, {\"Policy name\", type text}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -1913,6 +1984,14 @@
             "formatString": "$0.00"
           },
           {
+            "name": "oracle_cate",
+            "dataType": "double",
+            "sourceColumn": "oracle_cate",
+            "summarizeBy": "sum",
+            "lineageTag": "c3aeb1ac-0636-5c0c-93f7-e2be0cd5b4e3",
+            "formatString": "#,0.0000"
+          },
+          {
             "name": "share_35_plus",
             "dataType": "double",
             "sourceColumn": "share_35_plus",
@@ -1932,7 +2011,7 @@
                 "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com\", [RelativePath = DataPath & \"cate_deciles.csv\"]), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
                 "    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
                 "    Blanks = Table.TransformColumns(Promoted, {}, each if _ = \"\" then null else _),",
-                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"decile\", Int64.Type}, {\"predicted_cate\", type number}, {\"observed_uplift\", type number}, {\"share_35_plus\", type number}}, \"en-US\")",
+                "    Typed = Table.TransformColumnTypes(Blanks, {{\"arm\", type text}, {\"decile\", Int64.Type}, {\"predicted_cate\", type number}, {\"observed_uplift\", type number}, {\"oracle_cate\", type number}, {\"share_35_plus\", type number}}, \"en-US\")",
                 "in",
                 "    Typed"
               ]
@@ -2928,7 +3007,7 @@
           },
           {
             "name": "Minutes per User-Day (Control)",
-            "expression": "CALCULATE([Minutes per User-Day], dim_arm[arm] = \"control\")",
+            "expression": "CALCULATE([Minutes per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = \"control\")",
             "formatString": "0.00",
             "displayFolder": "Lift vs Control",
             "lineageTag": "6dc35e46-6b28-532c-afa5-51173dedb466"
@@ -2942,14 +3021,14 @@
           },
           {
             "name": "Revenue Lift vs Control",
-            "expression": "DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], dim_arm[arm] = \"control\")) - 1",
+            "expression": "DIVIDE([Revenue per User-Day], CALCULATE([Revenue per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = \"control\")) - 1",
             "formatString": "+0.0%;-0.0%;0.0%",
             "displayFolder": "Lift vs Control",
             "lineageTag": "b36cbe80-a7ef-5bd3-94ca-1fbe6f4a1e71"
           },
           {
             "name": "Friend Interactions Lift vs Control",
-            "expression": "DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], dim_arm[arm] = \"control\")) - 1",
+            "expression": "DIVIDE([Friend Interactions per User-Day], CALCULATE([Friend Interactions per User-Day], REMOVEFILTERS(dim_arm), dim_arm[arm] = \"control\")) - 1",
             "formatString": "+0.0%;-0.0%;0.0%",
             "displayFolder": "Lift vs Control",
             "lineageTag": "2380d73f-7ce2-5d27-a5ee-198f5c797298"
@@ -2963,7 +3042,7 @@
           },
           {
             "name": "Churn Rate (Control)",
-            "expression": "CALCULATE([Churn Rate], dim_arm[arm] = \"control\")",
+            "expression": "CALCULATE([Churn Rate], REMOVEFILTERS(dim_arm), dim_arm[arm] = \"control\")",
             "formatString": "0.00%",
             "displayFolder": "Retention",
             "lineageTag": "0ee2404e-ce1b-57fb-b43a-97433a16a1c3"
@@ -3032,11 +3111,11 @@
             "lineageTag": "34d3b3fd-4e73-58c1-bd86-aa2e3aeeb15b"
           },
           {
-            "name": "P(Friend Boost Beats AI Feed)",
+            "name": "Share of Draws FB Beats AI",
             "expression": "CALCULATE(MAX(impact_monte_carlo[prob_positive]), impact_monte_carlo[comparison] = \"Friend boost minus AI feed\")",
             "formatString": "0.0%",
             "displayFolder": "Headline KPIs",
-            "lineageTag": "307c900d-e6bf-5d9f-801c-34d0dc73367b"
+            "lineageTag": "c0437f78-ce48-5bc5-b311-4471ecb67243"
           },
           {
             "name": "Significant Wins",
@@ -3061,7 +3140,7 @@
           },
           {
             "name": "Churn Model AUC",
-            "expression": "CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[model] = \"LightGBM + isotonic\")",
+            "expression": "CALCULATE(MAX(churn_model_metrics[roc_auc]), churn_model_metrics[deployed] = 1)",
             "formatString": "0.000",
             "displayFolder": "Headline KPIs",
             "lineageTag": "18d55ac5-ff22-5fe1-a948-af36dd6ac393"
@@ -3165,6 +3244,20 @@
       {
         "name": "42f6698c-2624-5100-ace8-7292e0752fbb",
         "fromTable": "impact_distribution",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "907a9103-f936-515e-bdf9-4da3d6ad7686",
+        "fromTable": "qini_curves",
+        "fromColumn": "arm",
+        "toTable": "dim_arm",
+        "toColumn": "arm"
+      },
+      {
+        "name": "33337f2c-4c9d-5989-899b-97ec094b1e6a",
+        "fromTable": "cate_deciles",
         "fromColumn": "arm",
         "toTable": "dim_arm",
         "toColumn": "arm"

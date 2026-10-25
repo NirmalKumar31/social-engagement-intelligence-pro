@@ -85,11 +85,11 @@
   "exposure": [
     {
       "arm": "control",
-      "topic_entropy": 0.8800514697213407,
-      "top_topic_share": 0.2459888888888889,
-      "distinct_topics": 9.708333333333334,
-      "negative_share": 0.18941777777777777,
-      "expected_engagements": 17.747422758834382,
+      "topic_entropy": 0.8804100661788498,
+      "top_topic_share": 0.24365555555555551,
+      "distinct_topics": 9.697,
+      "negative_share": 0.2545911111111111,
+      "expected_engagements": 18.427206612045435,
       "topic_entropy_rel_change": NaN,
       "topic_entropy_p": NaN,
       "top_topic_share_rel_change": NaN,
@@ -103,39 +103,132 @@
     },
     {
       "arm": "ai_feed",
-      "topic_entropy": 0.5011513343801859,
-      "top_topic_share": 0.5666711111111111,
-      "distinct_topics": 6.392,
-      "negative_share": 0.36705111111111105,
-      "expected_engagements": 27.789050552089513,
-      "topic_entropy_rel_change": -0.4305431538693182,
+      "topic_entropy": 0.5023280247458107,
+      "top_topic_share": 0.5646577777777778,
+      "distinct_topics": 6.405666666666667,
+      "negative_share": 0.4035222222222222,
+      "expected_engagements": 28.067109028435347,
+      "topic_entropy_rel_change": -0.4294385718168675,
       "topic_entropy_p": 0.0,
-      "top_topic_share_rel_change": 1.3036451510908353,
+      "top_topic_share_rel_change": 1.3174426558438603,
       "top_topic_share_p": 0.0,
-      "distinct_topics_rel_change": -0.34159656652360515,
+      "distinct_topics_rel_change": -0.33941768931972083,
       "distinct_topics_p": 0.0,
-      "negative_share_rel_change": 0.9377859640066635,
+      "negative_share_rel_change": 0.5849815826685056,
       "negative_share_p": 0.0,
-      "expected_engagements_rel_change": 0.5658076628763784,
+      "expected_engagements_rel_change": 0.5231342231810943,
       "expected_engagements_p": 0.0
     },
     {
       "arm": "ai_feed_social",
-      "topic_entropy": 0.6668996031791031,
-      "top_topic_share": 0.42841333333333326,
-      "distinct_topics": 8.052333333333333,
-      "negative_share": 0.24630444444444446,
-      "expected_engagements": 23.280278938650007,
-      "topic_entropy_rel_change": -0.24220386406459837,
+      "topic_entropy": 0.6684477172312213,
+      "top_topic_share": 0.4282266666666667,
+      "distinct_topics": 8.060333333333332,
+      "negative_share": 0.3109666666666667,
+      "expected_engagements": 24.07397586004983,
+      "topic_entropy_rel_change": -0.2407541179845729,
       "topic_entropy_p": 0.0,
-      "top_topic_share_rel_change": 0.7415962780613394,
+      "top_topic_share_rel_change": 0.7575083223129193,
       "top_topic_share_p": 0.0,
-      "distinct_topics_rel_change": -0.17057510729613734,
+      "distinct_topics_rel_change": -0.168780722560242,
       "distinct_topics_p": 0.0,
-      "negative_share_rel_change": 0.3003237992444685,
+      "negative_share_rel_change": 0.22143567899725958,
       "negative_share_p": 0.0,
-      "expected_engagements_rel_change": 0.3117554731749126,
-      "expected_engagements_p": 1.0953305574254719e-221
+      "expected_engagements_rel_change": 0.30643652979465896,
+      "expected_engagements_p": 1.1911542980910175e-225
     }
-  ]
+  ],
+  "exposure_sensitivity": [
+    {
+      "concentration": 0.6,
+      "engagement_weight": 0.0,
+      "negative_share": 0.25338888888888894,
+      "topic_entropy": 0.8794010506760555
+    },
+    {
+      "concentration": 0.6,
+      "engagement_weight": 0.8,
+      "negative_share": 0.30902222222222225,
+      "topic_entropy": 0.8817402821679824
+    },
+    {
+      "concentration": 0.6,
+      "engagement_weight": 1.5,
+      "negative_share": 0.36343333333333333,
+      "topic_entropy": 0.8817916155712127
+    },
+    {
+      "concentration": 0.6,
+      "engagement_weight": 2.2,
+      "negative_share": 0.4258888888888889,
+      "topic_entropy": 0.8827601912173626
+    },
+    {
+      "concentration": 0.6,
+      "engagement_weight": 3.0,
+      "negative_share": 0.4930666666666667,
+      "topic_entropy": 0.882722182304641
+    },
+    {
+      "concentration": 1.4,
+      "engagement_weight": 0.0,
+      "negative_share": 0.2572555555555555,
+      "topic_entropy": 0.6765428322073518
+    },
+    {
+      "concentration": 1.4,
+      "engagement_weight": 0.8,
+      "negative_share": 0.3117,
+      "topic_entropy": 0.666162219410085
+    },
+    {
+      "concentration": 1.4,
+      "engagement_weight": 1.5,
+      "negative_share": 0.36127777777777775,
+      "topic_entropy": 0.6756821748940981
+    },
+    {
+      "concentration": 1.4,
+      "engagement_weight": 2.2,
+      "negative_share": 0.4187888888888889,
+      "topic_entropy": 0.6755904795092724
+    },
+    {
+      "concentration": 1.4,
+      "engagement_weight": 3.0,
+      "negative_share": 0.4764555555555556,
+      "topic_entropy": 0.6729435033814851
+    },
+    {
+      "concentration": 2.2,
+      "engagement_weight": 0.0,
+      "negative_share": 0.2536333333333333,
+      "topic_entropy": 0.5071873376385201
+    },
+    {
+      "concentration": 2.2,
+      "engagement_weight": 0.8,
+      "negative_share": 0.3045888888888889,
+      "topic_entropy": 0.5061502890151613
+    },
+    {
+      "concentration": 2.2,
+      "engagement_weight": 1.5,
+      "negative_share": 0.35034444444444446,
+      "topic_entropy": 0.5116808833109006
+    },
+    {
+      "concentration": 2.2,
+      "engagement_weight": 2.2,
+      "negative_share": 0.40127777777777773,
+      "topic_entropy": 0.5053956699217556
+    },
+    {
+      "concentration": 2.2,
+      "engagement_weight": 3.0,
+      "negative_share": 0.4526222222222222,
+      "topic_entropy": 0.5021950356765847
+    }
+  ],
+  "exposure_note": "scenario under assumed ranker weights on held-out posts; not learned from real engagement"
 }
