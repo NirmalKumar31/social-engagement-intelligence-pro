@@ -13,7 +13,25 @@ powerbi/
 └── measures.dax                     every measure, for reference or copy/paste
 ```
 
-## Open it (Windows, Power BI Desktop)
+## Option A: Power BI web app (Mac / any browser)
+
+The web app (app.powerbi.com) **cannot import `.pbip` projects**; it only takes `.pbix`, `.xlsx` and `.csv`.
+Use the generated workbook instead:
+
+1. In your workspace: **Import → Report, Paginated Report or Workbook → From this computer** →
+   `SEI_Dashboard_data.xlsx`. It becomes one semantic model with all 30 tables.
+2. Turn on web modelling if needed: *Workspace settings → General → Data model settings →
+   "Users can edit data models in the Power BI service"*.
+3. Open the semantic model → **Open data model**, then create the relationships (drag column to column):
+   - `fact_daily[date]` → `dim_date[date]`
+   - `arm` → `dim_arm[arm]` from: `fact_daily`, `fact_user`, `metric_results`, `segment_results`, `daily_lift`,
+     `km_survival`, `impact_fan`, `impact_distribution`, `topic_exposure_by_arm`, `content_exposure_summary`,
+     `sequential_monitoring`
+4. **New measure** → paste measures from `measures.dax` (put them on `fact_user` or any table; the formulas are
+   identical).
+5. **Create report** → build the pages listed under [Pages](#pages) below.
+
+## Option B: Power BI Desktop (Windows)
 
 1. **Turn on PBIP support once:** *File → Options and settings → Options → Preview features →
    "Power BI Project (.pbip) save option"* ✔, then restart Desktop. (Recent Desktop builds have it on by default.)

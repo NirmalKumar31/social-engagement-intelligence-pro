@@ -500,6 +500,23 @@ def write_pbip(tables, data_folder: str):
     (OUT / "measures.dax").write_text("\n".join(dax))
 
 
+def write_excel(tables: dict[str, pd.DataFrame]):
+    """One workbook, one Excel table per sheet: importable by the Power BI web app (Service) on any OS."""
+    from openpyxl.utils import get_column_letter
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    path = OUT / f"{NAME}_data.xlsx"
+    with pd.ExcelWriter(path, engine="openpyxl") as xw:
+        for t, df in tables.items():
+            df.to_excel(xw, sheet_name=t, index=False)
+            ws = xw.sheets[t]
+            ref = f"A1:{get_column_letter(df.shape[1])}{len(df) + 1}"
+            tab = Table(displayName=t, ref=ref)
+            tab.tableStyleInfo = TableStyleInfo(name="TableStyleLight9", showRowStripes=True)
+            ws.add_table(tab)
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-folder", default="C:\\SEI\\powerbi\\data\\",
@@ -508,6 +525,8 @@ def main():
     folder = args.data_folder if args.data_folder.endswith(("\\", "/")) else args.data_folder + "\\"
     tables = export_data()
     write_pbip(tables, folder)
+    xlsx = write_excel(tables)
+    print(f"wrote {xlsx.name} for the Power BI web app")
     total = sum(len(t) for t in tables.values())
     print(f"exported {len(tables)} tables ({total:,} rows) to {DATA} and wrote {NAME}.pbip (DataFolder = {folder})")
 
