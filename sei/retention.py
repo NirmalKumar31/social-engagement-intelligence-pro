@@ -1,25 +1,6 @@
-"""Retention: survival analysis by arm + a lapse early-warning model.
+"""Time to first 7-day lapse by arm, and a lapse early-warning model scored on day 13.
 
-One observable definition is used everywhere:
-  LAPSE = 7 consecutive days with no activity. A lapse "starts" on its first inactive day.
-  A start on day d is only fully observable when d + 6 <= 27, i.e. d <= 21.
-
-Survival endpoint (time to first lapse)
-  T = start day of the first lapse in [0, 21]; users without one are censored at day 21.
-  Kaplan-Meier, log-rank, Cox PH (with a proportional-hazards test), restricted mean survival time,
-  and a constant-hazard rate ratio (events / person-days at risk) for the impact model.
-  A simulator-only benchmark repeats the Cox fit on the latent permanent-quit day; it is never a feature.
-
-Early-warning task (point-in-time correct)
-  cohort  = users active ON the scoring day 13 (so nobody in it has already quit)
-  label   = a lapse starting on days 14-21
-  features use activity through day 13 only.
-  Simulator benchmark: share of positives that are permanent quits vs temporary lapses.
-
-Retention campaign
-  Depth is chosen on TRAINING out-of-fold predictions (including "send to nobody"), and a predefined
-  break-even rule (target if p * save_rate * value > cost) is also frozen; both are then evaluated once on
-  the test set with bootstrap intervals. save_rate is an assumption, not measured nudge efficacy.
+A lapse is 7 days in a row with no activity. A start on day d is only fully observed when d <= 21.
 """
 from __future__ import annotations
 
@@ -46,11 +27,10 @@ from .plotting import plt, save, setup
 
 SCORING_DAY = 13
 LAPSE = C.CHURN_WINDOW
-LAST_START = C.EXP_DAYS - LAPSE          # 21
+LAST_START = C.EXP_DAYS - LAPSE  # 21
 CATS = ["age_group", "region", "device", "account_type", "acquisition_channel", "arm"]
 
 
-# ---------------------------------------------------------------- lapse helpers
 def activity_matrix(users: pd.DataFrame, daily: pd.DataFrame) -> np.ndarray:
     act = np.zeros((len(users), C.EXP_DAYS), bool)
     pos = pd.Series(np.arange(len(users)), index=users.user_id.values)
@@ -68,14 +48,13 @@ def first_lapse_start(act: np.ndarray, first: int = 0, last: int = LAST_START) -
     return out
 
 
-# ---------------------------------------------------------------- survival
 def survival(users: pd.DataFrame, act: np.ndarray, df: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     start = first_lapse_start(act)
     d = df[["user_id", "arm", "age_group", "is_new_user", "pre_active_days_per_day",
             "pre_friend_interactions_per_day"]].copy()
     d["E"] = (start >= 0).astype(int)
     d["T"] = np.where(start >= 0, start, LAST_START).astype(float)
-    d["T"] = d["T"].clip(lower=0.5)       # a lapse starting on day 0 is an event at t ~ 0
+    d["T"] = d["T"].clip(lower=0.5)  # lifelines needs T > 0
     km_rows, rmst = [], {}
     for arm in C.ARMS:
         g = d[d.arm == arm]
@@ -99,7 +78,7 @@ def survival(users: pd.DataFrame, act: np.ndarray, df: pd.DataFrame) -> tuple[di
     ph = proportional_hazard_test(cph, cox_df, time_transform="rank").summary
     ph_p = {k: float(ph.loc[f"arm_{k}", "p"]) for k in C.TREATMENTS}
 
-    # Constant-hazard rate ratio (person-days at risk), the input the impact model's projection assumes
+    # Rate ratio per person-day at risk (what impact.py assumes)
     rates = d.groupby("arm").agg(events=("E", "sum"), person_days=("T", "sum"))
     rr = {}
     for arm in C.TREATMENTS:
@@ -107,7 +86,7 @@ def survival(users: pd.DataFrame, act: np.ndarray, df: pd.DataFrame) -> tuple[di
         se = np.sqrt(1 / rates.loc[arm, "events"] + 1 / rates.loc["control", "events"])
         rr[arm] = {"rate_ratio": float(r), "ci": [float(r * np.exp(-1.96 * se)), float(r * np.exp(1.96 * se))]}
 
-    # Simulator-only benchmark: the same Cox model on the latent permanent-quit day
+    # Benchmark only: same model on the simulator's true quit day
     truth = pd.read_parquet(C.RAW / "user_ground_truth.parquet").set_index("user_id").reindex(d.user_id)
     o = cox_df.copy()
     lq = truth.latent_churn_day.values
@@ -130,13 +109,12 @@ def survival(users: pd.DataFrame, act: np.ndarray, df: pd.DataFrame) -> tuple[di
     return summary, km
 
 
-# ---------------------------------------------------------------- early-warning features
 def build_features(users: pd.DataFrame, daily: pd.DataFrame) -> pd.DataFrame:
     obs = daily[daily.day <= SCORING_DAY]
     out = users.set_index("user_id")[["age_group", "region", "device", "account_type", "acquisition_channel", "arm",
                                       "tenure_days", "friend_count", "following_count", "follower_count", "is_new_user"]].copy()
     out["log_followers"] = np.log1p(out.pop("follower_count"))
-    obs = obs.assign(week=np.floor_divide(obs.day, 7))  # -2,-1,0,1
+    obs = obs.assign(week=np.floor_divide(obs.day, 7))  # -2, -1, 0, 1
     wk = obs.pivot_table(index="user_id", columns="week", values="minutes", aggfunc=["sum", "count"]).fillna(0)
     for w in [-2, -1, 0, 1]:
         out[f"minutes_w{w}"] = wk[("sum", w)].reindex(out.index).fillna(0) if ("sum", w) in wk else 0
@@ -233,7 +211,6 @@ def churn_model(users, daily, act) -> dict:
     imp = pd.DataFrame({"feature": sample.columns, "mean_abs_shap": np.abs(sv).mean(axis=0)}).sort_values("mean_abs_shap", ascending=False)
     imp.to_csv(C.TABLES / "churn_shap_importance.csv", index=False)
 
-    # ---- deployed scorer = the family with the better TRAINING cross-validated AUC (test never used to choose)
     if cv_auc["logistic"] >= cv_auc["lightgbm"]:
         deployed, make_model = "Logistic regression", lambda: Pipeline([("pre", pre()), ("clf", LogisticRegression(max_iter=3000, C=0.5))])
     else:
@@ -243,7 +220,6 @@ def churn_model(users, daily, act) -> dict:
     metrics["deployed"] = (metrics.model == deployed).astype(int)
     metrics.to_csv(C.TABLES / "churn_model_metrics.csv", index=False)
 
-    # ---- campaign: choose on TRAIN (OOF), evaluate once on TEST
     cost, save_rate, value = C.RETENTION_CAMPAIGN_COST, C.RETENTION_CAMPAIGN_SAVE_RATE, C.LTV_PER_RETAINED_USER
     oof_tr = cross_val_predict(make_model(), X_tr, y_tr, cv=StratifiedKFold(3, shuffle=True, random_state=2),
                                method="predict_proba")[:, 1]
@@ -253,7 +229,7 @@ def churn_model(users, daily, act) -> dict:
              "Break-even rule (p > cost / (save x value))": cost / (save_rate * value),
              "Send to nobody": np.inf}
     p_te = preds[deployed]
-    scale = C.MAU_POPULATION * (len(X) / len(users)) / len(y_te)   # population users represented per test user
+    scale = C.MAU_POPULATION * (len(X) / len(users)) / len(y_te)  # population users per test user
     rng = np.random.default_rng(5)
     boot_idx = [rng.integers(0, len(y_te), len(y_te)) for _ in range(500)]
     rule_rows = []
@@ -269,7 +245,7 @@ def churn_model(users, daily, act) -> dict:
     test_curve["profit_test_usd"] = test_curve.profit_usd
     test_curve.to_csv(C.TABLES / "retention_profit_curve.csv", index=False)
 
-    # Out-of-fold scores for every cohort user (dashboards / Power BI)
+    # Out-of-fold scores for every cohort user
     oof = cross_val_predict(make_model(), X, y, cv=StratifiedKFold(3, shuffle=True, random_state=1), method="predict_proba")[:, 1]
     scores = X[["age_group", "region", "device", "account_type", "arm"]].astype(str).copy()
     scores["churn_probability"] = oof
@@ -280,7 +256,6 @@ def churn_model(users, daily, act) -> dict:
     scores = scores.join(X[[f for f in top_feat if f not in CATS]])
     scores.reset_index().rename(columns={"index": "user_id"}).to_parquet(C.PROCESSED / "churn_scores.parquet", index=False)
 
-    # Figures
     setup()
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
     cols = {"Logistic regression": C.INK["secondary"], "Logistic (class-weighted)": C.INK["muted"],

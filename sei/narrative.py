@@ -1,8 +1,4 @@
-"""Single source of truth for every sentence a deliverable says about the results.
-
-Memo, Streamlit and Power BI all read facts from here, so no recommendation or claim is hard-coded:
-change the data and every narrative follows the decision rule and the numbers.
-"""
+"""Facts and sentences shared by the memo, the Streamlit app and the Power BI report."""
 from __future__ import annotations
 
 import json

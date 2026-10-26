@@ -1,7 +1,4 @@
-"""Social Engagement Intelligence: interactive decision dashboard.
-
-Run:  streamlit run dashboard/app.py   (after `make all` has produced reports/)
-"""
+"""Streamlit dashboard. Run with: streamlit run dashboard/app.py"""
 from __future__ import annotations
 
 import json
@@ -56,7 +53,7 @@ def _js(name: str, mtime: float) -> dict:
     return json.loads((R / name).read_text())
 
 
-def tbl(name: str) -> pd.DataFrame:      # cache key includes the file's modification time, so rebuilds never go stale
+def tbl(name: str) -> pd.DataFrame:  # keyed on mtime so rebuilt files aren't served stale
     return _tbl(name, (T / f"{name}.csv").stat().st_mtime)
 
 
@@ -86,7 +83,6 @@ def lift(arm, metric, key="rel_lift"):
     return res[(res.arm == arm) & (res.metric == metric)][key].iloc[0]
 
 
-# ======================================================================= pages
 if page == "Executive summary":
     st.title("Feed ranking experiment: launch decision")
     colour = {"LAUNCH": GOOD, "CONDITIONAL": C.STATUS["warning"], "DO NOT LAUNCH": BAD}[F["state"]]

@@ -1,4 +1,4 @@
-"""Regression tests for the 2026-10-25 audit (docs/AUDIT_2026-10-25.md). Each test names its finding."""
+"""Regression tests for the 2026-10-25 audit (docs/AUDIT_2026-10-25.md)."""
 import json
 
 import numpy as np
@@ -13,7 +13,6 @@ HAVE_DATA = (C.PROCESSED / "user_experiment.parquet").exists()
 needs_data = pytest.mark.skipif(not HAVE_DATA, reason="run the pipeline first")
 
 
-# ---------------------------------------------------------------- S01 decision rule
 def _results(primary=(0.08, 0.06, 0.10, 1e-6), **guards):
     """Build a metric_results-shaped frame for two arms; guards: metric -> (rel, lo, hi)."""
     rows = []
@@ -44,7 +43,6 @@ def test_s01_critical_guardrail_harm_blocks_launch():
 
 
 def test_s01_inconclusive_critical_guardrail_is_not_treated_as_safe():
-    # not significant, but the CI cannot rule out a harm larger than the margin
     d = decide(_results(churned=(0.01, -0.05, 0.07)))
     assert d["recommendation_state"] == "DO NOT LAUNCH"
     assert d["arms"]["ai_feed"]["guardrails"]["churned"]["status"] == "INCONCLUSIVE"
@@ -62,26 +60,23 @@ def test_s01_memo_is_generated_and_labelled_synthetic():
     assert summary["decision"]["recommendation_state"] in memo
 
 
-# ---------------------------------------------------------------- S10 CUPED estimand
 def test_s10_cuped_relative_lift_uses_raw_control_denominator():
     rng = np.random.default_rng(0)
-    x_t, x_c = rng.normal(10, 3, 300), rng.normal(12, 3, 300)        # deliberately imbalanced pre-period
+    x_t, x_c = rng.normal(10, 3, 300), rng.normal(12, 3, 300)  # imbalanced pre-period
     r = S.cuped(x_t + rng.normal(1, 1, 300), x_c + rng.normal(0, 1, 300), x_t, x_c)
     assert r["rel_lift"] == pytest.approx(r["diff"] / r["mean_control"])
     assert "mean_control_adj" in r and r["mean_control_adj"] != r["mean_control"]
 
 
-# ---------------------------------------------------------------- S06 campaign never chooses a guaranteed loss
 def test_s06_adverse_economics_send_to_nobody():
     from sei.retention import campaign_value
     rng = np.random.default_rng(1)
     p = rng.uniform(0, 1, 5000); y = (rng.uniform(0, 1, 5000) < p).astype(int)
-    cost, save, value = 3.0, 0.05, 5.0          # a known churner is worth at most 0.25 < cost
-    threshold = cost / (save * value)           # break-even rule
+    cost, save, value = 3.0, 0.05, 5.0  # a saved user is worth at most 0.25, less than the cost
+    threshold = cost / (save * value)
     assert threshold > 1 and campaign_value(p, y, threshold, cost, save, value) == 0.0
 
 
-# ---------------------------------------------------------------- S02 point-in-time cohort and features
 @needs_data
 def test_s02_features_unchanged_when_future_is_perturbed():
     from sei.features import load_raw
@@ -90,7 +85,7 @@ def test_s02_features_unchanged_when_future_is_perturbed():
     perturbed = daily.copy()
     future = perturbed.day > SCORING_DAY
     perturbed.loc[future, ["minutes", "likes", "comments", "ad_clicks"]] *= 7
-    perturbed = perturbed[~(future & (perturbed.user_id % 3 == 0))]       # also delete some future activity
+    perturbed = perturbed[~(future & (perturbed.user_id % 3 == 0))]
     pd.testing.assert_frame_equal(build_features(users, daily), build_features(users, perturbed))
 
 
@@ -100,7 +95,6 @@ def test_s02_no_scored_user_had_already_quit():
     assert s["already_quit_at_scoring"] == 0
 
 
-# ---------------------------------------------------------------- S03 survival endpoint
 @needs_data
 def test_s03_survival_events_censored_consistently():
     km = pd.read_csv(C.TABLES / "km_survival.csv")
@@ -108,14 +102,12 @@ def test_s03_survival_events_censored_consistently():
     assert km.day.max() <= LAST_START
 
 
-# ---------------------------------------------------------------- S04 sequential prior uses pre-period only
 @needs_data
 def test_s04_mixture_scale_is_prespecified_and_diagnosed_on_real_design():
     sq = json.loads((C.REPORTS / "experiment_summary.json").read_text())["sequential"]
     assert sq["tau_source"].startswith("5% of pre-period") and "re-randomised" in sq["null_design"]
 
 
-# ---------------------------------------------------------------- S08 control baseline clears arm filters
 def test_s08_control_measures_remove_arm_filters():
     from sei.powerbi import MEASURES
     for name, expr, *_ in MEASURES:
@@ -123,7 +115,6 @@ def test_s08_control_measures_remove_arm_filters():
             assert "REMOVEFILTERS(dim_arm)" in expr, name
 
 
-# ---------------------------------------------------------------- S09 pandas extension dtypes
 def test_s09_dtype_handles_extension_strings():
     from sei.powerbi import _dtype
     assert _dtype(pd.Series(["a", "b"], dtype="string")) == ("string", "type text")
@@ -131,14 +122,12 @@ def test_s09_dtype_handles_extension_strings():
     assert _dtype(pd.Series([True, False])) == ("int64", "Int64.Type")
 
 
-# ---------------------------------------------------------------- S12 virality threshold from training data
 @needs_data
 def test_s12_virality_threshold_from_training_only():
     v = json.loads((C.REPORTS / "virality_summary.json").read_text())
     assert v["threshold_source"] == "training articles only" and v["train_until"] < v["test_from"]
 
 
-# ---------------------------------------------------------------- S14 Power BI arm identity for HTE tables
 def test_s14_hte_tables_relate_to_arm_dimension():
     from sei.powerbi import RELATIONSHIPS
     linked = {r[0] for r in RELATIONSHIPS if r[2] == "dim_arm"}

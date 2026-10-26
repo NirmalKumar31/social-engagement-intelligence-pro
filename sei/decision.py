@@ -1,16 +1,8 @@
-"""Launch decision rule: turns metric results into a recommendation instead of hard-coding one.
+"""Launch decision rule.
 
-Primary metric
-  WIN        BH-adjusted p < alpha and the effect is in the good direction
-Guardrails (non-inferiority, one-sided, Bonferroni across every guardrail x arm comparison)
-  PASS          the harm-side confidence bound is inside the margin (harm larger than the margin ruled out)
-  FAIL          the whole confidence interval lies beyond the margin (harm larger than the margin shown)
-  INCONCLUSIVE  otherwise; non-significance is never treated as proof of safety
-Arm decision
-  DO NOT LAUNCH   primary not a win, or a critical guardrail is not PASS
-  CONDITIONAL     primary win, critical guardrails PASS, a standard guardrail FAIL/INCONCLUSIVE:
-                  launch only with a named mitigation and a guardrail monitor on the ramp
-  LAUNCH          primary win and every guardrail PASS
+A guardrail passes only if its adjusted CI rules out harm beyond the margin. An arm is DO NOT LAUNCH if the
+primary metric doesn't win or a critical guardrail doesn't pass, CONDITIONAL if a standard guardrail doesn't pass,
+and LAUNCH otherwise.
 """
 from __future__ import annotations
 
@@ -38,7 +30,7 @@ def decide(results: pd.DataFrame, arms: list[str] | None = None) -> dict:
     arms = arms or sorted(results.arm.unique())
     n_tests = len(C.GUARDRAILS) * len(arms)
     z_adj = stats.norm.ppf(1 - C.GUARDRAIL_FAMILY_ALPHA / n_tests)
-    out = {"arms": {}, "rule": __doc__.strip(), "z_guardrail": z_adj, "n_guardrail_tests": n_tests}
+    out = {"arms": {}, "rule": "guardrail non-inferiority, Bonferroni-adjusted", "z_guardrail": z_adj, "n_guardrail_tests": n_tests}
     for arm in arms:
         r = results[results.arm == arm].set_index("metric")
         p = r.loc[C.PRIMARY_METRIC]

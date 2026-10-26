@@ -1,16 +1,6 @@
-"""Heterogeneous treatment effects and personalised rollout policy.
+"""Heterogeneous treatment effects and rollout policies.
 
-Outcome = an ASSUMED utility score in USD-like units: late-window (days 14-27) ad revenue/day * 365 - churned * LTV.
-It is a decision score, not a forecast of incremental dollars (late revenue already reflects inactivity,
-so the LTV term partly overlaps it); impact.py holds the separate revenue scenario model.
-Revenue uses the post-novelty window (experiment days 14-27) so week-1 novelty is not annualised.
-It folds the engagement upside and the retention downside into one number a PM can act on.
-
-* T-learner and cross-fitted DR-learner (doubly robust pseudo-outcomes, known propensity)
-* Qini / uplift curves on a held-out fold
-* Validation against simulator counterfactual outcomes (oracle.py: every user re-simulated under every arm)
-* Three-arm policy learning, valued with Horvitz-Thompson IPW (known design probability) on held-out data, plus an
-  interpretable depth-3 "policy tree" that turns the model into rollout rules
+The outcome is an assumed utility score (365 x late-window revenue/day - churned x LTV), not a dollar forecast.
 """
 from __future__ import annotations
 
@@ -65,12 +55,7 @@ def dr_learner(Xtr, ytr, ttr, Xte, e: float, seed: int = 0):
 
 
 def gain_curve(tau_hat, y, t, n_points: int = 50) -> pd.DataFrame:
-    """Cumulative uplift gain for a continuous outcome (starts at the origin).
-
-    gain(k) = (mean_t - mean_c among the top-k users by predicted effect) * k. This is an uplift *gain*
-    curve, not the normalised Qini coefficient; the reported area ratio vs the random line is our own
-    convention and is undefined when the overall gain is ~0.
-    """
+    """Cumulative uplift gain by share targeted, highest predicted effect first."""
     order = np.argsort(-tau_hat)
     y, t = y[order], t[order]
     n = len(y)
@@ -86,7 +71,7 @@ def gain_curve(tau_hat, y, t, n_points: int = 50) -> pd.DataFrame:
 
 
 def ht_policy_value(policy: np.ndarray, arm: np.ndarray, y: np.ndarray, p_design: float, boot_idx) -> tuple[float, np.ndarray]:
-    """Horvitz-Thompson IPW value using the KNOWN randomisation probability; bootstrap draws share boot_idx."""
+    """Horvitz-Thompson policy value with the known design probability. Shared boot_idx pairs the draws."""
     vals = (policy == arm) * y / p_design
     return float(vals.mean()), np.array([vals[i].mean() for i in boot_idx])
 
@@ -150,7 +135,7 @@ def main():
             summary[arm][f"gain_area_ratio_{model}"] = (float(np.trapezoid(g.cumulative_gain, g.fraction_targeted) / rnd)
                                                         if abs(rnd) > 1e-9 else None)
 
-    # Interpretable surrogate policy: depth-3 tree trained on TRAINING-user predictions, evaluated on test
+    # Readable policy: a shallow tree fit on training-user predictions, valued on test users
     def readable(frame):
         r = frame[["tenure_days", "friend_count", "pre_minutes_per_day", "pre_friend_interactions_per_day", "is_new_user"]].copy()
         r["age_35_plus"] = (~frame.age_group.isin(["18-24", "25-34"])).astype(int)

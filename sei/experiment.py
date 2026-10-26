@@ -1,4 +1,4 @@
-"""Full experiment readout: design validity -> effects -> time dynamics -> decision statistics."""
+"""Experiment readout: design checks, effects, time dynamics and decision statistics."""
 from __future__ import annotations
 
 import json
@@ -16,7 +16,7 @@ from .decision import headline as headline_text
 from .features import load_raw
 from .plotting import plt, save, setup
 
-# metric key -> (label, tier, kind, pre covariate or ratio parts, higher_is_better)
+# metric: (label, tier, kind, pre-period covariate or ratio parts, higher is better)
 METRICS = {
     "minutes": ("Daily active minutes / user", "primary", "mean", "minutes", True),
     "active_days": ("DAU rate (active days / day)", "secondary", "mean", "active_days", True),
@@ -55,7 +55,6 @@ def design_checks(df: pd.DataFrame) -> dict:
                             for k, v in srm["observed"].items()])
     srm_tbl.to_csv(C.TABLES / "srm.csv", index=False)
 
-    # Power: MDE with and without CUPED at the realised sample size
     y, x = df.exp_minutes_per_day.values, df.pre_minutes_per_day.values
     rho = np.corrcoef(y, x)[0, 1]
     sd = y[df.arm == "control"].std()
@@ -78,7 +77,7 @@ def design_checks(df: pd.DataFrame) -> dict:
 
 
 def aa_test(df: pd.DataFrame, n_sims: int = 1000, seed: int = 1) -> dict:
-    """Re-randomise on pre-period data: a calibrated pipeline rejects ~5% of A/A tests."""
+    """Re-randomise pre-period data; a calibrated test rejects about 5% of A/A splits."""
     rng = np.random.default_rng(seed)
     y = df.pre_minutes_per_day.values
     p = np.empty(n_sims)
@@ -126,7 +125,7 @@ def metric_results(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def user_day_matrix(users: pd.DataFrame, daily: pd.DataFrame, value: str = "minutes") -> np.ndarray:
-    """users x experiment-day matrix of `value`, zeros on inactive days (intent-to-treat)."""
+    """Users x experiment-day matrix of `value`, zero on inactive days."""
     m = np.zeros((len(users), C.EXP_DAYS))
     pos = pd.Series(np.arange(len(users)), index=users.user_id.values)
     e = daily[daily.day >= 0]
@@ -147,13 +146,7 @@ def _fit(day, lift):
 
 
 def daily_dynamics(users: pd.DataFrame, daily: pd.DataFrame, n_boot: int = 200, seed: int = 3):
-    """Per-day lift on minutes/assigned user plus an exponential decay fit.
-
-    The fitted asymptote is an EXTRAPOLATION of 28 correlated daily ratios, not a measured steady state.
-    Uncertainty: users are resampled within arm (control resampled once per draw and shared by both
-    contrasts), daily lifts recomputed and the curve refitted, giving percentile intervals for the
-    asymptote, decay constant and the observed week-1 / week-4 lifts.
-    """
+    """Daily lift in minutes per assigned user, an exponential decay fit, and user-bootstrap CIs."""
     m = user_day_matrix(users, daily)
     arm = users.arm.values
     idx = {a: np.flatnonzero(arm == a) for a in C.ARMS}
@@ -198,15 +191,7 @@ def daily_dynamics(users: pd.DataFrame, daily: pd.DataFrame, n_boot: int = 200, 
 
 
 def sequential(users: pd.DataFrame, daily: pd.DataFrame, n_splits: int = 400, seed: int = 812):
-    """Running monitoring of the primary metric with mixture-SPRT p-values (an approximation here).
-
-    * Mixing scale tau is fixed BEFORE the experiment from pre-period data: 5% of the pre-period
-      control mean (minutes/day), i.e. the effect size we would care to detect.
-    * The exact always-valid guarantee assumes i.i.d. normal increments; here the same users are
-      re-observed daily (cumulative per-user averages), so we do not claim it. Instead we run a null
-      diagnostic on the ACTUAL design: control users are randomly split into two pseudo-arms many
-      times and monitored daily exactly like the real comparison.
-    """
+    """Running p-values on the primary metric and a re-randomised null check of peeking on the real data."""
     m = user_day_matrix(users, daily)
     cum = m.cumsum(axis=1) / np.arange(1, C.EXP_DAYS + 1)
     arm = users.arm.values
@@ -231,7 +216,7 @@ def sequential(users: pd.DataFrame, daily: pd.DataFrame, n_splits: int = 400, se
     seq = pd.DataFrame(rows)
     seq.to_csv(C.TABLES / "sequential_monitoring.csv", index=False)
 
-    # Null diagnostic on the real design (vectorised over splits)
+    # Split control users into two pseudo-arms many times and monitor them daily
     rng = np.random.default_rng(seed)
     ctrl = cum[arm == "control"]
     n = len(ctrl)
@@ -308,7 +293,7 @@ def segments(df: pd.DataFrame) -> pd.DataFrame:
         ["churn risk", "clear win"], "inconclusive")
     seg.to_csv(C.TABLES / "segment_results.csv", index=False)
 
-    # Formal heterogeneity test: does the AI-feed effect differ by age? (HC1 robust OLS)
+    # Does the AI-feed effect differ by age?
     sub = df[df.arm.isin(["control", "ai_feed"])].assign(treat=lambda x: (x.arm == "ai_feed").astype(int))
     m = smf.ols("exp_minutes_per_day ~ pre_minutes_per_day + treat * age_group", sub).fit(cov_type="HC1")
     joint = m.f_test([p for p in m.params.index if p.startswith("treat:")])
@@ -332,11 +317,9 @@ def quantile_effects(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-# ---------------------------------------------------------------- figures
 def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     setup()
     lab = {a: C.ARM_LABELS[a] for a in C.ARMS}
-    # 1. Forest plot of relative lifts
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.2), sharey=True)
     order = list(METRICS)
     for ax, arm in zip(axes, C.TREATMENTS):
@@ -355,7 +338,6 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     fig.tight_layout()
     save(fig, "01_metric_scorecard")
 
-    # 2. Novelty: daily lift with fitted decay
     fig, ax = plt.subplots(figsize=(10, 4.5))
     for arm in C.TREATMENTS:
         a = dyn[dyn.arm == arm]
@@ -370,7 +352,6 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     ax.legend(loc="upper right")
     save(fig, "02_novelty_decay")
 
-    # 3. Sequential monitoring
     fig, ax = plt.subplots(figsize=(10, 4.2))
     for arm in C.TREATMENTS:
         a = seq[seq.arm == arm]
@@ -383,7 +364,6 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     ax.legend(fontsize=8, loc="lower left")
     save(fig, "03_sequential_monitoring")
 
-    # 4. Segment churn deltas (AI feed vs friend boost) by age
     fig, ax = plt.subplots(figsize=(10, 4.5))
     s = seg[seg.dimension == "age_group"]
     levels = sorted(s.segment.unique())
@@ -401,7 +381,6 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     ax.legend()
     save(fig, "04_segment_churn_by_age")
 
-    # 5. Covariate balance (love plot)
     bal = pd.read_csv(bal_path)
     fig, ax = plt.subplots(figsize=(8, 5))
     covs = bal.covariate.unique()[::-1]
@@ -415,7 +394,6 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
     ax.legend(loc="lower right", fontsize=8)
     save(fig, "05_balance_love_plot")
 
-    # 6. CUPED variance reduction
     fig, ax = plt.subplots(figsize=(9, 4))
     r = res[(res.arm == "ai_feed") & (res.variance_reduction > 0)].sort_values("variance_reduction")
     ax.barh(r.label, r.variance_reduction * 100, color=C.SEQ_BLUE[4], height=0.6)
@@ -434,7 +412,7 @@ def main():
     seq, seqsum = sequential(users, daily)
     bay = bayesian(res, df)
     seg = segments(df)
-    q = quantile_effects(df)
+    quantile_effects(df)
     for a in C.TREATMENTS:
         headline = res[(res.arm == a) & (res.metric == "minutes")].rel_lift.iloc[0]
         fits[a]["headline_lift"] = float(headline)

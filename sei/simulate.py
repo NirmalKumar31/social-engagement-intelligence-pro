@@ -1,18 +1,4 @@
-"""Simulate a three-arm feed-ranking experiment as a realistic daily event log.
-
-Design choices that make the data analytically honest (and that the v1 project lacked):
-
-* Users carry latent traits (engagement level, social affinity, novelty seeking) that drive
-  BOTH their baseline behaviour and their individual treatment effect, so heterogeneous
-  treatment effects are real and recoverable, with ground truth kept aside for validation.
-* Daily behaviour follows a per-user AR(1) process, so the pre-period is genuinely predictive
-  of the experiment period. That is what makes CUPED variance reduction work.
-* Treatment effects decay from a novelty peak to a steady state, and social harm accumulates.
-* Churn is an emergent hazard process. Labels are derived from observed inactivity, never
-  written into feature columns (v1 leaked the label via `days_since_last_login`).
-* Assignment is deterministic salted hashing, exactly as production experiment platforms do.
-* Only active user-days are logged, like a real event warehouse.
-"""
+"""Simulate the three-arm feed experiment as a daily event log."""
 from __future__ import annotations
 
 import hashlib
@@ -45,7 +31,6 @@ def simulate_users(rng: np.random.Generator, n: int) -> pd.DataFrame:
     uid = np.arange(1, n + 1)
     age = rng.choice(AGE_GROUPS, n, p=[0.30, 0.31, 0.19, 0.12, 0.08])
     region = rng.choice(REGIONS, n, p=[0.22, 0.24, 0.16, 0.20, 0.18])
-    # Android-heavy in India/LATAM, iOS-heavy in North America
     p_ios = np.select([region == "North America", np.isin(region, ["India", "LATAM"])], [0.58, 0.22], 0.42)
     u = rng.random(n)
     device = np.where(u < p_ios, "iOS", np.where(u < 0.93, "Android", "Web"))
@@ -90,7 +75,7 @@ def simulate_daily(rng: np.random.Generator, users: pd.DataFrame):
 
     base_logit = 1.05 + 1.25 * eng
     base_logmin = 2.95 + 0.42 * eng
-    like_rate = rng.gamma(4, 0.08, n)            # likes per minute
+    like_rate = rng.gamma(4, 0.08, n)  # likes per minute
     comment_rate = 0.06 * (0.4 + s) * rng.gamma(4, 0.25, n)
     dm_rate = 0.09 * (0.2 + 1.3 * s) * rng.gamma(4, 0.25, n)
     share_rate = rng.gamma(3, 0.012, n)
@@ -98,7 +83,7 @@ def simulate_daily(rng: np.random.Generator, users: pd.DataFrame):
     ctr = np.clip(rng.normal(0.011, 0.003, n), 0.002, 0.04)
     neg_rate = rng.gamma(2, 0.004, n)
 
-    # Individual treatment effects (ground truth)
+    # True individual treatment effects
     steady_a = 0.075 + 0.150 * v - 0.100 * s
     steady_b = 0.030 + 0.090 * v - 0.030 * s
     novelty_a, novelty_b = 0.09 * (0.5 + v), 0.07 * (0.5 + v)

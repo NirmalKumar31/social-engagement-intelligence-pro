@@ -1,13 +1,9 @@
-"""Query every dataset in the project with SQL (DuckDB, no server needed).
+"""SQL over every dataset in the project (DuckDB).
 
-  python -m sei.sql                      interactive SQL prompt
-  python -m sei.sql "SELECT ..."         run one query
-  python -m sei.sql --tables             list tables and their columns
-  python -m sei.sql --file queries/examples.sql   run a .sql file (queries separated by ';')
-
-In Python / notebooks:
-  from sei.sql import connect, q
-  q("SELECT arm, COUNT(*) FROM users GROUP BY arm")      # -> pandas DataFrame
+    python -m sei.sql                 interactive prompt
+    python -m sei.sql "SELECT ..."    one query
+    python -m sei.sql --tables        list tables
+    python -m sei.sql --file x.sql    run a file
 """
 from __future__ import annotations
 
@@ -22,11 +18,7 @@ _CON: duckdb.DuckDBPyConnection | None = None
 
 
 def connect(refresh: bool = False) -> duckdb.DuckDBPyConnection:
-    """In-memory DuckDB with one view per project file (event logs, user tables, result tables, Power BI tables).
-
-    Views read the files lazily, so rebuilt data is picked up automatically; pass refresh=True to also pick up
-    files that did not exist when the connection was first created.
-    """
+    """DuckDB connection with one view per project file. refresh=True picks up new files."""
     global _CON
     if _CON is not None and not refresh:
         return _CON

@@ -1,17 +1,6 @@
-"""12-month revenue scenario model under explicit assumptions.
+"""12-month revenue scenarios: revenue per not-lapsed user-day x lapse survival, from joint bootstrap draws.
 
-Decomposition (one coherent endpoint, the 7-day lapse from retention.py):
-    monthly revenue of a cohort = users not yet lapsed (t)  x  revenue per not-lapsed user-month
-  * revenue rate   = ad revenue / person-days at risk, post-novelty window (days 14-27), counting only
-                     days before a user's first lapse. Treatment changes it by (1 + rev_lift).
-  * lapse hazard   = lapses / person-days at risk over days 0-21; treatment multiplies it by the rate ratio.
-Both parameters come from the SAME bootstrap resample of users per draw, with the control arm resampled
-once and shared by both contrasts, so their joint and shared-control dependence is kept.
-
-Transport assumptions (not identified by a 4-week test and shown as scenarios, not as uncertainty):
-  * a monthly base lapse rate for the full population (config.MONTHLY_BASE_CHURN),
-  * whether the 4-week effects persist, half-decay or fade by month 12.
-"Share of draws > 0" is a fraction of simulations under these assumptions, not an empirical probability.
+The base lapse rate and effect persistence are assumptions, shown as scenarios rather than as uncertainty.
 """
 from __future__ import annotations
 
@@ -36,7 +25,7 @@ def per_user_inputs(users: pd.DataFrame, daily: pd.DataFrame) -> pd.DataFrame:
     act = activity_matrix(users, daily)
     start = first_lapse_start(act)
     T = np.where(start >= 0, start, LAST_START).clip(min=0.5)
-    end = np.where(start >= 0, start, C.EXP_DAYS)        # at risk on days < first lapse start
+    end = np.where(start >= 0, start, C.EXP_DAYS)  # at risk until the first lapse
     lo = C.EXP_DAYS // 2
     risk_days = np.clip(end - lo, 0, C.EXP_DAYS - lo)
     rev = np.zeros((len(users), C.EXP_DAYS))
@@ -58,7 +47,7 @@ def estimates(u: pd.DataFrame, sel: dict[str, np.ndarray]) -> dict:
 
 
 def project(rev_lift, rr, rev_month, persistence="persist", base_churn=C.MONTHLY_BASE_CHURN, pop=C.MAU_POPULATION):
-    """Cumulative incremental-able revenue path (USD) for a cohort of `pop` users. Vectorised over draws."""
+    """Cumulative revenue path (USD) for a cohort of `pop` users, one row per draw."""
     t = np.arange(MONTHS)
     k = PERSISTENCE[persistence](t)[None, :]
     lift = 1 + np.atleast_1d(rev_lift)[:, None] * k
@@ -114,7 +103,7 @@ def main(n_boot: int = 1000):
         hist += [{"arm": a, "bin_mid_musd": (edges[i] + edges[i + 1]) / 2, "share_of_draws": c / len(v)} for i, c in enumerate(cnt)]
     pd.DataFrame(hist).to_csv(C.TABLES / "impact_distribution.csv", index=False)
 
-    # Sensitivity: one-way ranges plus a joint adverse stress case (marginal bounds, not a probability)
+    # One-way ranges, plus a joint worst case built from marginal bounds
     q = lambda a, k, p: float(np.quantile(par[a][k], p))
 
     def fb_minus_ai(la=None, lb=None, ra=None, rb=None, churn=C.MONTHLY_BASE_CHURN, pop=C.MAU_POPULATION, rev=rev0,
@@ -167,7 +156,7 @@ def main(n_boot: int = 1000):
     fig.tight_layout()
     save(fig, "17_business_impact")
 
-    out = {"method": __doc__.strip(), "point": point, "rev_per_at_risk_user_month": rev0,
+    out = {"method": "Revenue per not-lapsed user-day x lapse survival, joint bootstrap with a shared control.", "point": point, "rev_per_at_risk_user_month": rev0,
            "param_ci": {a: {k: [q(a, k, .025), q(a, k, .975)] for k in ("rev_lift", "rate_ratio")} for a in C.TREATMENTS},
            "param_correlation_rev_vs_hazard": corr, "cross_arm_rev_lift_correlation": cross,
            "results": res.to_dict(orient="records"), "scenarios": scen.to_dict(orient="records"),

@@ -1,8 +1,4 @@
-"""Download the two public datasets used alongside the simulation.
-
-* UCI Online News Popularity (Fernandes et al., 2015), CC BY 4.0
-* TweetEval sentiment (Barbieri et al., 2020; SemEval-2017 Task 4), via the Hugging Face hub
-"""
+"""Download the public datasets: UCI Online News Popularity and TweetEval sentiment."""
 import io
 import urllib.request
 import zipfile

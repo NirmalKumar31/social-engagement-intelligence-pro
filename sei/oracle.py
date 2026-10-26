@@ -1,11 +1,6 @@
-"""Simulator oracle: counterfactual outcomes for every user under every arm.
+"""Counterfactual outcomes for every user under every arm, by re-simulating with common seeds.
 
-Each replication re-runs the daily simulation for the SAME users (same latent traits) with the arm forced
-to control, AI feed and AI feed + friend boost in turn, using the same seed for all three arms (common
-random numbers). The HTE outcome is computed exactly as hte.outcome() does, so the oracle CATE is the
-expected effect on the modelled outcome, estimated with Monte Carlo error reported per user.
-
-Used ONLY to validate the causal models (recovery, calibration, policy regret); never as a feature.
+Used only to validate the causal models.
 """
 from __future__ import annotations
 

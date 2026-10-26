@@ -1,13 +1,4 @@
-"""What makes content spread? A real-data model on UCI Online News Popularity (39,644 Mashable articles).
-
-An ORDERED RETROSPECTIVE BENCHMARK, not a verified point-in-time production evaluation:
-* split on whole publication dates (oldest ~75% of dates train, newest test; no date in both)
-* the "viral" threshold (top quartile of shares) is computed on TRAINING articles only
-* keyword-share (kw_*) and linked-article-share (self_reference_*) features have no verified
-  publication-time availability (UCI collected all shares on one date, 2015-01-08), so an ablation
-  without them is reported alongside the full model
-* SHAP drivers + a DESCRIPTIVE playbook (unadjusted associations, not causal publishing advice)
-"""
+"""Virality model on UCI Online News Popularity, evaluated on a whole-date split."""
 from __future__ import annotations
 
 import json

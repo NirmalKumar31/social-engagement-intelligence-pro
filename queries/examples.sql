@@ -1,16 +1,11 @@
--- ============================================================================
--- Example SQL queries: run them all with
---     python -m sei.sql --file queries/examples.sql
--- or paste any single query into  python -m sei.sql  (end with ';').
+-- Example queries. Run all:  python -m sei.sql --file queries/examples.sql
+-- Or paste one into:         python -m sei.sql
 --
--- Main tables
---   users              one row per user: arm, age_group, region, device, account_type, ...
---   daily_activity     one row per ACTIVE user-day: day (-14..27), minutes, likes, comments, ad_revenue, ...
---   user_experiment    one row per user: pre_* / exp_* / late_* metrics, churned
---   churn_scores       7-day-lapse probability + risk tier for users active ON day 13 (scoring day)
---   user_cate          per-user predicted treatment effects (held-out users)
---   metric_results, segment_results, daily_lift, ...   analysis outputs (reports/tables)
--- ============================================================================
+-- users            one row per user (arm, age_group, region, device, account_type)
+-- daily_activity   one row per active user-day (day -14..27)
+-- user_experiment  one row per user with pre_*, exp_* and late_* metrics and churned
+-- churn_scores     lapse probability for users active on day 13
+-- user_cate        predicted treatment effects for held-out users
 
 -- 1. How many users are in each arm?
 SELECT arm, COUNT(*) AS users, ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct
@@ -23,7 +18,7 @@ SELECT arm,
        ROUND(100 * (AVG(exp_minutes_per_day) / AVG(pre_minutes_per_day) - 1), 1) AS change_pct
 FROM user_experiment GROUP BY arm ORDER BY arm;
 
--- 3. Raw lift vs control on the main metrics (no CUPED; compare with metric_results)
+-- 3. Raw lift vs control (no CUPED)
 WITH a AS (
   SELECT arm, AVG(exp_minutes_per_day) AS minutes, AVG(churned) AS churn,
          AVG(exp_friend_interactions_per_day) AS friend_int, AVG(exp_ad_revenue_per_day) AS revenue
@@ -36,12 +31,12 @@ SELECT t.arm,
 FROM a t CROSS JOIN (SELECT * FROM a WHERE arm = 'control') c
 WHERE t.arm <> 'control';
 
--- 4. Churn rate by age group and arm (the key segment finding)
+-- 4. Churn rate by age group and arm
 PIVOT (SELECT age_group, arm, churned FROM user_experiment)
 ON arm USING ROUND(100 * AVG(churned), 2)
 GROUP BY age_group ORDER BY age_group;
 
--- 5. Novelty effect: weekly minutes per assigned user, by arm
+-- 5. Weekly minutes per assigned user, by arm
 SELECT d.day // 7 + 1 AS week, u.arm,
        ROUND(SUM(d.minutes) / (7.0 * ANY_VALUE(n.users)), 2) AS minutes_per_user_day
 FROM daily_activity d
@@ -63,21 +58,20 @@ FROM user_experiment GROUP BY region ORDER BY annual_revenue_per_user DESC;
 SELECT account_type, arm, ROUND(AVG(exp_posts_created_per_day), 3) AS posts_per_day
 FROM user_experiment GROUP BY account_type, arm ORDER BY account_type, arm;
 
--- 9. Top 10 users most at risk of a 7-day lapse (early-warning model, out-of-fold scores)
+-- 9. Users most at risk of a 7-day lapse
 SELECT user_id, arm, age_group, region, ROUND(churn_probability, 3) AS lapse_probability, risk_tier
 FROM churn_scores ORDER BY churn_probability DESC LIMIT 10;
 
--- 10. Is the risk model calibrated? Actual lapse rate by predicted risk decile
+-- 10. Predicted vs actual lapse rate by risk decile
 SELECT risk_decile, COUNT(*) AS users, ROUND(100 * AVG(churn_probability), 1) AS predicted_pct,
        ROUND(100 * AVG(actual_churn_next_14d), 1) AS actual_pct
 FROM churn_scores GROUP BY risk_decile ORDER BY risk_decile DESC;
 
--- 11. Which arm does the personalisation model pick for each age group?
+-- 11. Arm picked by the personalisation model, by age group
 SELECT age_group, policy_arm, COUNT(*) AS users
 FROM user_cate GROUP BY age_group, policy_arm ORDER BY age_group, users DESC;
 
--- 12. Official experiment results (CUPED + Benjamini-Hochberg) for guardrail metrics
--- (the launch decision itself uses non-inferiority margins: see experiment_summary.json -> decision)
+-- 12. Guardrail results (CUPED, BH-adjusted)
 SELECT arm, label, ROUND(100 * rel_lift, 1) AS lift_pct, p_adj_bh, verdict
 FROM metric_results WHERE tier = 'guardrail' ORDER BY arm, label;
 
@@ -85,6 +79,6 @@ FROM metric_results WHERE tier = 'guardrail' ORDER BY arm, label;
 SELECT dimension, segment, ROUND(churn_diff_pp, 2) AS churn_change_pp, ROUND(churn_p_adj, 4) AS p_adj
 FROM segment_results WHERE arm = 'ai_feed' AND status = 'churn risk' ORDER BY churn_change_pp DESC;
 
--- 14. Real data: which news channels go viral most?
+-- 14. Viral rate by news channel (real data)
 SELECT level AS channel, articles, median_shares, ROUND(100 * viral_rate, 1) AS viral_pct
 FROM virality_playbook WHERE dimension = 'channel' ORDER BY viral_pct DESC

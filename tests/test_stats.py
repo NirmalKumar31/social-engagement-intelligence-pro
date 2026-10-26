@@ -1,4 +1,4 @@
-"""Statistical calibration tests: the estimators must be unbiased and their CIs must cover."""
+"""Calibration tests for the estimators."""
 import numpy as np
 import pytest
 
@@ -49,7 +49,7 @@ def test_srm_detects_imbalance():
 
 
 def test_msprt_controls_type_one_error_iid_textbook_case():
-    """Exact guarantee holds only for i.i.d. normal increments; the real-design check lives in experiment.sequential()."""
+    """Only the i.i.d. case has an exact guarantee."""
     rng = np.random.default_rng(4)
     k = np.arange(1, 29)
     se = np.sqrt(2 / (k * 300))

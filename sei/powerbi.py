@@ -1,15 +1,4 @@
-"""Export a Power BI star schema and generate a Power BI Project (PBIP).
-
-Outputs (all under powerbi/):
-  data/*.csv                      star schema + analysis result tables
-  Feed_Ranking_Launch_Review.pbip              open in Power BI Desktop (Windows)
-  Feed_Ranking_Launch_Review.ipynb             Fabric notebook: creates/updates the model + report (Run all)
-  Feed_Ranking_Launch_Review.SemanticModel/    model.bim: tables, relationships, DAX measures, DataPath parameter
-  Feed_Ranking_Launch_Review.Report/           report.json: 11 report pages
-  Feed_Ranking_Launch_Review_Theme.json        palette theme (View > Themes > Browse for themes)
-  Feed_Ranking_Launch_Review_data.xlsx         all tables as one workbook (web-app upload fallback)
-  measures.dax                    every DAX measure, for copy/paste into any model
-"""
+"""Export the Power BI star schema and write the PBIP project, Fabric notebook and Excel fallback."""
 from __future__ import annotations
 
 import argparse
@@ -28,14 +17,13 @@ from .pbi_report import build_report
 
 OUT = C.POWERBI
 DATA = OUT / "data"
-NAME = "Feed_Ranking_Launch_Review"          # folder / file stem
-DISPLAY = "Feed Ranking Launch Review"      # item name in Power BI / Fabric
+NAME = "Feed_Ranking_Launch_Review"
+DISPLAY = "Feed Ranking Launch Review"
 SEGMENTS = ["age_group", "region", "device", "account_type"]
 SUMS = ["sessions", "minutes", "likes", "comments", "dms_sent", "shares", "posts_created", "negative_feedback",
         "ad_impressions", "ad_clicks", "ad_revenue"]
 
 
-# ---------------------------------------------------------------- data export
 def export_data() -> dict[str, pd.DataFrame]:
     users = pd.read_parquet(C.RAW / "users.parquet")
     daily = pd.read_parquet(C.RAW / "daily_activity.parquet")
@@ -52,7 +40,7 @@ def export_data() -> dict[str, pd.DataFrame]:
                                       "is_treatment": [0, 1, 1], "sort_order": [1, 2, 3],
                                       "color_hex": [C.ARM_COLORS[a] for a in C.ARMS]})
 
-    # Daily fact at (date x arm x segment) grain: ~28K rows, additive sums + assigned-user denominators
+    # Grain: date x arm x segment, with assigned-user counts as denominators
     d = daily.merge(users[["user_id", "arm"] + SEGMENTS], on="user_id")
     agg = d.groupby(["day", "arm"] + SEGMENTS)[SUMS].sum()
     agg["active_users"] = d.groupby(["day", "arm"] + SEGMENTS).size()
@@ -68,7 +56,6 @@ def export_data() -> dict[str, pd.DataFrame]:
     fact["ad_revenue"] = fact.ad_revenue.round(4)
     tables["fact_daily"] = fact
 
-    # User fact
     keep = ["user_id", "arm", "age_group", "region", "device", "account_type", "acquisition_channel", "tenure_days",
             "friend_count", "is_new_user", "churned", "pre_minutes_per_day", "exp_minutes_per_day",
             "pre_active_days_per_day", "exp_active_days_per_day", "exp_friend_interactions_per_day",
@@ -82,7 +69,6 @@ def export_data() -> dict[str, pd.DataFrame]:
     fu["policy_arm"] = fu.policy_arm.fillna("Not in held-out fold")
     tables["fact_user"] = fu.round(5)
 
-    # Analysis result tables
     topic = pd.read_csv(C.TABLES / "topic_info.csv")
     tx = pd.read_csv(C.TABLES / "topic_exposure_by_arm.csv").merge(topic[["topic_id", "label"]], on="topic_id")
     simple = {
@@ -121,9 +107,8 @@ def export_data() -> dict[str, pd.DataFrame]:
     return tables
 
 
-# ---------------------------------------------------------------- display columns
-# Short, human-readable columns for report visuals. Names must not collide case-insensitively with
-# existing columns (Power BI column names are case-insensitive).
+# Readable columns for the report. Power BI column names are case-insensitive, so these must not
+# collide with existing ones.
 SHORT_METRIC = {"minutes": "Minutes / user", "active_days": "DAU rate", "sessions": "Sessions", "likes": "Likes",
                 "shares": "Shares", "posts_created": "Posts created", "ad_revenue": "Ad revenue",
                 "churned": "Churn (28-day)", "friend_interactions": "Friend interactions",
@@ -223,7 +208,6 @@ def add_display_columns(tables: dict[str, pd.DataFrame]):
     mde["Minimum detectable lift"] = mde.mde_rel
 
 
-# ---------------------------------------------------------------- semantic model
 DISPLAY_FORMATS = {"Lift": "+0.0%;-0.0%;0.0%", "CI low": "+0.0%;-0.0%;0.0%", "CI high": "+0.0%;-0.0%;0.0%",
                    "p-value (BH)": "0.0000", "Variance removed": "0%", "Minutes lift %": "+0.0%;-0.0%;0.0%",
                    "Churn change (pp)": "+0.00;-0.00;0.00", "Low case ($M)": "$#,0", "High case ($M)": "$#,0",
@@ -244,7 +228,7 @@ PCT_COLS = {"rel_lift", "rel_ci_low", "rel_ci_high", "minutes_lift", "minutes_ci
 
 
 def _dtype(s: pd.Series) -> tuple[str, str]:
-    """Model + Power Query type. Uses pandas predicates so extension dtypes (pandas 3 strings) work."""
+    """Model and Power Query types for a column (works with pandas 3 string dtypes)."""
     t = pd.api.types
     if t.is_datetime64_any_dtype(s):
         return "dateTime", "type date"
@@ -259,7 +243,7 @@ def _dtype(s: pd.Series) -> tuple[str, str]:
 
 def m_expression(table: str, df: pd.DataFrame, source: str) -> list[str]:
     types = ", ".join(f'{{"{c}", {_dtype(df[c])[1]}}}' for c in df.columns)
-    # Static base URL + RelativePath keeps the query refreshable in the Power BI Service (no gateway needed)
+    # A static base URL keeps the query refreshable in the Power BI Service
     content = (f'Web.Contents("https://raw.githubusercontent.com", [RelativePath = DataPath & "{table}.csv"])'
                if source == "github" else f'File.Contents(DataPath & "{table}.csv")')
     return [
@@ -274,7 +258,6 @@ def m_expression(table: str, df: pd.DataFrame, source: str) -> list[str]:
 
 
 MEASURES = [
-    # (name, expression, format, display folder)
     ("Users", "COUNTROWS(fact_user)", "#,0", "Experiment"),
     ("User-Days", "SUM(fact_daily[users_assigned])", "#,0", "Engagement"),
     ("Minutes per User-Day", "DIVIDE(SUM(fact_daily[minutes]), [User-Days])", "0.00", "Engagement"),
@@ -365,8 +348,6 @@ def build_model(tables: dict[str, pd.DataFrame], data_path: str, source: str) ->
     }
 
 
-# ---------------------------------------------------------------- report
-# Layout and design system live in pbi_report.py
 
 
 def theme() -> dict:
@@ -383,7 +364,7 @@ def theme() -> dict:
 
 
 def platform(item_type: str) -> str:
-    """Fabric Git-integration metadata; without it a synced workspace ignores the item folder."""
+    """Fabric Git metadata. Without it a synced workspace ignores the folder."""
     return json.dumps({
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
         "metadata": {"type": item_type, "displayName": DISPLAY},
@@ -392,13 +373,13 @@ def platform(item_type: str) -> str:
 
 
 def write_notebook():
-    """Fabric notebook that creates or updates the semantic model and report from this repo (no Git integration needed)."""
+    """Fabric notebook that creates or updates the model and report from this repo."""
     def md(t): return {"cell_type": "markdown", "metadata": {}, "source": t}
     def code(t): return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": t}
     repo = "https://raw.githubusercontent.com/" + C.GITHUB_DATA_PATH.rsplit("/data/", 1)[0]
     cells = [
-        md(f"# {DISPLAY}\n\nCreates **or updates** the **{DISPLAY}** semantic model and report in this Fabric workspace from the "
-           "public GitHub repo. Just **Run all** (about 2-3 minutes); re-run any time the repo changes."),
+        md(f"# {DISPLAY}\n\nCreates or updates the {DISPLAY} semantic model and report in this workspace from the GitHub "
+           "repo. Run all (2-3 minutes); re-run whenever the repo changes."),
         code("%pip install -q semantic-link-labs"),
         code(f'''import time
 import requests
@@ -424,8 +405,8 @@ for _ in range(30):
         print("semantic model is ready")
         break
     time.sleep(5)'''),
-        md("## 2. Load the data\n\nFirst run only: if this fails with a **credentials** error, open the semantic model "
-           "**... → Settings → Data source credentials → Edit (pencil) → Anonymous / Public → Sign in**, then re-run this cell."),
+        md("## 2. Load the data\n\nOn the first run this may fail on credentials. Set the Web source to Anonymous / Public "
+           "under the semantic model's Settings → Data source credentials, then re-run this cell."),
         code("labs.refresh_semantic_model(dataset=NAME)"),
         md("## 3. Report (create or update)"),
         code('''if NAME in fabric.list_reports()["Name"].values:
@@ -440,7 +421,7 @@ print(f"Done. Open the '{NAME}' report (refresh the browser tab if it was alread
 
 
 def write_pbip(tables, data_path: str, source: str):
-    for old in glob.glob(str(OUT / "SEI_*")) + glob.glob(str(OUT / "deploy_to_fabric.ipynb")):   # pre-rename artefacts
+    for old in glob.glob(str(OUT / "SEI_*")) + glob.glob(str(OUT / "deploy_to_fabric.ipynb")):  # old names
         shutil.rmtree(old) if os.path.isdir(old) else os.remove(old)
     model_dir, report_dir = OUT / f"{NAME}.SemanticModel", OUT / f"{NAME}.Report"
     for d in (model_dir, report_dir):
@@ -466,11 +447,11 @@ def write_pbip(tables, data_path: str, source: str):
 
 
 def write_excel(tables: dict[str, pd.DataFrame]):
-    """One workbook, one Excel table per sheet: importable by the Power BI web app (Service) on any OS."""
+    """All tables in one workbook, for uploading to the Power BI web app."""
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.table import Table, TableStyleInfo
 
-    path = OUT / f"{NAME}_data.xlsx"   # web-app upload fallback
+    path = OUT / f"{NAME}_data.xlsx"
     with pd.ExcelWriter(path, engine="openpyxl") as xw:
         for t, df in tables.items():
             df.to_excel(xw, sheet_name=t, index=False)

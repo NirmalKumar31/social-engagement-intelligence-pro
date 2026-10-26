@@ -1,16 +1,4 @@
-"""Power BI report layout (legacy report.json) with an embedded design system.
-
-All styling is written into the report itself (page backgrounds, card containers, fonts, series colours),
-so it renders identically in Power BI Desktop and the Power BI Service without a custom theme file.
-
-Design system
-  page      #F4F6FA background, 1280x720, 24px margins, 20px gutters
-  header    deep-navy band: kicker, title, subtitle
-  cards     white, 10px radius, hairline border, soft shadow, visual header hidden
-  type      Power BI's Segoe UI font stack (with web fallbacks, so Macs never drop to serif)
-  colour    arm identity fixed everywhere (control blue, AI feed orange, friend boost aqua); single-series navy
-  text      short display columns for every category axis and table (see powerbi.add_display_columns)
-"""
+"""Power BI report layout (legacy report.json) with the styling built in."""
 from __future__ import annotations
 
 import json
@@ -39,7 +27,6 @@ FOOTER_H = 18
 BOTTOM = H - M - FOOTER_H
 
 
-# ---------------------------------------------------------------- literal helpers
 def lit(v: str) -> dict:
     return {"expr": {"Literal": {"Value": v}}}
 
@@ -65,7 +52,7 @@ def props(**kw) -> list[dict]:
 
 
 def series_colours(entity: str, prop: str, mapping: dict[str, str]) -> list[dict]:
-    """dataPoint fill per category/series value, so identity colours never depend on sort order."""
+    """Colour each series by its value so colours don't depend on sort order."""
     return [{"properties": {"fill": colour(c)},
              "selector": {"data": [{"scopeId": {"Comparison": {
                  "ComparisonKind": 0,
@@ -75,7 +62,7 @@ def series_colours(entity: str, prop: str, mapping: dict[str, str]) -> list[dict
 
 
 def measure_colours(mapping: dict[str, str]) -> list[dict]:
-    """dataPoint fill per measure/aggregation (multi-Y charts); keys are queryRefs."""
+    """Colour each measure in a multi-measure chart. Keys are queryRefs."""
     return [{"properties": {"fill": colour(c)}, "selector": {"metadata": ref}} for ref, c in mapping.items()]
 
 
@@ -92,7 +79,6 @@ def visual_filter(table: str, column: str, values: list[str]) -> dict:
             "type": "Categorical", "howCreated": 1}
 
 
-# ---------------------------------------------------------------- object presets
 def card_container(title: str | None) -> dict:
     vc = {
         "background": props(show=flag(True), color=colour(CARD_BG), transparency=num(0)),
@@ -159,7 +145,6 @@ def slicer_objects() -> dict:
             "items": props(fontColor=colour(INK), fontSize=num(10), fontFamily=txt(FONT), background=colour(CARD_BG))}
 
 
-# ---------------------------------------------------------------- page model
 def m(t, n): return ("m", t, n)
 def col(t, n): return ("c", t, n)
 def agg(t, n, f="sum"): return ("a", t, n, f)
@@ -265,12 +250,12 @@ def rows(n: int, y0: int, y1: int = BOTTOM) -> list[tuple[int, int]]:
 
 
 def accent(p: Page, x, y, h, colour_: str):
-    """Thin coloured strip on the left edge of a card (drawn on top of it)."""
+    """Thin coloured strip on a card's left edge."""
     p.text(x, y + 14, 4, h - 28, [[(" ", style(1, colour_))]], bg=colour_, radius=2)
 
 
 def kpis(p: Page, y: int, h: int, items: list[tuple[str, str, str]], width: int = W - 2 * M, x0: int = M):
-    """items: (measure, title, value colour). Each card gets an accent strip in its value colour."""
+    """One card per (measure, title, colour), each with an accent strip."""
     for (x, w), (meas, title, c) in zip(grid(len(items), width, x0), items):
         p.add("card", x, y, w, h, {"Values": [m("_Measures", meas)]}, title, card_objects(c))
         accent(p, x, y, h, c)
@@ -305,16 +290,14 @@ KPI_H = 92
 DISPLAY_NAME = "Feed Ranking Launch Review"
 
 
-# ---------------------------------------------------------------- pages
 def build_report(F: dict) -> dict:
-    """F: narrative.facts(); every sentence and number shown on the pages comes from it."""
+    """Build report.json from narrative.facts()."""
     L, R = grid(2)
     pages = []
     ex, sv, cm, imp, vir = F["experiment"], F["survival"], F["churn_model"], F["impact"], F["virality"]
     d = ex["design"]
     tone = {"LAUNCH": "good", "CONDITIONAL": "warn", "DO NOT LAUNCH": "bad"}[F["state"]]
 
-    # 0 ── Overview: the story in six cards
     p = Page("Overview")
     header(p, "Feed ranking experiment · launch review", DISPLAY_NAME,
            "Simulated 3-arm randomised test · 60,000 users · 14-day pre-period + 28-day experiment · every statement below is "
@@ -335,7 +318,6 @@ def build_report(F: dict) -> dict:
           filters=[visual_filter("metric_results", "tier", ["primary", "guardrail"])])
     pages.append(p)
 
-    # 0b ── Decision & guardrails
     p = Page("Decision & Guardrails")
     header(p, "Launch decision rule", "Which arm can ship, and what blocks the other",
            f"Guardrails: one-sided non-inferiority, Bonferroni across {F['decision']['n_guardrail_tests']} comparisons · "
@@ -363,7 +345,6 @@ def build_report(F: dict) -> dict:
            "Series": [ARM]}, "Worst-case harm (adjusted bound) vs margin", bar_objects(ARM_COLOURS, labels=True))
     pages.append(p)
 
-    # 1 ── Results snapshot
     p = Page("Results Snapshot")
     header(p, "Experiment results", "Engagement up in both arms; retention splits them",
            "CUPED-adjusted lifts vs control · Benjamini-Hochberg across 22 tests · daily lift shows the novelty decay")
@@ -386,7 +367,6 @@ def build_report(F: dict) -> dict:
           "Metric scorecard", table_objects())
     pages.append(p)
 
-    # 2 ── Experiment scorecard
     p = Page("Experiment Scorecard")
     header(p, "Experiment validity & results", "Every metric, every arm, with uncertainty",
            f"SRM p = {d['srm']['p_value']:.2f} · max |SMD| {d['max_abs_smd']:.3f} · A/A false-positive rate "
@@ -411,7 +391,6 @@ def build_report(F: dict) -> dict:
           "95% confidence intervals", table_objects())
     pages.append(p)
 
-    # 3 ── Engagement trends
     p = Page("Engagement Trends")
     header(p, "Engagement explorer", "Slice every daily metric by segment",
            "All measures are per assigned user-day (intent-to-treat), so they stay correct under any filter")
@@ -429,7 +408,6 @@ def build_report(F: dict) -> dict:
               t, line_objects(ARM_COLOURS))
     pages.append(p)
 
-    # 4 ── Segments
     p = Page("Segment Deep-Dive")
     header(p, "Heterogeneity", "Who wins, who churns",
            "CUPED minutes lift and churn change by segment · Benjamini-Hochberg across all segment tests")
@@ -453,7 +431,6 @@ def build_report(F: dict) -> dict:
           "All segment verdicts", table_objects())
     pages.append(p)
 
-    # 5 ── Retention
     p = Page("Retention & Lapse Risk")
     header(p, "Retention", "Time to first 7-day lapse, and a lapse early-warning model",
            f"Cox HR AI feed {sv['hr_ai_feed']:.2f}, friend boost {sv['hr_ai_feed_social']:.2f} · early warning scores users "
@@ -472,7 +449,6 @@ def build_report(F: dict) -> dict:
           "Nudge campaign value ($M, assumed save rate) by share targeted", line_objects(legend=False))
     pages.append(p)
 
-    # 6 ── Personalisation
     p = Page("Personalisation")
     header(p, "Causal ML", "Heterogeneous effects & rollout policy",
            "Cross-fitted DR-learner on an assumed utility score · Horvitz-Thompson IPW on 35% held-out users · "
@@ -494,7 +470,6 @@ def build_report(F: dict) -> dict:
           "Observed held-out uplift by predicted-effect decile (per arm)", bar_objects(ARM_COLOURS))
     pages.append(p)
 
-    # 7 ── Content health
     p = Page("Content Health (Scenario)")
     sm = F["nlp"]["sentiment"]["metrics"]
     header(p, "Responsible AI · scenario", "Content health under ASSUMED ranker weights",
@@ -517,7 +492,6 @@ def build_report(F: dict) -> dict:
           "Sentiment model (TweetEval test)", table_objects())
     pages.append(p)
 
-    # 8 ── Business impact
     p = Page("Revenue Scenarios")
     header(p, "Decision economics · scenario model", "12-month revenue under explicit assumptions",
            f"{imp['n_boot']:,} joint bootstrap draws (shared control) · {C.MONTHLY_BASE_CHURN:.1%} assumed monthly lapse rate · "
@@ -545,7 +519,6 @@ def build_report(F: dict) -> dict:
                                        "Sum(impact_sensitivity.High case ($M))": SERIES})))
     pages.append(p)
 
-    # 9 ── Creator virality
     p = Page("Creator Virality (Real)")
     header(p, "Creator insights · real data", "What makes content spread",
            f"UCI news · ordered retrospective benchmark · AUC {vir['auc_lightgbm']:.3f} "

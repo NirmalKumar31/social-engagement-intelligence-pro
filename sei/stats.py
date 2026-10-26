@@ -1,8 +1,4 @@
-"""Reusable experimentation statistics.
-
-Every estimator returns plain dicts so results flow straight into tables, dashboards and Power BI.
-Unit tests in tests/test_stats.py check calibration (A/A false-positive rates, CI coverage).
-"""
+"""Experiment statistics. Every function returns a plain dict."""
 from __future__ import annotations
 
 import numpy as np
@@ -13,12 +9,7 @@ Z = stats.norm.ppf(0.975)
 
 
 def welch(y_t: np.ndarray, y_c: np.ndarray, alpha: float = 0.05) -> dict:
-    """Difference in means: unpooled (Welch) standard error with a large-sample normal reference.
-
-    Normal critical values and tail probabilities are used instead of Welch-Satterthwaite degrees of
-    freedom; at the ~20K-per-arm sizes here the difference is negligible. Requires >=2 rows per arm.
-    Relative lift CI is a delta-method interval for (mean_t / mean_c - 1), independent groups.
-    """
+    """Difference in means with an unpooled SE and a normal reference (fine at these sample sizes)."""
     y_t, y_c = np.asarray(y_t, float), np.asarray(y_c, float)
     if len(y_t) < 2 or len(y_c) < 2:
         raise ValueError("welch() needs at least two observations per arm")
@@ -28,7 +19,6 @@ def welch(y_t: np.ndarray, y_c: np.ndarray, alpha: float = 0.05) -> dict:
     z = stats.norm.ppf(1 - alpha / 2)
     p = 2 * stats.norm.sf(abs(diff / se)) if se > 0 else 1.0
     rel = diff / mc if mc else np.nan
-    # Var(mt/mc) by the delta method (independent groups)
     rel_se = np.sqrt(vt / mc**2 + vc * mt**2 / mc**4) if mc else np.nan
     return {"mean_control": mc, "mean_treatment": mt, "diff": diff, "se": se,
             "ci_low": diff - z * se, "ci_high": diff + z * se, "p_value": p,
@@ -42,15 +32,7 @@ def cuped_theta(y: np.ndarray, x: np.ndarray) -> float:
 
 
 def cuped(y_t, y_c, x_t, x_c, alpha: float = 0.05) -> dict:
-    """CUPED (Deng et al. 2013): regress out a pre-period covariate with a pooled theta.
-
-    Estimands
-      diff      = mean(adj_t) - mean(adj_c), the variance-reduced absolute effect
-      rel_lift  = diff / mean_control_raw, i.e. the absolute effect relative to the RAW control mean.
-                  Its delta-method SE accounts for the dependence between the adjusted difference and
-                  the raw control mean (both are computed from the same control users).
-    Raw and adjusted arm means are reported under separate names.
-    """
+    """CUPED-adjusted difference. rel_lift is relative to the raw control mean."""
     y_t, y_c, x_t, x_c = (np.asarray(a, float) for a in (y_t, y_c, x_t, x_c))
     y = np.concatenate([y_t, y_c]); x = np.concatenate([x_t, x_c])
     theta = cuped_theta(y, x)
@@ -64,7 +46,7 @@ def cuped(y_t, y_c, x_t, x_c, alpha: float = 0.05) -> dict:
     nc = len(y_c)
     var_diff = out["se"] ** 2
     var_mc = y_c.var(ddof=1) / nc
-    cov_diff_mc = -np.cov(adj_c, y_c, ddof=1)[0, 1] / nc     # Cov(mean_t_adj - mean_c_adj, mean_c_raw)
+    cov_diff_mc = -np.cov(adj_c, y_c, ddof=1)[0, 1] / nc  # Cov(adjusted diff, raw control mean)
     d = out["diff"]
     rel = d / mc_raw
     rel_var = var_diff / mc_raw**2 + d**2 * var_mc / mc_raw**4 - 2 * d * cov_diff_mc / mc_raw**3
@@ -77,11 +59,7 @@ def cuped(y_t, y_c, x_t, x_c, alpha: float = 0.05) -> dict:
 
 
 def ratio_metric(num_t, den_t, num_c, den_c, alpha: float = 0.05) -> dict:
-    """Ratio-of-sums metric (e.g. CTR = clicks / impressions) with delta-method variance.
-
-    Randomisation is per user, so a per-event t-test would understate variance; the delta method
-    treats each user as the unit of analysis.
-    """
+    """Ratio-of-sums metric (e.g. CTR) with delta-method variance, users as the unit."""
     def _ratio(num, den):
         num, den = np.asarray(num, float), np.asarray(den, float)
         n = len(num); mn, md = num.mean(), den.mean()
@@ -102,7 +80,7 @@ def ratio_metric(num_t, den_t, num_c, den_c, alpha: float = 0.05) -> dict:
 
 
 def poisson_bootstrap_quantile(y_t, y_c, q: float = 0.5, n_boot: int = 500, seed: int = 0) -> dict:
-    """Poisson bootstrap CI for a difference in quantiles (scales to large n, streaming-friendly)."""
+    """Poisson bootstrap CI for a difference in quantiles."""
     rng = np.random.default_rng(seed)
     y_t, y_c = np.sort(np.asarray(y_t, float)), np.sort(np.asarray(y_c, float))
 
@@ -150,13 +128,9 @@ def mde(sd: float, n_per_arm: int, alpha: float = 0.05, power: float = 0.8,
 
 
 def msprt_pvalue(diffs: np.ndarray, ses: np.ndarray, tau2: float) -> np.ndarray:
-    """Normal-mixture SPRT p-values (Johari et al. 2017) applied to running estimates.
+    """Mixture-SPRT p-values (Johari et al. 2017).
 
-    diffs/ses are the running estimate and its SE at each look; tau2 is the mixing-prior variance and
-    must be fixed in advance (not estimated from later looks). The exact always-valid guarantee holds
-    for i.i.d. normal increments with known variance. Applied to cumulative averages of the SAME users
-    over time (this experiment), it is an approximation; experiment.sequential() reports a
-    re-randomisation null diagnostic on the actual data rather than asserting a guarantee.
+    tau2 must be fixed in advance. Exact for i.i.d. normal increments, approximate for repeated users.
     """
     diffs, ses = np.asarray(diffs, float), np.asarray(ses, float)
     v = ses**2
@@ -172,7 +146,7 @@ def bayes_normal(diff: float, se: float, prior_sd: float | None = None) -> dict:
         w = prior_sd**2 / (prior_sd**2 + se**2)
         post_mean, post_sd = w * diff, np.sqrt(w) * se
     p_better = stats.norm.sf(0, loc=post_mean, scale=post_sd)
-    # Expected loss of shipping = E[max(0, -delta)]
+    # Expected loss of shipping: E[max(0, -delta)]
     z = post_mean / post_sd
     exp_loss = post_sd * stats.norm.pdf(z) - post_mean * stats.norm.cdf(-z)
     return {"post_mean": post_mean, "post_sd": post_sd, "p_better": p_better,

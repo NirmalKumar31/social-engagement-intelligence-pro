@@ -1,10 +1,9 @@
-"""Central configuration: paths, simulation parameters, and business assumptions."""
+"""Paths, simulation settings and business assumptions."""
 import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-# SEI_WORKDIR redirects every generated artefact (data, reports, Power BI export) so fixture / CI runs never
-# overwrite the real outputs. Downloaded public datasets stay shared under ROOT/data/external.
+# SEI_WORKDIR lets fixture and CI runs write somewhere other than the real outputs.
 WORK = Path(os.environ.get("SEI_WORKDIR", ROOT)).resolve()
 DATA = WORK / "data"
 RAW = DATA / "raw"
@@ -20,11 +19,10 @@ for _p in (RAW, PROCESSED, FIGURES, TABLES, POWERBI):
 
 SEED = 20261024
 
-# Experiment design
 N_USERS = int(os.environ.get("SEI_N_USERS", 60_000))
-PRE_DAYS = 14            # days -14..-1: pre-period (used for CUPED + balance checks)
-EXP_DAYS = 28            # days 0..27: experiment
-START_DATE = "2026-08-03"  # day 0 (a Monday)
+PRE_DAYS = 14              # days -14..-1
+EXP_DAYS = 28              # days 0..27
+START_DATE = "2026-08-03"  # day 0
 ARMS = ["control", "ai_feed", "ai_feed_social"]
 ARM_LABELS = {
     "control": "Control (ranked-chronological)",
@@ -33,39 +31,33 @@ ARM_LABELS = {
 }
 TREATMENTS = ["ai_feed", "ai_feed_social"]
 ALPHA = 0.05
-CHURN_WINDOW = 7         # churned = no activity in the final 7 experiment days
+CHURN_WINDOW = 7           # churned = inactive for the last 7 days
 
-# Business assumptions (all configurable, used by the impact model)
-MAU_POPULATION = 40_000_000   # users eligible for rollout
+# Business assumptions
+MAU_POPULATION = 40_000_000
 ANNUAL_DAYS = 365
-LTV_PER_RETAINED_USER = 38.0  # USD, 12-month net ad revenue of an average retained user
-RETENTION_CAMPAIGN_COST = 0.60   # USD per targeted user (push + incentive)
-RETENTION_CAMPAIGN_SAVE_RATE = 0.18  # share of true churners saved when targeted
+LTV_PER_RETAINED_USER = 38.0         # USD per retained user per year
+RETENTION_CAMPAIGN_COST = 0.60       # USD per targeted user
+RETENTION_CAMPAIGN_SAVE_RATE = 0.18  # assumed, not measured
+MONTHLY_BASE_CHURN = 0.035
 
-# Palette (validated categorical slots 1-3, see reports/README_palette note)
 ARM_COLORS = {"control": "#2a78d6", "ai_feed": "#eb6834", "ai_feed_social": "#1baf7a"}
 INK = {"primary": "#0b0b0b", "secondary": "#52514e", "muted": "#898781",
        "grid": "#e1e0d9", "axis": "#c3c2b7", "surface": "#fcfcfb"}
 STATUS = {"good": "#0ca30c", "warning": "#fab219", "serious": "#ec835a", "critical": "#d03b3b"}
 SEQ_BLUE = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
-MONTHLY_BASE_CHURN = 0.035    # platform-wide monthly churn of mature users (measured HRs scale it)
-MC_DRAWS = 20_000
 
-# Power BI reads its CSVs from here (raw.githubusercontent.com/<this path><table>.csv)
 GITHUB_DATA_PATH = "NirmalKumar31/social-engagement-intelligence-pro/main/powerbi/data/"
 
-# ---------------------------------------------------------------- launch decision rule (see sei/decision.py)
-# Non-inferiority margins on the RELATIVE change of each guardrail, in its harmful direction.
-# Disclosure: these margins were written on 2026-10-25, AFTER the first analysis had been seen (prompted by
-# an external audit). A real experiment program must fix them before unblinding.
+# Margins are on the relative change in the harmful direction. They were set after the first analysis was seen.
 PRIMARY_METRIC = "minutes"
 GUARDRAILS = {
-    # metric: (harmful direction, relative margin, severity)
+    # metric: (harmful direction, margin, severity)
     "churned": ("increase", 0.03, "critical"),
     "friend_interactions": ("decrease", 0.03, "standard"),
     "neg_feedback_rate": ("increase", 0.05, "standard"),
     "ad_ctr": ("decrease", 0.03, "standard"),
 }
-GUARDRAIL_FAMILY_ALPHA = 0.05   # Bonferroni across all guardrail x arm comparisons, one-sided
+GUARDRAIL_FAMILY_ALPHA = 0.05  # one-sided, Bonferroni across guardrails x arms
 SYNTHETIC_NOTICE = ("SYNTHETIC DATA: the experiment is simulated (sei/simulate.py); only the NLP and virality "
                     "modules use real public data. Numbers illustrate methods, not a real product.")

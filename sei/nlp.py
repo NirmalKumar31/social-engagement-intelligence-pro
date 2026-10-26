@@ -1,13 +1,4 @@
-"""Content intelligence on REAL text (TweetEval sentiment, ~60K labelled tweets).
-
-1. Sentiment model: TF-IDF word+char n-grams + logistic regression, tuned on the official
-   validation split, scored on the official test split, benchmarked against VADER.
-2. Topic discovery: NMF on TF-IDF over the full corpus.
-3. Feed-exposure SCENARIO: each arm's ASSUMED ranker (topic concentration + a hand-set preference for
-   high-arousal posts) serves real held-out posts to sampled users. The harms it shows are built into those
-   assumed weights, not learned from real engagement data, so results are reported with a weight
-   sensitivity sweep. "Negative sentiment" is not the same as toxicity or polarisation.
-"""
+"""Sentiment model and topics on TweetEval, plus a feed-exposure scenario under assumed ranker weights."""
 from __future__ import annotations
 
 import json
@@ -72,7 +63,6 @@ def sentiment_model(d) -> tuple[dict, object]:
     metrics.to_csv(C.TABLES / "sentiment_model_metrics.csv", index=False)
     cm = pd.DataFrame(confusion_matrix(y, pred, normalize="true"), index=LABELS, columns=LABELS)
     cm.to_csv(C.TABLES / "sentiment_confusion_matrix.csv")
-    # Probabilities for the whole corpus, used by the exposure simulation
     corpus = pd.concat(d.values(), ignore_index=True)
     Xall = sparse.hstack([word.transform(corpus.clean), char.transform(corpus.clean)]).tocsr()
     proba = model.predict_proba(Xall)
@@ -104,21 +94,21 @@ def topics(corpus: pd.DataFrame) -> pd.DataFrame:
     return info
 
 
-RANKERS = {"control": (0.6, 0.0), "ai_feed": (2.2, 2.2), "ai_feed_social": (1.4, 0.8)}   # (concentration, engagement weight)
+RANKERS = {"control": (0.6, 0.0), "ai_feed": (2.2, 2.2), "ai_feed_social": (1.4, 0.8)}  # (concentration, engagement weight)
 
 
 def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impressions: int = 150,
                         rankers: dict | None = None, save_outputs: bool = True) -> pd.DataFrame:
-    """Serve real held-out posts to sampled users under each arm's ASSUMED ranking objective."""
+    """Serve held-out posts to sampled users under each arm's assumed ranker."""
     rng = np.random.default_rng(C.SEED)
     rankers = rankers or RANKERS
     users = pd.read_parquet(C.RAW / "users.parquet")
     users = users[users.arm.isin(list(rankers))]
     sample = users.groupby("arm", group_keys=False).apply(lambda g: g.sample(min(n_users_per_arm, len(g)), random_state=0))
-    # Only posts from the TweetEval test split: the sentiment model never trained on them
+    # Test-split posts only, so the sentiment model never saw them
     items = corpus[(corpus.topic_strength > 0) & (corpus.split == "test")].reset_index(drop=True)
     topic_items = [np.flatnonzero(items.topic_id.values == k) for k in range(N_TOPICS)]
-    # ASSUMED engagement score: the scenario posits that high-arousal (negative) posts draw more reactions
+    # Assumption: negative posts draw more reactions
     eng_score = 0.9 * items.p_negative.values + 0.3 * items.p_positive.values
     rows, topic_rows = [], []
     for _, u in sample.iterrows():
@@ -169,7 +159,7 @@ def exposure_simulation(corpus: pd.DataFrame, n_users_per_arm: int = 3000, impre
 
 
 def exposure_sensitivity(corpus: pd.DataFrame) -> pd.DataFrame:
-    """How much of the AI-feed exposure result is driven by the assumed weights?"""
+    """Rerun the AI-feed scenario over a grid of ranker weights."""
     rows = []
     for conc in (0.6, 1.4, 2.2):
         for w in (0.0, 0.8, 1.5, 2.2, 3.0):

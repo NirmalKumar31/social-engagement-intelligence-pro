@@ -1,4 +1,4 @@
-"""Shared matplotlib style: recessive chrome, thin marks, validated arm palette."""
+"""Shared matplotlib style."""
 import matplotlib
 
 matplotlib.use("Agg")

@@ -1,8 +1,4 @@
-"""Static validation of the generated Power BI report (no Power BI engine needed).
-
-Every visual field, visual filter value, colour selector and DAX column reference must exist in the exported model and
-data; visuals must stay on the 1280x720 canvas and must not overlap (except 4px accent strips drawn on cards).
-"""
+"""Static checks of the generated Power BI report."""
 import json
 import re
 
@@ -78,7 +74,7 @@ def test_layout_on_canvas_without_overlaps(visuals):
         x, y, w, h = v["x"], v["y"], v["width"], v["height"]
         assert x >= 0 and y >= 0 and x + w <= 1280.5 and y + h <= 720.5, f"{page}: {sv['visualType']} off canvas"
         if sv["visualType"] == "textbox" and w <= 6:
-            continue                                   # accent strip, drawn on top of a card on purpose
+            continue  # accent strips sit on top of cards
         for (bx, by, bw, bh, bt) in by_page.get(page, []):
             overlap = x < bx + bw - 0.5 and bx < x + w - 0.5 and y < by + bh - 0.5 and by < y + h - 0.5
             assert not overlap, f"{page}: {sv['visualType']} overlaps {bt}"

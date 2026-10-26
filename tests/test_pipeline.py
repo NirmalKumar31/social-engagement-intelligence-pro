@@ -1,4 +1,4 @@
-"""Data-contract tests on pipeline outputs (run after `make all`)."""
+"""Checks on pipeline outputs (run the pipeline first)."""
 import pandas as pd
 import pytest
 

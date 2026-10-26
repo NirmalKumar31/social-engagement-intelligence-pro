@@ -1,8 +1,4 @@
-"""Run the full pipeline end to end:  python -m sei.pipeline [--skip-nlp] [--llm]
-
-Writes reports/run_manifest.json tying every output to one run: git commit (and whether the tree was dirty),
-configuration, package versions, input-file hashes, stages run, and output-file hashes.
-"""
+"""Run the whole pipeline and write a run manifest: python -m sei.pipeline [--skip-nlp] [--llm]"""
 import argparse
 import hashlib
 import json
@@ -48,7 +44,7 @@ def write_manifest(stages: list[dict], started: str):
                and p.name != "run_manifest.json"}
     manifest = {"started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "git_commit": _git("rev-parse", "HEAD"),
-                # dirty = uncommitted changes to SOURCE (generated outputs are expected to differ during a run)
+                # outputs change during a run, so only source files count as dirty
                 "git_source_dirty": bool(_git("status", "--porcelain", "--", *SOURCE_PATHS)),
                 "python": platform.python_version(), "packages": {p: metadata.version(p) for p in PACKAGES},
                 "config": config_fingerprint(), "workdir": str(C.WORK), "stages": stages,
@@ -62,7 +58,6 @@ def main():
     ap.add_argument("--skip-nlp", action="store_true", help="reuse NLP outputs from a previous run with the same config")
     ap.add_argument("--llm", action="store_true", help="also generate a Claude-polished executive brief")
     args = ap.parse_args()
-    # Silence only known-noisy third-party categories; analysis warnings stay visible.
     for cat in (FutureWarning, DeprecationWarning, UserWarning):
         warnings.filterwarnings("ignore", category=cat)
     if args.skip_nlp:

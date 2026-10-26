@@ -1,4 +1,4 @@
-"""Roll the event log up to the user grain used by every downstream analysis."""
+"""Roll the event log up to one row per user."""
 from __future__ import annotations
 
 import pandas as pd
@@ -26,9 +26,9 @@ def _window(daily: pd.DataFrame, lo: int, hi: int, prefix: str) -> pd.DataFrame:
 def build_user_table(users: pd.DataFrame, daily: pd.DataFrame) -> pd.DataFrame:
     pre = _window(daily, -C.PRE_DAYS, -1, "pre_")
     exp = _window(daily, 0, C.EXP_DAYS - 1, "exp_")
-    late = _window(daily, C.EXP_DAYS // 2, C.EXP_DAYS - 1, "late_")  # late window (days 14-27), used as a post-novelty proxy
+    late = _window(daily, C.EXP_DAYS // 2, C.EXP_DAYS - 1, "late_")  # days 14-27
     df = users.set_index("user_id").join(pre).join(exp).join(late).fillna(0).reset_index()
-    # Per-day normalised metrics: inactive days count as zero (intent-to-treat)
+    # Inactive days count as zero (intent-to-treat)
     for c in COUNT_COLS + ["active_days", "friend_interactions"]:
         df[f"pre_{c}_per_day"] = df[f"pre_{c}"] / C.PRE_DAYS
         df[f"exp_{c}_per_day"] = df[f"exp_{c}"] / C.EXP_DAYS

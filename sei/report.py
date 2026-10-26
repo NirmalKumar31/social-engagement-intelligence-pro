@@ -1,9 +1,4 @@
-"""Executive decision memo.
-
-Always writes a deterministic memo built directly from the analysis outputs and the decision rule
-(so every number and the recommendation itself are traceable). With `--llm`, Claude rewrites it into a polished narrative; if no credentials are
-configured, or the call fails, the deterministic memo stands on its own.
-"""
+"""Executive memo built from the results. --llm also writes a Claude-polished version."""
 from __future__ import annotations
 
 import argparse
@@ -174,7 +169,7 @@ def llm_polish(memo: str) -> str | None:
     except anthropic.APIStatusError as e:
         print(f"LLM polish skipped (API {e.status_code}): {e}")
         return None
-    except TypeError as e:  # no credentials resolved at all
+    except TypeError as e:  # no credentials at all
         print(f"LLM polish skipped: {e}")
         return None
     if response.stop_reason == "refusal":
