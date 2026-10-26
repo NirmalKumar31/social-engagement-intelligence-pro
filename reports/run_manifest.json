@@ -1,7 +1,7 @@
 {
-  "started_utc": "2026-10-25T23:50:21+00:00",
-  "finished_utc": "2026-10-25T23:55:48+00:00",
-  "git_commit": "89aca994dd6210ca6e604a49fec8f4bfaa43d435",
+  "started_utc": "2026-10-26T00:44:04+00:00",
+  "finished_utc": "2026-10-26T00:49:55+00:00",
+  "git_commit": "8a0e20e7e52d87e85e17e830c0de49d73c58d2ad",
   "git_source_dirty": false,
   "python": "3.12.3",
   "packages": {
@@ -50,42 +50,42 @@
     {
       "stage": "simulate",
       "status": "ran",
-      "seconds": 2.3
+      "seconds": 2.1
     },
     {
       "stage": "features",
       "status": "ran",
-      "seconds": 0.9
+      "seconds": 0.7
     },
     {
       "stage": "experiment",
       "status": "ran",
-      "seconds": 8.6
+      "seconds": 9.2
     },
     {
       "stage": "oracle",
       "status": "ran",
-      "seconds": 78.9
+      "seconds": 96.8
     },
     {
       "stage": "hte",
       "status": "ran",
-      "seconds": 28.7
+      "seconds": 30.5
     },
     {
       "stage": "retention",
       "status": "ran",
-      "seconds": 39.0
+      "seconds": 37.7
     },
     {
       "stage": "nlp",
       "status": "ran",
-      "seconds": 120.4
+      "seconds": 126.4
     },
     {
       "stage": "virality",
       "status": "ran",
-      "seconds": 14.7
+      "seconds": 14.0
     },
     {
       "stage": "impact",
@@ -95,7 +95,7 @@
     {
       "stage": "powerbi",
       "status": "ran",
-      "seconds": 30.6
+      "seconds": 30.8
     },
     {
       "stage": "report",
@@ -112,9 +112,9 @@
   },
   "outputs_sha256_16": {
     "reports/EXECUTIVE_MEMO.md": "7dfd5042151b5238",
-    "reports/experiment_summary.json": "7951e20ab3b3d18c",
+    "reports/experiment_summary.json": "66a050a30f4d41e2",
     "reports/hte_summary.json": "2cae75268aa55f82",
-    "reports/impact_summary.json": "ff126ed398217395",
+    "reports/impact_summary.json": "13114c46b01c6a74",
     "reports/nlp_summary.json": "a07164a4cc48cbee",
     "reports/policy_tree_rules.txt": "7d8803642303df98",
     "reports/retention_summary.json": "a6b42e2acd9b6723",

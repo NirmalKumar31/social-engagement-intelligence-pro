@@ -184,7 +184,7 @@
         ]
       }
     },
-    "rule": "Launch decision rule: turns metric results into a recommendation instead of hard-coding one.\n\nPrimary metric\n  WIN        BH-adjusted p < alpha and the effect is in the good direction\nGuardrails (non-inferiority, one-sided, Bonferroni across every guardrail x arm comparison)\n  PASS          the harm-side confidence bound is inside the margin (harm larger than the margin ruled out)\n  FAIL          the whole confidence interval lies beyond the margin (harm larger than the margin shown)\n  INCONCLUSIVE  otherwise; non-significance is never treated as proof of safety\nArm decision\n  DO NOT LAUNCH   primary not a win, or a critical guardrail is not PASS\n  CONDITIONAL     primary win, critical guardrails PASS, a standard guardrail FAIL/INCONCLUSIVE:\n                  launch only with a named mitigation and a guardrail monitor on the ramp\n  LAUNCH          primary win and every guardrail PASS",
+    "rule": "guardrail non-inferiority, Bonferroni-adjusted",
     "z_guardrail": 2.497705474412374,
     "n_guardrail_tests": 8,
     "recommended_arm": "ai_feed_social",
