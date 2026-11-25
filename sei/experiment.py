@@ -359,9 +359,12 @@ def figures(res, dyn, seq, seg, bal_path=C.TABLES / "balance_smd.csv"):
         ax.plot(a.day, a.p_naive, color=C.ARM_COLORS[arm], lw=1.2, alpha=0.5, label=f"{lab[arm]} · naive")
     ax.axhline(0.05, color=C.STATUS["critical"], lw=1)
     ax.text(27, 0.06, "α = 0.05", color=C.INK["secondary"], ha="right")
-    ax.set_yscale("log"); ax.set_ylim(1e-12, 1.2)
-    ax.set(xlabel="Experiment day", ylabel="p-value (log scale)", title="Sequential monitoring: naive vs mixture-SPRT p-values (approximation)")
-    ax.legend(fontsize=8, loc="lower left")
+    ax.set_yscale("log")
+    positive_p = seq[["p_naive", "p_mixture"]].where(lambda x: x > 0).min().min()
+    lower = max(np.nextafter(0.0, 1.0), positive_p / 10) if np.isfinite(positive_p) else 1e-12
+    ax.set_ylim(lower, 1.2)
+    ax.set(xlabel="Experiment day", ylabel="p-value (log scale)", title="How the evidence changed during the test")
+    ax.legend(fontsize=8, loc="upper right")
     save(fig, "03_sequential_monitoring")
 
     fig, ax = plt.subplots(figsize=(10, 4.5))

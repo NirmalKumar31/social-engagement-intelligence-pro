@@ -9,7 +9,7 @@ from . import config as C
 from .narrative import facts, musd
 
 
-def build_memo() -> tuple[str, dict]:
+def build_technical_report() -> tuple[str, dict]:
     F = facts()
     ex, ret, imp, vir, hte = F["experiment"], F["survival"], F["impact"], F["virality"], F["hte"]
     d = ex["design"]
@@ -141,6 +141,112 @@ shared control). "Share of draws > 0" is a fraction of simulations under these a
     return memo, F
 
 
+
+def recommendation(F: dict) -> str:
+    arm = F["recommended_arm"]
+    if arm is None:
+        return "Keep the original feed and improve the alternatives before another test."
+    name = C.ARM_LABELS[arm]
+    if F["state"] == "LAUNCH":
+        return f"Recommend {name}: activity improved and all decision checks passed."
+    issues = ", ".join(F["label"][m] for m in F["decision"]["arms"][arm]["mitigations_required"])
+    return f"Consider a limited rollout of {name} after addressing {issues}, with continued monitoring."
+
+
+def build_memo() -> tuple[str, dict]:
+    F = facts()
+    L = F["lift"]
+    def row(metric, label):
+        a = L[("ai_feed", metric)].rel_lift
+        b = L[("ai_feed_social", metric)].rel_lift
+        return f"| {label} | {a:+.1%} | {b:+.1%} |"
+    nov = F["experiment"]["novelty"]["ai_feed"]
+    memo = f"""# Social Feed Experiment
+
+> {F['notice']}
+
+## The question
+
+Which feed increases activity while supporting continued participation?
+
+The comparison uses {C.N_USERS:,} simulated users, {C.PRE_DAYS} days of prior activity,
+and a {C.EXP_DAYS}-day experiment. The original feed is the comparison group.
+
+## What changed
+
+| Measure, relative to the original feed | AI feed | AI + friend boost |
+|---|---:|---:|
+{row('minutes', 'Time spent per user')}
+{row('churned', 'Inactive during the final week')}
+{row('friend_interactions', 'Interactions with friends')}
+{row('neg_feedback_rate', 'Negative feedback per 100 minutes')}
+
+![Feed comparison](figures/00_project_summary.png)
+
+## Recommendation: {F['state']}
+
+{recommendation(F)}
+
+The pure AI feed increased activity but also increased inactivity. Friend boost offered
+a better balance, while negative feedback remained a concern.
+
+## What I checked next
+
+- **Over time:** the AI feed's activity improvement declined from {nov['week1_lift']:.1%}
+  in week one to {nov['week4_lift']:.1%} in week four. Long-term fitted values are extrapolations.
+- **Across people:** group-level comparisons show who was affected; they do not establish
+  an individual person's response.
+- **Personalized assignment:** the analysis did not demonstrate a gain over giving everyone friend boost.
+- **Data and uncertainty:** allocation, prior behavior, and uncertainty were checked before interpreting the results.
+
+## Limitations and next steps
+
+This is a simulation. Inactivity is an observable seven-day lapse, not confirmed permanent departure.
+The decision thresholds were chosen after seeing the initial analysis. A new experiment should
+set its outcomes and thresholds in advance and retain a comparison group for longer follow-up.
+
+Financial and content-ranking examples depend on assumptions. They are not observed revenue
+or measured effects of a real platform.
+
+[Chart guide](CHART_GUIDE.md) · [Full methods and results](TECHNICAL_REPORT.md)
+"""
+    return memo, F
+
+
+def build_summary_chart(F: dict) -> None:
+    import matplotlib.pyplot as plt
+    from .plotting import setup, save
+    setup()
+    labels = [
+        ("minutes", "Time spent per user", "Higher means more activity"),
+        ("churned", "Inactive in the final week", "Lower means fewer inactive users"),
+        ("neg_feedback_rate", "Negative feedback", "Per 100 minutes; lower is better"),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(11.8, 4.2))
+    arms = C.TREATMENTS
+    for ax, (metric, title, note) in zip(axes, labels):
+        rows = [F["lift"][(arm, metric)] for arm in arms]
+        values = [r.rel_lift * 100 for r in rows]
+        lower = [(r.rel_lift - r.rel_ci_low) * 100 for r in rows]
+        upper = [(r.rel_ci_high - r.rel_lift) * 100 for r in rows]
+        ax.bar([0, 1], values, color=[C.ARM_COLORS[a] for a in arms],
+               yerr=[lower, upper], capsize=4, width=.55)
+        ax.axhline(0, color=C.INK["axis"], lw=1)
+        ax.set_xticks([0, 1], ["AI feed", "AI + friends"])
+        ax.set_title(title, fontsize=12)
+        ax.set_ylabel("Change vs original feed (%)")
+        ax.text(.5, -.22, note, ha="center", transform=ax.transAxes, fontsize=9)
+        for i, value in enumerate(values):
+            ax.annotate(f"{value:+.1f}%", (i, value), xytext=(0, 9 if value >= 0 else -16),
+                        textcoords="offset points", ha="center", fontsize=11)
+        ax.margins(y=.3)
+    fig.suptitle("Feed comparison", x=.02, ha="left", fontsize=17)
+    fig.text(.02, .02, "Simulated experiment. Changes are relative percentages; error bars show 95% intervals.",
+             fontsize=9, color=C.INK["secondary"])
+    fig.tight_layout(rect=[0, .08, 1, .92])
+    save(fig, "00_project_summary")
+
+
 def llm_polish(memo: str) -> str | None:
     try:
         import anthropic
@@ -181,8 +287,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--llm", action="store_true", help="also write a Claude-polished brief")
     args = ap.parse_args()
-    memo, _ = build_memo()
+    memo, F = build_memo()
+    technical, _ = build_technical_report()
     (C.REPORTS / "EXECUTIVE_MEMO.md").write_text(memo)
+    (C.REPORTS / "TECHNICAL_REPORT.md").write_text(technical)
+    build_summary_chart(F)
     print(memo)
     if args.llm:
         polished = llm_polish(memo)

@@ -189,5 +189,14 @@
     "powerbi/data/virality_playbook.csv": "caf0e9d5119d2bfc",
     "powerbi/data/virality_shap_importance.csv": "ad9d21e808057d10",
     "powerbi/data/virality_weekly.csv": "f70152ff3d84c7da"
+  },
+  "presentation_update": {
+    "note": "README, dashboard, report wording and selected figures were simplified using cached results. No analysis was rerun. The outputs_sha256_16 entries above describe the original analysis run; its executive memo is preserved as TECHNICAL_REPORT.md.",
+    "outputs_sha256_16": {
+      "reports/EXECUTIVE_MEMO.md": "298f4c05a2050871",
+      "reports/TECHNICAL_REPORT.md": "7dfd5042151b5238",
+      "reports/figures/00_project_summary.png": "502151259e7dfa57",
+      "reports/figures/03_sequential_monitoring.png": "53dac3f0896df51d"
+    }
   }
 }
